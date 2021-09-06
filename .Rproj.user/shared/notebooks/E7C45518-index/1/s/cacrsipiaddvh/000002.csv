@@ -1,4 +1,0 @@
-"0","sample %>% "
-"0","  summarise(events = sum(bad_flag == 1), "
-"0","            non_events = sum(bad_flag == 0)) %>% "
-"0","  mutate(event_rate = events/(events + non_events))"

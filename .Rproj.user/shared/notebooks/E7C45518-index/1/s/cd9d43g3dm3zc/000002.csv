@@ -1,8 +1,0 @@
-"0","# Start with the test dataset and start to summarise"
-"0","gains_table <- test %>% "
-"0","  group_by(bins) %>% "
-"0","  summarise(total = n(), "
-"0","            events = sum(bad_flag == 1), "
-"0","            non_events = sum(bad_flag == 0))"
-"0",""
-"0","head(gains_table)"
