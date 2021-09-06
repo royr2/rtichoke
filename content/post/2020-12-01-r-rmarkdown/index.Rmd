@@ -3,9 +3,10 @@ title: "Measuring model performance using a gains table"
 subtitle: "Credit scoring series (Part 1)"
 summary: "How to create a gains table to measure the performance of a binary classification model"
 author: "royr2"
-date: 2020-06-01
+date: 2021-09-06
 categories: ["R", "Credit Risk Analytics"]
-tags: ["R", "dplyr", "credit scoring", "credirt risk"]
+tags: ["R", "dplyr", "credit scoring", "credirt risk"]  
+comments: true
 ---
 
 ```{r setup, include=FALSE}
@@ -38,7 +39,7 @@ p_load(dplyr, magrittr, knitr, scales)
 
 Here's some sample data to play around with. The data set is small sample of the **Lending Club** dataset available on [kaggle](https://www.kaggle.com/wordsforthewise/lending-club).
 
-The file is available for download [here](https://github.com/royr2/blog/download).
+The file is available for download [here](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/royr2/blog/tree/main/download/credit_sample.csv).
 
 ```{r echo = F}
 sample <- read.csv("/Github/royr2/download/credit_sample.csv")
