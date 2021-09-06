@@ -39,10 +39,10 @@ p_load(dplyr, magrittr, knitr, scales)
 
 Here's some sample data to play around with. The data set is small sample of the **Lending Club** dataset available on [kaggle](https://www.kaggle.com/wordsforthewise/lending-club).
 
-The file is available for download [here](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/royr2/blog/tree/main/download/credit_sample.csv).
+The file is available for download [here](https://github.com/royr2/blog/blob/main/download/credit_sample.csv).
 
 ```{r echo = F}
-sample <- read.csv("/Github/royr2/download/credit_sample.csv")
+sample <- read.csv("../../../download/credit_sample.csv")
 ```
 
 ```{r eval = F}

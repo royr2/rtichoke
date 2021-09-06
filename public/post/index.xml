@@ -13,7 +13,7 @@
       <pubDate>Mon, 01 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>/post/2020-12-01-r-rmarkdown/</guid>
-      <description>Modelers/analysts developing credit scores generally use something known as the gains table (or a ks table) to measure and quantify the performance of such models.</description>
+      <description>How to create a gains table to measure the performance of a binary classification model</description>
     </item>
     
   </channel>

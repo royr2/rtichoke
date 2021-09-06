@@ -1,10 +1,12 @@
 ---
 title: "Measuring model performance using a gains table"
 subtitle: "Credit scoring series (Part 1)"
+summary: "How to create a gains table to measure the performance of a binary classification model"
 author: "royr2"
-date: 2020-06-01
+date: 2021-09-06
 categories: ["R", "Credit Risk Analytics"]
-tags: ["R", "dplyr", "credit scoring", "credirt risk"]
+tags: ["R", "dplyr", "credit scoring", "credirt risk"]  
+comments: true
 ---
 
 ```{r setup, include=FALSE}
@@ -15,17 +17,16 @@ Modelers/analysts developing credit scores generally use something known as the 
 
 The idea is simple - discretise the population under consideration (say the testing or validation set) into groups based on the model's output (probability/log odds/scores). Typically, this is done in a way such that each group represents 10% of the total population (or deciles). Post which summary statistics are generated for each group and  cumulative distributions of events and non-events are analysed. 
 
-I'll show how to dow this using `dplyr` syntax. I recommend doing it this way since it's easier to read and if you are using `sparklyr` (say within a Hadoop + Spark setup), you don't need to make any changes to the code.
+We'll explore how to create a gains table using `dplyr`. I recommend doing it this way since it's easier to read and the code would need minimal changes if using `sparklyr` (say within a big data environment where you might need to run this code directly on a *hadoop* table).
 
 
 ## Packages
-Let's get package installation out of the way first
+Let's get package installation out of the way first.
 
 ```{r eval = F}
 # Pacman is a package management tool 
 install.packages("pacman")
 ```
-
 
 ```{r message = F}
 library(pacman)
@@ -36,9 +37,9 @@ p_load(dplyr, magrittr, knitr, scales)
 
 ## Sample dataset
 
-Here's some sample data to play around with. The data set is small sample of the `Lending Club dataset` available on [kaggle](https://www.kaggle.com/wordsforthewise/lending-club).
+Here's some sample data to play around with. The data set is small sample of the **Lending Club** dataset available on [kaggle](https://www.kaggle.com/wordsforthewise/lending-club).
 
-The file is available for download [here]({{site.url}}/download).
+The file is available for download [here](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/royr2/blog/tree/main/download/credit_sample.csv).
 
 ```{r echo = F}
 sample <- read.csv("/Github/royr2/download/credit_sample.csv")
@@ -57,7 +58,7 @@ class(sample)
 ```
 
 ## Defining a target
-First, let's create a target to model for.
+First, we need to create a target (outcome) to model for. Since this is a credit risk use case, we are looking to create a target which identifies borrowers who defaulted on (or missed) their payments consecutively.
 
 ```{r}
 unique(sample$loan_status)
@@ -69,12 +70,12 @@ unique(sample$loan_status)
 # 2. "Does not meet the credit policy. Status:Charged Off"
 codes <- c("Charged Off", "Does not meet the credit policy. Status:Charged Off")
 
-# For details on the %<>% operator please look at the dcumentation for the magrittr 
-# package. 
+# For details on the %<>% operator please look at the 
+# documentation for the magrittr package. 
 sample %<>% mutate(bad_flag = ifelse(loan_status %in% codes, 1, 0))
 ```
 
-Let's also check for the overall event rates.
+Let's also check for overall event rates.
 ```{r}
 sample %>% 
   summarise(events = sum(bad_flag == 1), 
@@ -83,7 +84,7 @@ sample %>%
 ```
 
 ## Building a model
-Next lets build a quick and dirty model, the output of which we will use to build the `gains table`.
+Next lets build a quick and dirty model, the output of which we will use to build the gains table.
 
 ```{r eval = F}
 # Check out available features (not shown here for brevity)
@@ -122,8 +123,8 @@ dim(test)
 # Using a GLM model for simplicity
 mdl <- glm(
   formula = bad_flag ~ 
-    loan_amnt + term + mths_since_last_delinq + 
-    home_ownership + pymnt_plan + dti + dti_joint + 
+    loan_amnt + term + mths_since_last_delinq + total_pymnt + 
+    home_ownership + acc_now_delinq + 
     inq_last_6mths + delinq_amnt + 
     mths_since_last_record + mths_since_recent_revol_delinq + 
     mths_since_last_major_derog + mths_since_recent_inq + 
@@ -133,7 +134,7 @@ mdl <- glm(
 )
 ```
 
-While we are here, let's also attach the model predictions to the test dataset.
+While we are at it, let's also attach the model predictions to the test dataset.
 ```{r}
 test$pred <- predict(mdl, newdata = test)
 ```
@@ -147,8 +148,10 @@ The table has a few important components:
 - Cumulative events and non events distributions
 
 ```{r}
-# Bin predictions based on quantiles
+# Discretise predictions based on quantiles
 q <- quantile(test$pred, probs = seq(0, 1, length.out = 11))
+
+# Add bins to test dataset
 test$bins <- cut(test$pred, breaks = q, include.lowest = T, right = T, ordered_result = T)
 ```
 
@@ -161,7 +164,7 @@ levels(test$bins)
 Using the bins we created above, we can now start to put the table together
 
 ```{r}
-# Start with the test dataset and start to summarise
+# Start with the test dataset and summarise
 gains_table <- test %>% 
   group_by(bins) %>% 
   summarise(total = n(), 
@@ -174,7 +177,7 @@ At this point the table should look something like this:
 kable(gains_table)
 ```
 
-Next, we'll add the event rate columns. Let's also make the table presentable - I'll use the `percent()` function in the scales package to show numbers as percentages. 
+Next, we'll add the event rate columns. Let's also make the table presentable - I'll use the `percent()` function in the `scales` package to show numbers as percentages. 
 ```{r}
 gains_table %<>%
   mutate(event_rate = percent(events / total, 0.1, 100))
@@ -182,12 +185,12 @@ gains_table %<>%
 kable(gains_table)
 ```
 
-To this, we'll add some columns quantifying how events and non events are distributed across each bin.
+To this we'll add some columns quantifying how events and non events are distributed across each bin.
 ```{r}
 gains_table %<>%
   mutate(pop_pct = percent(total/sum(total), 0.1, 100), 
          
-         # Not formatting these as percents just yet
+         # Not formatting these as percentages just yet
          c.events_pct = cumsum(events) / sum(events),
          c.non_events_pct = cumsum(non_events) / sum(non_events))
 
@@ -196,18 +199,73 @@ kable(gains_table)
 
 Almost done - we just need a few more columns namely:
 
-- A column computing the difference between the two cumulative distribution columns we computed previously. The maximum value of this column will become the primary performance metric nown as the `KS statistic`.
-- Two additional columns computing the `event capture rates` and the `cumulative event rate`.
+- A column computing the difference between the two cumulative distribution columns we computed previously. The maximum value of this column will become the primary performance metric known as the `KS statistic`.
+- Two additional columns computing the `event capture rate` and the `cumulative event rate`.
 
-```{r results = 'asis'}
+```{r}
 gains_table %<>%
   mutate(ks = round(abs(c.events_pct - c.non_events_pct), 2), 
          cap_rate = percent(cumsum(events)/sum(events), 1, 100), 
          c_event_rate = percent(cumsum(events)/cumsum(total), 0.1, 100), 
          
-         #Finally format the remaining columns
+         # Format pending columns
          c.events_pct = percent(c.events_pct, 0.1, 100),
          c.non_events_pct = percent(c.non_events_pct, 0.1, 100))
-  
+
 kable(gains_table)
 ```
+
+## Creating a function
+Finally, we can encapsulate all of the above code in a single function (our future selves would thank us :smile:). Note that we actually do not need the full test/train dataset, just the actual classes and predicted outcomes (log odds/probability/score).
+
+```{r}
+gains_table <- function(act, pred, increasing = T, nBins = 10){
+  
+  q <- quantile(pred, probs = seq(0, 1, length.out = nBins + 1))
+  bins <- cut(pred, breaks = q, include.lowest = T, right = T, ordered_result = T)
+  
+  df <- data.frame(act, pred, bins)
+  
+  df %>% 
+    
+    group_by(bins) %>% 
+    summarise(total = n(), 
+              events = sum(act == 1), 
+              non_events = sum(act == 0)) %>% 
+    mutate(event_rate = percent(events / total, 0.1, 100)) %>% 
+    
+    # This odd looking format is to ensure that the if-else 
+    # condition is part of the dplyr chain
+    {if(increasing == TRUE){
+      arrange(., bins)
+    }else{
+      arrange(., desc(bins))
+    }} %>% 
+    
+    mutate(pop_pct = percent(total/sum(total), 0.1, 100), 
+           c.events_pct = cumsum(events) / sum(events),
+           c.non_events_pct = cumsum(non_events) / sum(non_events), 
+           ks = round(abs(c.events_pct - c.non_events_pct), 2), 
+           cap_rate = percent(cumsum(events)/sum(events), 1, 100), 
+           c_event_rate = percent(cumsum(events)/cumsum(total), 0.1, 100), 
+           c.events_pct = percent(c.events_pct, 0.1, 100),
+           c.non_events_pct = percent(c.non_events_pct, 0.1, 100))
+}
+```
+
+It is worth noting here that since the capture rate is being computed from **top to bottom**, it is important that the table is arranged in an appropriate manner. That is, when modelling for `bads`, the table should be arrange in **descending** order of the model output (i.e. higher event rates at the top) and vice versa. 
+```{r}
+# Test the function
+tab <- gains_table(test$bad_flag, test$pred, F, 10)
+kable(tab)
+```
+## Interpretation
+Some notes on how to interpret this table:
+
+- Since the first objective of scoring models is to risk-rank borrowers, the first thing to look for is whether or not the event rates are consistently increasing  (or decreasing) across bins. If not, when using the actual model, one might not be able to confidently conclude if borrower A is better (or worse) than borrower B. 
+- If bin sizes are not consistent (in this case ~10%) it would imply that the model is assigning the same output to a lot of borrowers. This could pose issues later on (say when deciding cutoffs). The ideal solution is to add additional variables that can help differentiate between good and bad borrowers. 
+- While the ideal cutoff would be the bin where the `KS` statistic is at its maximum, additonal aspects like capture rates and approcal rates should be taken into account. 
+- Typically, analysts would look for a model which achieves the maximum calue of the `KS` statistic within the first 2/3 deciles. That way, when creating underwriting policies, you would only end up rejecting 20%-30% of the applicant pool.
+
+
+*Thoughts? Comments? Helpful? Not helpful? Like to see anythnig else added in here? Let me know!*
