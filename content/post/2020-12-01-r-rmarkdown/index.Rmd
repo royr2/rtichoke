@@ -263,7 +263,7 @@ tab <- gains_table(test$bad_flag, test$pred, F, 10)
 kable(tab)
 ```
 ## Interpretation
-Some notes on how to interpret this table:
+Some notes on how to interpret a gains table:
 
 - Since the first objective of scoring models is to risk-rank borrowers, the first thing to look for is whether or not the event rates are consistently increasing  (or decreasing) across bins. If not, when using the actual model, one might not be able to confidently conclude if borrower A is better (or worse) than borrower B. 
 - If bin sizes are not consistent (in this case ~10%) it would imply that the model is assigning the same output to a lot of borrowers. This could pose issues later on (say when deciding cutoffs). The ideal solution is to add additional variables that can help differentiate between good and bad borrowers. 

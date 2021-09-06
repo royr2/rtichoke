@@ -1,6 +1,6 @@
 title = "R'tichoke"
 theme = "axiom"
-baseURL = "https://royr2.netlify.app"
+baseURL = "https://royr2.netlify.app/"
 languageCode = "en-us"
 defaultContentLanguage = "en"
 
@@ -40,4 +40,4 @@ footer = ["twitter", "github", "linkedin"]
 
 [params.services]
 googleAnalyticsId = "UA-57026003-1"
-disqusShortname = "royr2"
+disqusShortname = "rtichoke"
