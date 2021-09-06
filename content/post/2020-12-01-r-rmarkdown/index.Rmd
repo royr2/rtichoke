@@ -13,7 +13,7 @@ comments: true
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-Modelers/analysts developing credit scores generally use something known as the `gains table` (or a `ks table`) to measure and quantify the performance of such models. We'll explore how to build such a table in this post. 
+Modellers/analysts developing credit scores generally use something known as the `gains table` (or a `ks table`) to measure and quantify the performance of such models. We'll explore how to build such a table in this post. 
 
 The idea is simple - discretise the population under consideration (say the testing or validation set) into groups based on the model's output (probability/log odds/scores). Typically, this is done in a way such that each group represents 10% of the total population (or deciles). Post which summary statistics are generated for each group and  cumulative distributions of events and non-events are analysed. 
 
@@ -264,8 +264,8 @@ Some notes on how to interpret this table:
 
 - Since the first objective of scoring models is to risk-rank borrowers, the first thing to look for is whether or not the event rates are consistently increasing  (or decreasing) across bins. If not, when using the actual model, one might not be able to confidently conclude if borrower A is better (or worse) than borrower B. 
 - If bin sizes are not consistent (in this case ~10%) it would imply that the model is assigning the same output to a lot of borrowers. This could pose issues later on (say when deciding cutoffs). The ideal solution is to add additional variables that can help differentiate between good and bad borrowers. 
-- While the ideal cutoff would be the bin where the `KS` statistic is at its maximum, additonal aspects like capture rates and approcal rates should be taken into account. 
-- Typically, analysts would look for a model which achieves the maximum calue of the `KS` statistic within the first 2/3 deciles. That way, when creating underwriting policies, you would only end up rejecting 20%-30% of the applicant pool.
+- While the ideal cutoff would be the bin where the `KS` statistic is at its maximum, additional aspects like capture rates and approval rates should be taken into account. 
+- Typically, analysts would look for a model which achieves the maximum value of the `KS` statistic within the first 2/3 deciles. That way, when creating underwriting policies, you would only end up rejecting 20%-30% of the applicant pool.
 
 
-*Thoughts? Comments? Helpful? Not helpful? Like to see anythnig else added in here? Let me know!*
+*Thoughts? Comments? Helpful? Not helpful? Like to see anything else added in here? Let me know!*
