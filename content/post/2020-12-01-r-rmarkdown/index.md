@@ -13,9 +13,9 @@ comments: true
 
 Modellers/analysts developing credit scores generally use something known as the `gains table` (or a `ks table`) to measure and quantify the performance of such models. We'll explore how to build such a table in this post. 
 
-The idea is simple - discretise the population under consideration (say the testing or validation set) into groups based on the model's output (probability/log odds/scores). Typically, this is done in a way such that each group represents 10% of the total population (or deciles). Post which summary statistics are generated for each group and  cumulative distributions of events and non-events are analysed. 
+The idea is to first discretise the population under consideration (say the testing or validation set) into groups based on the model's output (probability/log odds/scores). Typically, this is done in a way such that each group represents 10% of the total population (or deciles). Then, summary statistics are generated for each group and  cumulative distributions of events and non-events are analysed and the model's performance is quantified. 
 
-We'll explore how to create a gains table using `dplyr`. I recommend doing it this way since it's easier to read and the code would need minimal changes if using `sparklyr` (say within a big data environment where you might need to run this code directly on a *hadoop* table).
+We'll use `dplyr` in this post. You can use base R or even `data.table` to do this. Doing it this way is nice  it's easier to read and the code would need minimal changes if using `sparklyr` (say within a big data environment where you might need to run this code directly on a *hadoop* table).
 
 
 ## Packages
@@ -186,9 +186,9 @@ test$bins <- cut(test$pred, breaks = q, include.lowest = T, right = T, ordered_r
 
 ```r
 levels(test$bins)
-##  [1] "[-5.1,-3.35]"  "(-3.35,-2.91]" "(-2.91,-2.65]" "(-2.65,-2.43]"
-##  [5] "(-2.43,-2.23]" "(-2.23,-2.06]" "(-2.06,-1.88]" "(-1.88,-1.67]"
-##  [9] "(-1.67,-1.28]" "(-1.28,0.716]"
+##  [1] "[-5.28,-3.32]" "(-3.32,-2.91]" "(-2.91,-2.66]" "(-2.66,-2.45]"
+##  [5] "(-2.45,-2.27]" "(-2.27,-2.08]" "(-2.08,-1.9]"  "(-1.9,-1.64]" 
+##  [9] "(-1.64,-1.28]" "(-1.28,1.08]"
 ```
 
 Using the bins we created above, we can now start to put the table together
@@ -213,16 +213,16 @@ kable(gains_table)
 
 |bins          | total| events| non_events|
 |:-------------|-----:|------:|----------:|
-|[-5.1,-3.35]  |   300|      4|        296|
-|(-3.35,-2.91] |   300|     10|        290|
-|(-2.91,-2.65] |   300|     15|        285|
-|(-2.65,-2.43] |   300|     13|        287|
-|(-2.43,-2.23] |   300|     27|        273|
-|(-2.23,-2.06] |   300|     32|        268|
-|(-2.06,-1.88] |   300|     49|        251|
-|(-1.88,-1.67] |   300|     58|        242|
-|(-1.67,-1.28] |   300|     60|        240|
-|(-1.28,0.716] |   300|     86|        214|
+|[-5.28,-3.32] |   300|      5|        295|
+|(-3.32,-2.91] |   300|      7|        293|
+|(-2.91,-2.66] |   300|     13|        287|
+|(-2.66,-2.45] |   300|     21|        279|
+|(-2.45,-2.27] |   300|     21|        279|
+|(-2.27,-2.08] |   300|     34|        266|
+|(-2.08,-1.9]  |   300|     40|        260|
+|(-1.9,-1.64]  |   300|     59|        241|
+|(-1.64,-1.28] |   300|     73|        227|
+|(-1.28,1.08]  |   300|     74|        226|
 
 Next, we'll add the event rate columns. Let's also make the table presentable - I'll use the `percent()` function in the `scales` package to show numbers as percentages. 
 
@@ -237,16 +237,16 @@ kable(gains_table)
 
 |bins          | total| events| non_events|event_rate |
 |:-------------|-----:|------:|----------:|:----------|
-|[-5.1,-3.35]  |   300|      4|        296|1.3%       |
-|(-3.35,-2.91] |   300|     10|        290|3.3%       |
-|(-2.91,-2.65] |   300|     15|        285|5.0%       |
-|(-2.65,-2.43] |   300|     13|        287|4.3%       |
-|(-2.43,-2.23] |   300|     27|        273|9.0%       |
-|(-2.23,-2.06] |   300|     32|        268|10.7%      |
-|(-2.06,-1.88] |   300|     49|        251|16.3%      |
-|(-1.88,-1.67] |   300|     58|        242|19.3%      |
-|(-1.67,-1.28] |   300|     60|        240|20.0%      |
-|(-1.28,0.716] |   300|     86|        214|28.7%      |
+|[-5.28,-3.32] |   300|      5|        295|1.7%       |
+|(-3.32,-2.91] |   300|      7|        293|2.3%       |
+|(-2.91,-2.66] |   300|     13|        287|4.3%       |
+|(-2.66,-2.45] |   300|     21|        279|7.0%       |
+|(-2.45,-2.27] |   300|     21|        279|7.0%       |
+|(-2.27,-2.08] |   300|     34|        266|11.3%      |
+|(-2.08,-1.9]  |   300|     40|        260|13.3%      |
+|(-1.9,-1.64]  |   300|     59|        241|19.7%      |
+|(-1.64,-1.28] |   300|     73|        227|24.3%      |
+|(-1.28,1.08]  |   300|     74|        226|24.7%      |
 
 To this we'll add some columns quantifying how events and non events are distributed across each bin.
 
@@ -265,16 +265,16 @@ kable(gains_table)
 
 |bins          | total| events| non_events|event_rate |pop_pct | c.events_pct| c.non_events_pct|
 |:-------------|-----:|------:|----------:|:----------|:-------|------------:|----------------:|
-|[-5.1,-3.35]  |   300|      4|        296|1.3%       |10.0%   |    0.0112994|        0.1118670|
-|(-3.35,-2.91] |   300|     10|        290|3.3%       |10.0%   |    0.0395480|        0.2214664|
-|(-2.91,-2.65] |   300|     15|        285|5.0%       |10.0%   |    0.0819209|        0.3291761|
-|(-2.65,-2.43] |   300|     13|        287|4.3%       |10.0%   |    0.1186441|        0.4376417|
-|(-2.43,-2.23] |   300|     27|        273|9.0%       |10.0%   |    0.1949153|        0.5408163|
-|(-2.23,-2.06] |   300|     32|        268|10.7%      |10.0%   |    0.2853107|        0.6421013|
-|(-2.06,-1.88] |   300|     49|        251|16.3%      |10.0%   |    0.4237288|        0.7369615|
-|(-1.88,-1.67] |   300|     58|        242|19.3%      |10.0%   |    0.5875706|        0.8284203|
-|(-1.67,-1.28] |   300|     60|        240|20.0%      |10.0%   |    0.7570621|        0.9191232|
-|(-1.28,0.716] |   300|     86|        214|28.7%      |10.0%   |    1.0000000|        1.0000000|
+|[-5.28,-3.32] |   300|      5|        295|1.7%       |10.0%   |    0.0144092|        0.1111949|
+|(-3.32,-2.91] |   300|      7|        293|2.3%       |10.0%   |    0.0345821|        0.2216359|
+|(-2.91,-2.66] |   300|     13|        287|4.3%       |10.0%   |    0.0720461|        0.3298153|
+|(-2.66,-2.45] |   300|     21|        279|7.0%       |10.0%   |    0.1325648|        0.4349793|
+|(-2.45,-2.27] |   300|     21|        279|7.0%       |10.0%   |    0.1930836|        0.5401432|
+|(-2.27,-2.08] |   300|     34|        266|11.3%      |10.0%   |    0.2910663|        0.6404071|
+|(-2.08,-1.9]  |   300|     40|        260|13.3%      |10.0%   |    0.4063401|        0.7384093|
+|(-1.9,-1.64]  |   300|     59|        241|19.7%      |10.0%   |    0.5763689|        0.8292499|
+|(-1.64,-1.28] |   300|     73|        227|24.3%      |10.0%   |    0.7867435|        0.9148134|
+|(-1.28,1.08]  |   300|     74|        226|24.7%      |10.0%   |    1.0000000|        1.0000000|
 
 Almost done - we just need a few more columns namely:
 
@@ -299,19 +299,19 @@ kable(gains_table)
 
 |bins          | total| events| non_events|event_rate |pop_pct |c.events_pct |c.non_events_pct |   ks|cap_rate |c_event_rate |
 |:-------------|-----:|------:|----------:|:----------|:-------|:------------|:----------------|----:|:--------|:------------|
-|[-5.1,-3.35]  |   300|      4|        296|1.3%       |10.0%   |1.1%         |11.2%            | 0.10|1%       |1.3%         |
-|(-3.35,-2.91] |   300|     10|        290|3.3%       |10.0%   |4.0%         |22.1%            | 0.18|4%       |2.3%         |
-|(-2.91,-2.65] |   300|     15|        285|5.0%       |10.0%   |8.2%         |32.9%            | 0.25|8%       |3.2%         |
-|(-2.65,-2.43] |   300|     13|        287|4.3%       |10.0%   |11.9%        |43.8%            | 0.32|12%      |3.5%         |
-|(-2.43,-2.23] |   300|     27|        273|9.0%       |10.0%   |19.5%        |54.1%            | 0.35|19%      |4.6%         |
-|(-2.23,-2.06] |   300|     32|        268|10.7%      |10.0%   |28.5%        |64.2%            | 0.36|29%      |5.6%         |
-|(-2.06,-1.88] |   300|     49|        251|16.3%      |10.0%   |42.4%        |73.7%            | 0.31|42%      |7.1%         |
-|(-1.88,-1.67] |   300|     58|        242|19.3%      |10.0%   |58.8%        |82.8%            | 0.24|59%      |8.7%         |
-|(-1.67,-1.28] |   300|     60|        240|20.0%      |10.0%   |75.7%        |91.9%            | 0.16|76%      |9.9%         |
-|(-1.28,0.716] |   300|     86|        214|28.7%      |10.0%   |100.0%       |100.0%           | 0.00|100%     |11.8%        |
+|[-5.28,-3.32] |   300|      5|        295|1.7%       |10.0%   |1.4%         |11.1%            | 0.10|1%       |1.7%         |
+|(-3.32,-2.91] |   300|      7|        293|2.3%       |10.0%   |3.5%         |22.2%            | 0.19|3%       |2.0%         |
+|(-2.91,-2.66] |   300|     13|        287|4.3%       |10.0%   |7.2%         |33.0%            | 0.26|7%       |2.8%         |
+|(-2.66,-2.45] |   300|     21|        279|7.0%       |10.0%   |13.3%        |43.5%            | 0.30|13%      |3.8%         |
+|(-2.45,-2.27] |   300|     21|        279|7.0%       |10.0%   |19.3%        |54.0%            | 0.35|19%      |4.5%         |
+|(-2.27,-2.08] |   300|     34|        266|11.3%      |10.0%   |29.1%        |64.0%            | 0.35|29%      |5.6%         |
+|(-2.08,-1.9]  |   300|     40|        260|13.3%      |10.0%   |40.6%        |73.8%            | 0.33|41%      |6.7%         |
+|(-1.9,-1.64]  |   300|     59|        241|19.7%      |10.0%   |57.6%        |82.9%            | 0.25|58%      |8.3%         |
+|(-1.64,-1.28] |   300|     73|        227|24.3%      |10.0%   |78.7%        |91.5%            | 0.13|79%      |10.1%        |
+|(-1.28,1.08]  |   300|     74|        226|24.7%      |10.0%   |100.0%       |100.0%           | 0.00|100%     |11.6%        |
 
 ## Creating a function
-Finally, we can encapsulate all of the above code in a single function (our future selves would thank us :smile:). Note that we actually do not need the full test/train dataset, just the actual classes and predicted outcomes (log odds/probability/score).
+Finally, we can encapsulate all of the above code in a single function. Note that we actually do not need the full test/train dataset, just the actual classes and predicted outcomes (log odds/probability/score).
 
 
 ```r
@@ -351,6 +351,9 @@ gains_table <- function(act, pred, increasing = T, nBins = 10){
 
 It is worth noting here that since the capture rate is being computed from **top to bottom**, it is important that the table is arranged in an appropriate manner. That is, when modelling for `bads`, the table should be arrange in **descending** order of the model output (i.e. higher event rates at the top) and vice versa. 
 
+Also, if you are planning on using this with `sparklyr`, please look into the `ft_quantile_discretizer()` function within the same package. It would essentially replace the `cut()` function here.
+
+
 ```r
 # Test the function
 tab <- gains_table(test$bad_flag, test$pred, F, 10)
@@ -361,16 +364,16 @@ kable(tab)
 
 |bins          | total| events| non_events|event_rate |pop_pct |c.events_pct |c.non_events_pct |   ks|cap_rate |c_event_rate |
 |:-------------|-----:|------:|----------:|:----------|:-------|:------------|:----------------|----:|:--------|:------------|
-|(-1.28,0.716] |   300|     86|        214|28.7%      |10.0%   |24.3%        |8.1%             | 0.16|24%      |28.7%        |
-|(-1.67,-1.28] |   300|     60|        240|20.0%      |10.0%   |41.2%        |17.2%            | 0.24|41%      |24.3%        |
-|(-1.88,-1.67] |   300|     58|        242|19.3%      |10.0%   |57.6%        |26.3%            | 0.31|58%      |22.7%        |
-|(-2.06,-1.88] |   300|     49|        251|16.3%      |10.0%   |71.5%        |35.8%            | 0.36|71%      |21.1%        |
-|(-2.23,-2.06] |   300|     32|        268|10.7%      |10.0%   |80.5%        |45.9%            | 0.35|81%      |19.0%        |
-|(-2.43,-2.23] |   300|     27|        273|9.0%       |10.0%   |88.1%        |56.2%            | 0.32|88%      |17.3%        |
-|(-2.65,-2.43] |   300|     13|        287|4.3%       |10.0%   |91.8%        |67.1%            | 0.25|92%      |15.5%        |
-|(-2.91,-2.65] |   300|     15|        285|5.0%       |10.0%   |96.0%        |77.9%            | 0.18|96%      |14.2%        |
-|(-3.35,-2.91] |   300|     10|        290|3.3%       |10.0%   |98.9%        |88.8%            | 0.10|99%      |13.0%        |
-|[-5.1,-3.35]  |   300|      4|        296|1.3%       |10.0%   |100.0%       |100.0%           | 0.00|100%     |11.8%        |
+|(-1.28,1.08]  |   300|     74|        226|24.7%      |10.0%   |21.3%        |8.5%             | 0.13|21%      |24.7%        |
+|(-1.64,-1.28] |   300|     73|        227|24.3%      |10.0%   |42.4%        |17.1%            | 0.25|42%      |24.5%        |
+|(-1.9,-1.64]  |   300|     59|        241|19.7%      |10.0%   |59.4%        |26.2%            | 0.33|59%      |22.9%        |
+|(-2.08,-1.9]  |   300|     40|        260|13.3%      |10.0%   |70.9%        |36.0%            | 0.35|71%      |20.5%        |
+|(-2.27,-2.08] |   300|     34|        266|11.3%      |10.0%   |80.7%        |46.0%            | 0.35|81%      |18.7%        |
+|(-2.45,-2.27] |   300|     21|        279|7.0%       |10.0%   |86.7%        |56.5%            | 0.30|87%      |16.7%        |
+|(-2.66,-2.45] |   300|     21|        279|7.0%       |10.0%   |92.8%        |67.0%            | 0.26|93%      |15.3%        |
+|(-2.91,-2.66] |   300|     13|        287|4.3%       |10.0%   |96.5%        |77.8%            | 0.19|97%      |14.0%        |
+|(-3.32,-2.91] |   300|      7|        293|2.3%       |10.0%   |98.6%        |88.9%            | 0.10|99%      |12.7%        |
+|[-5.28,-3.32] |   300|      5|        295|1.7%       |10.0%   |100.0%       |100.0%           | 0.00|100%     |11.6%        |
 ## Interpretation
 Some notes on how to interpret this table:
 

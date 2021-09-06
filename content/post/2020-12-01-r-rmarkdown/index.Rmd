@@ -15,9 +15,9 @@ knitr::opts_chunk$set(collapse = TRUE)
 
 Modellers/analysts developing credit scores generally use something known as the `gains table` (or a `ks table`) to measure and quantify the performance of such models. We'll explore how to build such a table in this post. 
 
-The idea is simple - discretise the population under consideration (say the testing or validation set) into groups based on the model's output (probability/log odds/scores). Typically, this is done in a way such that each group represents 10% of the total population (or deciles). Post which summary statistics are generated for each group and  cumulative distributions of events and non-events are analysed. 
+The idea is to first discretise the population under consideration (say the testing or validation set) into groups based on the model's output (probability/log odds/scores). Typically, this is done in a way such that each group represents 10% of the total population (or deciles). Then, summary statistics are generated for each group and  cumulative distributions of events and non-events are analysed and the model's performance is quantified. 
 
-We'll explore how to create a gains table using `dplyr`. I recommend doing it this way since it's easier to read and the code would need minimal changes if using `sparklyr` (say within a big data environment where you might need to run this code directly on a *hadoop* table).
+We'll use `dplyr` in this post. You can use base R or even `data.table` to do this. Doing it this way is nice  it's easier to read and the code would need minimal changes if using `sparklyr` (say within a big data environment where you might need to run this code directly on a *hadoop* table).
 
 
 ## Packages
@@ -216,7 +216,7 @@ kable(gains_table)
 ```
 
 ## Creating a function
-Finally, we can encapsulate all of the above code in a single function (our future selves would thank us :smile:). Note that we actually do not need the full test/train dataset, just the actual classes and predicted outcomes (log odds/probability/score).
+Finally, we can encapsulate all of the above code in a single function. Note that we actually do not need the full test/train dataset, just the actual classes and predicted outcomes (log odds/probability/score).
 
 ```{r}
 gains_table <- function(act, pred, increasing = T, nBins = 10){
@@ -254,6 +254,9 @@ gains_table <- function(act, pred, increasing = T, nBins = 10){
 ```
 
 It is worth noting here that since the capture rate is being computed from **top to bottom**, it is important that the table is arranged in an appropriate manner. That is, when modelling for `bads`, the table should be arrange in **descending** order of the model output (i.e. higher event rates at the top) and vice versa. 
+
+Also, if you are planning on using this with `sparklyr`, please look into the `ft_quantile_discretizer()` function within the same package. It would essentially replace the `cut()` function here.
+
 ```{r}
 # Test the function
 tab <- gains_table(test$bad_flag, test$pred, F, 10)
