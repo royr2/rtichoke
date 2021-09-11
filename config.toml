@@ -18,8 +18,8 @@ posts = "/:filename"
 [params]
 copyrightYear = 2020
 dateFormat = "Jan 2, 2006"
-maxWidthContent = "max-w-3xl"
-maxWidthTitle = "max-w-3xl"
+maxWidthContent = "max-w-4xl"
+maxWidthTitle = "max-w-4xl"
 
 [menu]
 [[menu.main]]

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>plots on R&#39;tichoke</title>
+    <link>https://royr2.netlify.app/tags/plots/</link>
+    <description>Recent content in plots on R&#39;tichoke</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 11 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://royr2.netlify.app/tags/plots/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Custom charting functions using ggplot2</title>
+      <link>https://royr2.netlify.app/post/charting_functions_with_ggplot/</link>
+      <pubDate>Sat, 11 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://royr2.netlify.app/post/charting_functions_with_ggplot/</guid>
+      <description>How to create a customised charting function using ggplot2</description>
+    </item>
+    
+  </channel>
+</rss>
