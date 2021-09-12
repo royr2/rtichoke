@@ -3,7 +3,7 @@ title: "Visualising COVID data using leaflet"
 subtitle: "Data visualisation series (#2)"
 summary: "Data visualisation using leaflet"
 author: "royr2"
-date: 2021-09-13
+date: 2021-09-12
 categories: ["R", "Data Visualisation", "leaflet"]
 tags: ["R", "leaflet", "data visualisation", "covid19"]  
 comments: true
