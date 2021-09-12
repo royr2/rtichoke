@@ -1,11 +1,11 @@
 ---
 title: "Custom charting functions using ggplot2"
-subtitle: "Data visualisation series (Part 1)"
+subtitle: "Data visualisation series (#1)"
 summary: "How to create a customised charting function using ggplot2"
 author: "royr2"
 date: 2021-09-11
 categories: ["R", "Data Visualisation", "ggplot2"]
-tags: ["R", "ggplot2", "plots", "data visualisation"]  
+tags: ["R", "ggplot2", "data visualisation"]  
 comments: true
 ---
 
@@ -13,7 +13,7 @@ comments: true
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-While `R` has variety of options to choose from when it comes to 2D graphics and data visualisation, it is hard to beat `ggplot2` in terms of features, functionality and overall visual quality. While there are many tutorials on how to use `ggplot2`, I wanted to share my take on how to use the package which is, to make customised charting functions for specific chart types using `ggplot2` as the underlying visualisation engine. 
+While `R` has variety of options to choose from when it comes to 2D graphics and data visualisation, it is hard to beat `ggplot2` in terms of features, functionality and overall visual quality. I wanted to share my take on how to use the package which is, to make customised charting functions for specific chart types using `ggplot2` as the underlying visualisation engine. 
 
 ## Libraries
 ```{r eval = F}
@@ -21,7 +21,7 @@ While `R` has variety of options to choose from when it comes to 2D graphics and
 install.packages("pacman")
 ```
 
-```{r message = FALSE}
+```{r message = F, warning = F}
 library(pacman)
 
 # p_load automatically installs packages if needed
@@ -29,7 +29,8 @@ p_load(dplyr, ggplot2, scales, stringr)
 ```
 
 ## Sample dataset
-A clean sample of the entire COVID database hosted by JHU is available for download  [here](https://github.com/royr2/blog/blob/main/download/covid_data.csv)
+A summarised version of the COVID-19 Data Repository hosted by [JHU](https://github.com/CSSEGISandData/COVID-19) is available for download [here](https://github.com/royr2/blog/blob/main/download/covid_data.csv)
+
 
 ```{r echo = F}
 df <- read.csv("/Github/yetanothercovidapp/plot_data.csv")

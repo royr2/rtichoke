@@ -1,11 +1,11 @@
 ---
 title: "Measuring model performance using a gains table"
-subtitle: "Credit scoring series (Part 1)"
+subtitle: "Credit risk series (#1)"
 summary: "How to create a gains table to measure the performance of a binary classification model"
 author: "royr2"
 date: 2021-09-06
 categories: ["R", "Credit Risk Analytics"]
-tags: ["R", "dplyr", "credit scoring", "credirt risk"]  
+tags: ["R", "dplyr", "credit scoring", "credit risk"]  
 comments: true
 ---
 
@@ -17,7 +17,7 @@ Modellers/analysts developing credit scores generally use something known as the
 
 The idea is to first discretise the population under consideration (say the testing or validation set) into groups based on the model's output (probability/log odds/scores). Typically, this is done in a way such that each group represents 10% of the total population (or deciles). Then, summary statistics are generated for each group and  cumulative distributions of events and non-events are analysed and the model's performance is quantified. 
 
-We'll use `dplyr` in this post. You can use base R or even `data.table` to do this. Doing it this way is nice  it's easier to read and the code would need minimal changes if using `sparklyr` (say within a big data environment where you might need to run this code directly on a *hadoop* table).
+We'll use `dplyr` in this post. Doing it this way is nice since it's easier to read and the code would need minimal changes if using `sparklyr` (say within a big data environment where one might need to run this directly on a *hadoop* table).
 
 
 ## Packages
@@ -37,9 +37,9 @@ p_load(dplyr, magrittr, knitr, scales)
 
 ## Sample dataset
 
-Here's some sample data to play around with. The data set is small sample of the **Lending Club** dataset available on [kaggle](https://www.kaggle.com/wordsforthewise/lending-club).
+[Here's](https://github.com/royr2/blog/blob/main/download/credit_sample.csv) some sample data to play around with. The data set is small sample of the **Lending Club** dataset available on [kaggle](https://www.kaggle.com/wordsforthewise/lending-club).
 
-The file is available for download [here](https://github.com/royr2/blog/blob/main/download/credit_sample.csv).
+
 
 ```{r echo = F}
 sample <- read.csv("../../../download/credit_sample.csv")
@@ -197,10 +197,10 @@ gains_table %<>%
 kable(gains_table) 
 ```
 
-Almost done - we just need a few more columns namely:
+Almost done - just need a few more columns namely:
 
-- A column computing the difference between the two cumulative distribution columns we computed previously. The maximum value of this column will become the primary performance metric known as the `KS statistic`.
-- Two additional columns computing the `event capture rate` and the `cumulative event rate`.
+- A column computing the difference between the two cumulative distribution columns we created previously. The maximum value of this column will become the primary performance metric known as the `KS statistic`.
+- Two additional columns computing `event capture rates` and `cumulative event rates`.
 
 ```{r}
 gains_table %<>%
@@ -255,7 +255,7 @@ gains_table <- function(act, pred, increasing = T, nBins = 10){
 
 It is worth noting here that since the capture rate is being computed from **top to bottom**, it is important that the table is arranged in an appropriate manner. That is, when modelling for `bads`, the table should be arrange in **descending** order of the model output (i.e. higher event rates at the top) and vice versa. 
 
-Also, if you are planning on using this with `sparklyr`, please look into the `ft_quantile_discretizer()` function within the same package. It would essentially replace the `cut()` function here.
+Also, if you are planning on using this with `sparklyr`, consider looking into the `ft_quantile_discretizer()` function. It would replace `cut()` here.
 
 ```{r}
 # Test the function
@@ -263,10 +263,10 @@ tab <- gains_table(test$bad_flag, test$pred, F, 10)
 kable(tab)
 ```
 ## Interpretation
-Some notes on how to interpret a gains table:
+Some notes on how to interpret such a table:
 
-- Since the first objective of scoring models is to risk-rank borrowers, the first thing to look for is whether or not the event rates are consistently increasing  (or decreasing) across bins. If not, when using the actual model, one might not be able to confidently conclude if borrower A is better (or worse) than borrower B. 
-- If bin sizes are not consistent (in this case ~10%) it would imply that the model is assigning the same output to a lot of borrowers. This could pose issues later on (say when deciding cutoffs). The ideal solution is to add additional variables that can help differentiate between good and bad borrowers. 
+- Since scoring models aim to risk-rank borrowers, the first thing to look for is whether or not the event rates are consistently increasing  (or decreasing) across bins. If not, when using the actual model, one might not be able to confidently conclude if borrower A is better (or worse) than borrower B. 
+- If bin sizes are not consistent (in this case ~10%) it would imply that the model is assigning the same output/score to a lot of borrowers (clumping). This could pose issues later on (say when deciding cutoffs). The ideal solution is to add additional variables that can help differentiate between good and bad borrowers. 
 - While the ideal cutoff would be the bin where the `KS` statistic is at its maximum, additional aspects like capture rates and approval rates should be taken into account. 
 - Typically, analysts would look for a model which achieves the maximum value of the `KS` statistic within the first 2/3 deciles. That way, when creating underwriting policies, you would only end up rejecting 20%-30% of the applicant pool.
 

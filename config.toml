@@ -41,3 +41,8 @@ footer = ["twitter", "github", "linkedin"]
 [params.services]
 googleAnalyticsId = "UA-57026003-1"
 disqusShortname = "rtichoke"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true

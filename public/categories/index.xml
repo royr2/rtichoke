@@ -2,44 +2,44 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on R&#39;tichoke</title>
-    <link>https://royr2.netlify.app/categories/</link>
+    <link>https://rtichoke.netlify.app/categories/</link>
     <description>Recent content in Categories on R&#39;tichoke</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 11 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://royr2.netlify.app/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 11 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://rtichoke.netlify.app/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Data Visualisation</title>
-      <link>https://royr2.netlify.app/categories/data-visualisation/</link>
+      <link>https://rtichoke.netlify.app/categories/data-visualisation/</link>
       <pubDate>Sat, 11 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://royr2.netlify.app/categories/data-visualisation/</guid>
+      <guid>https://rtichoke.netlify.app/categories/data-visualisation/</guid>
       <description></description>
     </item>
     
     <item>
       <title>ggplot2</title>
-      <link>https://royr2.netlify.app/categories/ggplot2/</link>
+      <link>https://rtichoke.netlify.app/categories/ggplot2/</link>
       <pubDate>Sat, 11 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://royr2.netlify.app/categories/ggplot2/</guid>
+      <guid>https://rtichoke.netlify.app/categories/ggplot2/</guid>
       <description></description>
     </item>
     
     <item>
       <title>R</title>
-      <link>https://royr2.netlify.app/categories/r/</link>
+      <link>https://rtichoke.netlify.app/categories/r/</link>
       <pubDate>Sat, 11 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://royr2.netlify.app/categories/r/</guid>
+      <guid>https://rtichoke.netlify.app/categories/r/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Credit Risk Analytics</title>
-      <link>https://royr2.netlify.app/categories/credit-risk-analytics/</link>
+      <link>https://rtichoke.netlify.app/categories/credit-risk-analytics/</link>
       <pubDate>Mon, 06 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://royr2.netlify.app/categories/credit-risk-analytics/</guid>
+      <guid>https://rtichoke.netlify.app/categories/credit-risk-analytics/</guid>
       <description></description>
     </item>
     

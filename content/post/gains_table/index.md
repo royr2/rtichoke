@@ -1,11 +1,11 @@
 ---
 title: "Measuring model performance using a gains table"
-subtitle: "Credit scoring series (Part 1)"
+subtitle: "Credit risk series (#1)"
 summary: "How to create a gains table to measure the performance of a binary classification model"
 author: "royr2"
 date: 2021-09-06
 categories: ["R", "Credit Risk Analytics"]
-tags: ["R", "dplyr", "credit scoring", "credirt risk"]  
+tags: ["R", "dplyr", "credit scoring", "credit risk"]  
 comments: true
 ---
 
@@ -15,7 +15,7 @@ Modellers/analysts developing credit scores generally use something known as the
 
 The idea is to first discretise the population under consideration (say the testing or validation set) into groups based on the model's output (probability/log odds/scores). Typically, this is done in a way such that each group represents 10% of the total population (or deciles). Then, summary statistics are generated for each group and  cumulative distributions of events and non-events are analysed and the model's performance is quantified. 
 
-We'll use `dplyr` in this post. You can use base R or even `data.table` to do this. Doing it this way is nice  it's easier to read and the code would need minimal changes if using `sparklyr` (say within a big data environment where you might need to run this code directly on a *hadoop* table).
+We'll use `dplyr` in this post. Doing it this way is nice since it's easier to read and the code would need minimal changes if using `sparklyr` (say within a big data environment where one might need to run this directly on a *hadoop* table).
 
 
 ## Packages
@@ -38,9 +38,9 @@ p_load(dplyr, magrittr, knitr, scales)
 
 ## Sample dataset
 
-Here's some sample data to play around with. The data set is small sample of the **Lending Club** dataset available on [kaggle](https://www.kaggle.com/wordsforthewise/lending-club).
+[Here's](https://github.com/royr2/blog/blob/main/download/credit_sample.csv) some sample data to play around with. The data set is small sample of the **Lending Club** dataset available on [kaggle](https://www.kaggle.com/wordsforthewise/lending-club).
 
-The file is available for download [here](https://github.com/royr2/blog/blob/main/download/credit_sample.csv).
+
 
 
 
@@ -186,9 +186,9 @@ test$bins <- cut(test$pred, breaks = q, include.lowest = T, right = T, ordered_r
 
 ```r
 levels(test$bins)
-##  [1] "[-5.48,-3.33]" "(-3.33,-2.9]"  "(-2.9,-2.64]"  "(-2.64,-2.42]"
-##  [5] "(-2.42,-2.21]" "(-2.21,-2.03]" "(-2.03,-1.86]" "(-1.86,-1.65]"
-##  [9] "(-1.65,-1.31]" "(-1.31,1.74]"
+##  [1] "[-5.74,-3.39]" "(-3.39,-3]"    "(-3,-2.71]"    "(-2.71,-2.51]"
+##  [5] "(-2.51,-2.31]" "(-2.31,-2.13]" "(-2.13,-1.9]"  "(-1.9,-1.64]" 
+##  [9] "(-1.64,-1.24]" "(-1.24,1.22]"
 ```
 
 Using the bins we created above, we can now start to put the table together
@@ -213,16 +213,16 @@ kable(gains_table)
 
 |bins          | total| events| non_events|
 |:-------------|-----:|------:|----------:|
-|[-5.48,-3.33] |   300|      7|        293|
-|(-3.33,-2.9]  |   300|     10|        290|
-|(-2.9,-2.64]  |   300|     13|        287|
-|(-2.64,-2.42] |   300|     18|        282|
-|(-2.42,-2.21] |   300|     32|        268|
-|(-2.21,-2.03] |   300|     38|        262|
-|(-2.03,-1.86] |   300|     42|        258|
-|(-1.86,-1.65] |   300|     47|        253|
-|(-1.65,-1.31] |   300|     68|        232|
-|(-1.31,1.74]  |   300|     90|        210|
+|[-5.74,-3.39] |   300|      6|        294|
+|(-3.39,-3]    |   300|     11|        289|
+|(-3,-2.71]    |   300|     13|        287|
+|(-2.71,-2.51] |   300|     23|        277|
+|(-2.51,-2.31] |   300|     32|        268|
+|(-2.31,-2.13] |   300|     38|        262|
+|(-2.13,-1.9]  |   300|     47|        253|
+|(-1.9,-1.64]  |   300|     57|        243|
+|(-1.64,-1.24] |   300|     59|        241|
+|(-1.24,1.22]  |   300|     72|        228|
 
 Next, we'll add the event rate columns. Let's also make the table presentable - I'll use the `percent()` function in the `scales` package to show numbers as percentages. 
 
@@ -237,16 +237,16 @@ kable(gains_table)
 
 |bins          | total| events| non_events|event_rate |
 |:-------------|-----:|------:|----------:|:----------|
-|[-5.48,-3.33] |   300|      7|        293|2.3%       |
-|(-3.33,-2.9]  |   300|     10|        290|3.3%       |
-|(-2.9,-2.64]  |   300|     13|        287|4.3%       |
-|(-2.64,-2.42] |   300|     18|        282|6.0%       |
-|(-2.42,-2.21] |   300|     32|        268|10.7%      |
-|(-2.21,-2.03] |   300|     38|        262|12.7%      |
-|(-2.03,-1.86] |   300|     42|        258|14.0%      |
-|(-1.86,-1.65] |   300|     47|        253|15.7%      |
-|(-1.65,-1.31] |   300|     68|        232|22.7%      |
-|(-1.31,1.74]  |   300|     90|        210|30.0%      |
+|[-5.74,-3.39] |   300|      6|        294|2.0%       |
+|(-3.39,-3]    |   300|     11|        289|3.7%       |
+|(-3,-2.71]    |   300|     13|        287|4.3%       |
+|(-2.71,-2.51] |   300|     23|        277|7.7%       |
+|(-2.51,-2.31] |   300|     32|        268|10.7%      |
+|(-2.31,-2.13] |   300|     38|        262|12.7%      |
+|(-2.13,-1.9]  |   300|     47|        253|15.7%      |
+|(-1.9,-1.64]  |   300|     57|        243|19.0%      |
+|(-1.64,-1.24] |   300|     59|        241|19.7%      |
+|(-1.24,1.22]  |   300|     72|        228|24.0%      |
 
 To this we'll add some columns quantifying how events and non events are distributed across each bin.
 
@@ -265,21 +265,21 @@ kable(gains_table)
 
 |bins          | total| events| non_events|event_rate |pop_pct | c.events_pct| c.non_events_pct|
 |:-------------|-----:|------:|----------:|:----------|:-------|------------:|----------------:|
-|[-5.48,-3.33] |   300|      7|        293|2.3%       |10.0%   |    0.0191781|        0.1111954|
-|(-3.33,-2.9]  |   300|     10|        290|3.3%       |10.0%   |    0.0465753|        0.2212524|
-|(-2.9,-2.64]  |   300|     13|        287|4.3%       |10.0%   |    0.0821918|        0.3301708|
-|(-2.64,-2.42] |   300|     18|        282|6.0%       |10.0%   |    0.1315068|        0.4371917|
-|(-2.42,-2.21] |   300|     32|        268|10.7%      |10.0%   |    0.2191781|        0.5388994|
-|(-2.21,-2.03] |   300|     38|        262|12.7%      |10.0%   |    0.3232877|        0.6383302|
-|(-2.03,-1.86] |   300|     42|        258|14.0%      |10.0%   |    0.4383562|        0.7362429|
-|(-1.86,-1.65] |   300|     47|        253|15.7%      |10.0%   |    0.5671233|        0.8322581|
-|(-1.65,-1.31] |   300|     68|        232|22.7%      |10.0%   |    0.7534247|        0.9203036|
-|(-1.31,1.74]  |   300|     90|        210|30.0%      |10.0%   |    1.0000000|        1.0000000|
+|[-5.74,-3.39] |   300|      6|        294|2.0%       |10.0%   |    0.0167598|        0.1112793|
+|(-3.39,-3]    |   300|     11|        289|3.7%       |10.0%   |    0.0474860|        0.2206662|
+|(-3,-2.71]    |   300|     13|        287|4.3%       |10.0%   |    0.0837989|        0.3292960|
+|(-2.71,-2.51] |   300|     23|        277|7.7%       |10.0%   |    0.1480447|        0.4341408|
+|(-2.51,-2.31] |   300|     32|        268|10.7%      |10.0%   |    0.2374302|        0.5355791|
+|(-2.31,-2.13] |   300|     38|        262|12.7%      |10.0%   |    0.3435754|        0.6347464|
+|(-2.13,-1.9]  |   300|     47|        253|15.7%      |10.0%   |    0.4748603|        0.7305072|
+|(-1.9,-1.64]  |   300|     57|        243|19.0%      |10.0%   |    0.6340782|        0.8224830|
+|(-1.64,-1.24] |   300|     59|        241|19.7%      |10.0%   |    0.7988827|        0.9137017|
+|(-1.24,1.22]  |   300|     72|        228|24.0%      |10.0%   |    1.0000000|        1.0000000|
 
-Almost done - we just need a few more columns namely:
+Almost done - just need a few more columns namely:
 
-- A column computing the difference between the two cumulative distribution columns we computed previously. The maximum value of this column will become the primary performance metric known as the `KS statistic`.
-- Two additional columns computing the `event capture rate` and the `cumulative event rate`.
+- A column computing the difference between the two cumulative distribution columns we created previously. The maximum value of this column will become the primary performance metric known as the `KS statistic`.
+- Two additional columns computing `event capture rates` and `cumulative event rates`.
 
 
 ```r
@@ -299,16 +299,16 @@ kable(gains_table)
 
 |bins          | total| events| non_events|event_rate |pop_pct |c.events_pct |c.non_events_pct |   ks|cap_rate |c_event_rate |
 |:-------------|-----:|------:|----------:|:----------|:-------|:------------|:----------------|----:|:--------|:------------|
-|[-5.48,-3.33] |   300|      7|        293|2.3%       |10.0%   |1.9%         |11.1%            | 0.09|2%       |2.3%         |
-|(-3.33,-2.9]  |   300|     10|        290|3.3%       |10.0%   |4.7%         |22.1%            | 0.17|5%       |2.8%         |
-|(-2.9,-2.64]  |   300|     13|        287|4.3%       |10.0%   |8.2%         |33.0%            | 0.25|8%       |3.3%         |
-|(-2.64,-2.42] |   300|     18|        282|6.0%       |10.0%   |13.2%        |43.7%            | 0.31|13%      |4.0%         |
-|(-2.42,-2.21] |   300|     32|        268|10.7%      |10.0%   |21.9%        |53.9%            | 0.32|22%      |5.3%         |
-|(-2.21,-2.03] |   300|     38|        262|12.7%      |10.0%   |32.3%        |63.8%            | 0.32|32%      |6.6%         |
-|(-2.03,-1.86] |   300|     42|        258|14.0%      |10.0%   |43.8%        |73.6%            | 0.30|44%      |7.6%         |
-|(-1.86,-1.65] |   300|     47|        253|15.7%      |10.0%   |56.7%        |83.2%            | 0.27|57%      |8.6%         |
-|(-1.65,-1.31] |   300|     68|        232|22.7%      |10.0%   |75.3%        |92.0%            | 0.17|75%      |10.2%        |
-|(-1.31,1.74]  |   300|     90|        210|30.0%      |10.0%   |100.0%       |100.0%           | 0.00|100%     |12.2%        |
+|[-5.74,-3.39] |   300|      6|        294|2.0%       |10.0%   |1.7%         |11.1%            | 0.09|2%       |2.0%         |
+|(-3.39,-3]    |   300|     11|        289|3.7%       |10.0%   |4.7%         |22.1%            | 0.17|5%       |2.8%         |
+|(-3,-2.71]    |   300|     13|        287|4.3%       |10.0%   |8.4%         |32.9%            | 0.25|8%       |3.3%         |
+|(-2.71,-2.51] |   300|     23|        277|7.7%       |10.0%   |14.8%        |43.4%            | 0.29|15%      |4.4%         |
+|(-2.51,-2.31] |   300|     32|        268|10.7%      |10.0%   |23.7%        |53.6%            | 0.30|24%      |5.7%         |
+|(-2.31,-2.13] |   300|     38|        262|12.7%      |10.0%   |34.4%        |63.5%            | 0.29|34%      |6.8%         |
+|(-2.13,-1.9]  |   300|     47|        253|15.7%      |10.0%   |47.5%        |73.1%            | 0.26|47%      |8.1%         |
+|(-1.9,-1.64]  |   300|     57|        243|19.0%      |10.0%   |63.4%        |82.2%            | 0.19|63%      |9.5%         |
+|(-1.64,-1.24] |   300|     59|        241|19.7%      |10.0%   |79.9%        |91.4%            | 0.11|80%      |10.6%        |
+|(-1.24,1.22]  |   300|     72|        228|24.0%      |10.0%   |100.0%       |100.0%           | 0.00|100%     |11.9%        |
 
 ## Creating a function
 Finally, we can encapsulate all of the above code in a single function. Note that we actually do not need the full test/train dataset, just the actual classes and predicted outcomes (log odds/probability/score).
@@ -351,7 +351,7 @@ gains_table <- function(act, pred, increasing = T, nBins = 10){
 
 It is worth noting here that since the capture rate is being computed from **top to bottom**, it is important that the table is arranged in an appropriate manner. That is, when modelling for `bads`, the table should be arrange in **descending** order of the model output (i.e. higher event rates at the top) and vice versa. 
 
-Also, if you are planning on using this with `sparklyr`, please look into the `ft_quantile_discretizer()` function within the same package. It would essentially replace the `cut()` function here.
+Also, if you are planning on using this with `sparklyr`, consider looking into the `ft_quantile_discretizer()` function. It would replace `cut()` here.
 
 
 ```r
@@ -364,21 +364,21 @@ kable(tab)
 
 |bins          | total| events| non_events|event_rate |pop_pct |c.events_pct |c.non_events_pct |   ks|cap_rate |c_event_rate |
 |:-------------|-----:|------:|----------:|:----------|:-------|:------------|:----------------|----:|:--------|:------------|
-|(-1.31,1.74]  |   300|     90|        210|30.0%      |10.0%   |24.7%        |8.0%             | 0.17|25%      |30.0%        |
-|(-1.65,-1.31] |   300|     68|        232|22.7%      |10.0%   |43.3%        |16.8%            | 0.27|43%      |26.3%        |
-|(-1.86,-1.65] |   300|     47|        253|15.7%      |10.0%   |56.2%        |26.4%            | 0.30|56%      |22.8%        |
-|(-2.03,-1.86] |   300|     42|        258|14.0%      |10.0%   |67.7%        |36.2%            | 0.32|68%      |20.6%        |
-|(-2.21,-2.03] |   300|     38|        262|12.7%      |10.0%   |78.1%        |46.1%            | 0.32|78%      |19.0%        |
-|(-2.42,-2.21] |   300|     32|        268|10.7%      |10.0%   |86.8%        |56.3%            | 0.31|87%      |17.6%        |
-|(-2.64,-2.42] |   300|     18|        282|6.0%       |10.0%   |91.8%        |67.0%            | 0.25|92%      |16.0%        |
-|(-2.9,-2.64]  |   300|     13|        287|4.3%       |10.0%   |95.3%        |77.9%            | 0.17|95%      |14.5%        |
-|(-3.33,-2.9]  |   300|     10|        290|3.3%       |10.0%   |98.1%        |88.9%            | 0.09|98%      |13.3%        |
-|[-5.48,-3.33] |   300|      7|        293|2.3%       |10.0%   |100.0%       |100.0%           | 0.00|100%     |12.2%        |
+|(-1.24,1.22]  |   300|     72|        228|24.0%      |10.0%   |20.1%        |8.6%             | 0.11|20%      |24.0%        |
+|(-1.64,-1.24] |   300|     59|        241|19.7%      |10.0%   |36.6%        |17.8%            | 0.19|37%      |21.8%        |
+|(-1.9,-1.64]  |   300|     57|        243|19.0%      |10.0%   |52.5%        |26.9%            | 0.26|53%      |20.9%        |
+|(-2.13,-1.9]  |   300|     47|        253|15.7%      |10.0%   |65.6%        |36.5%            | 0.29|66%      |19.6%        |
+|(-2.31,-2.13] |   300|     38|        262|12.7%      |10.0%   |76.3%        |46.4%            | 0.30|76%      |18.2%        |
+|(-2.51,-2.31] |   300|     32|        268|10.7%      |10.0%   |85.2%        |56.6%            | 0.29|85%      |16.9%        |
+|(-2.71,-2.51] |   300|     23|        277|7.7%       |10.0%   |91.6%        |67.1%            | 0.25|92%      |15.6%        |
+|(-3,-2.71]    |   300|     13|        287|4.3%       |10.0%   |95.3%        |77.9%            | 0.17|95%      |14.2%        |
+|(-3.39,-3]    |   300|     11|        289|3.7%       |10.0%   |98.3%        |88.9%            | 0.09|98%      |13.0%        |
+|[-5.74,-3.39] |   300|      6|        294|2.0%       |10.0%   |100.0%       |100.0%           | 0.00|100%     |11.9%        |
 ## Interpretation
-Some notes on how to interpret a gains table:
+Some notes on how to interpret such a table:
 
-- Since the first objective of scoring models is to risk-rank borrowers, the first thing to look for is whether or not the event rates are consistently increasing  (or decreasing) across bins. If not, when using the actual model, one might not be able to confidently conclude if borrower A is better (or worse) than borrower B. 
-- If bin sizes are not consistent (in this case ~10%) it would imply that the model is assigning the same output to a lot of borrowers. This could pose issues later on (say when deciding cutoffs). The ideal solution is to add additional variables that can help differentiate between good and bad borrowers. 
+- Since scoring models aim to risk-rank borrowers, the first thing to look for is whether or not the event rates are consistently increasing  (or decreasing) across bins. If not, when using the actual model, one might not be able to confidently conclude if borrower A is better (or worse) than borrower B. 
+- If bin sizes are not consistent (in this case ~10%) it would imply that the model is assigning the same output/score to a lot of borrowers (clumping). This could pose issues later on (say when deciding cutoffs). The ideal solution is to add additional variables that can help differentiate between good and bad borrowers. 
 - While the ideal cutoff would be the bin where the `KS` statistic is at its maximum, additional aspects like capture rates and approval rates should be taken into account. 
 - Typically, analysts would look for a model which achieves the maximum value of the `KS` statistic within the first 2/3 deciles. That way, when creating underwriting policies, you would only end up rejecting 20%-30% of the applicant pool.
 

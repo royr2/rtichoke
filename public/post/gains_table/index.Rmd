@@ -1,11 +1,11 @@
 ---
 title: "Measuring model performance using a gains table"
-subtitle: "Credit scoring series (Part 1)"
+subtitle: "Credit risk series (#1)"
 summary: "How to create a gains table to measure the performance of a binary classification model"
 author: "royr2"
 date: 2021-09-06
 categories: ["R", "Credit Risk Analytics"]
-tags: ["R", "dplyr", "credit scoring", "credirt risk"]  
+tags: ["R", "dplyr", "credit scoring", "credit risk"]  
 comments: true
 ---
 

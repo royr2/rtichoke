@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://royr2.netlify.app/sitemap.xml
+Sitemap: https://rtichoke.netlify.app/sitemap.xml

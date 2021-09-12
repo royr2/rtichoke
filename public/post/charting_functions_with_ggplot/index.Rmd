@@ -1,11 +1,11 @@
 ---
 title: "Custom charting functions using ggplot2"
-subtitle: "Data visualisation series (Part 1)"
+subtitle: "Data visualisation series (#1)"
 summary: "How to create a customised charting function using ggplot2"
 author: "royr2"
 date: 2021-09-11
 categories: ["R", "Data Visualisation", "ggplot2"]
-tags: ["R", "ggplot2", "plots", "data visualisation"]  
+tags: ["R", "ggplot2", "data visualisation"]  
 comments: true
 ---
 
@@ -21,7 +21,7 @@ While `R` has variety of options to choose from when it comes to 2D graphics and
 install.packages("pacman")
 ```
 
-```{r message = FALSE}
+```{r message = F, warning = F}
 library(pacman)
 
 # p_load automatically installs packages if needed
@@ -29,7 +29,8 @@ p_load(dplyr, ggplot2, scales, stringr)
 ```
 
 ## Sample dataset
-A clean sample of the entire COVID database hosted by JHU is available for download  [here](https://github.com/royr2/blog/blob/main/download/covid_data.csv)
+A summarised version of the COVID-19 Data Repository hosted by [JHU](https://github.com/CSSEGISandData/COVID-19) is available for download [here](https://github.com/royr2/blog/blob/main/download/covid_data.csv)
+
 
 ```{r echo = F}
 df <- read.csv("/Github/yetanothercovidapp/plot_data.csv")
@@ -215,7 +216,7 @@ line_chart(plotdf,
 ![](chart3-1.png)
 
 ## Bar chart example
-The good thing about this is that the `custom_theme()` function can be applied to any chart type. It'll also work directly with `ggplot()`.
+The good thing about the `custom_theme()` function is that it can be applied to any `ggplot2` object. 
 
 ```{r chart4, fig.show = 'hide', warning = F, fig.path = ''}
 p <- plotdf %>%  
