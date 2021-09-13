@@ -13,7 +13,7 @@ comments: true
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-Here's a short post on how to use `leaflet` to visualise some COVID-19 data.
+`Leaflet` is a JavaScript library for interactive maps. Leaflet for R is super easy to use and a great way to visualise data that has a spatial dimension. Below are some examples on how to use the `leaflet` package in R to visualise some COVID-19 data.
 
 ## Packages
 ```{r eval = F}
