@@ -6,13 +6,31 @@
     <description>Recent content in Categories on R&#39;tichoke</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 11 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://rtichoke.netlify.app/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 12 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://rtichoke.netlify.app/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Data Visualisation</title>
       <link>https://rtichoke.netlify.app/categories/data-visualisation/</link>
-      <pubDate>Sat, 11 Sep 2021 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 12 Sep 2021 00:00:00 +0000</pubDate>
       
       <guid>https://rtichoke.netlify.app/categories/data-visualisation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>leaflet</title>
+      <link>https://rtichoke.netlify.app/categories/leaflet/</link>
+      <pubDate>Sun, 12 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://rtichoke.netlify.app/categories/leaflet/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>R</title>
+      <link>https://rtichoke.netlify.app/categories/r/</link>
+      <pubDate>Sun, 12 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://rtichoke.netlify.app/categories/r/</guid>
       <description></description>
     </item>
     
@@ -22,15 +40,6 @@
       <pubDate>Sat, 11 Sep 2021 00:00:00 +0000</pubDate>
       
       <guid>https://rtichoke.netlify.app/categories/ggplot2/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>R</title>
-      <link>https://rtichoke.netlify.app/categories/r/</link>
-      <pubDate>Sat, 11 Sep 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://rtichoke.netlify.app/categories/r/</guid>
       <description></description>
     </item>
     

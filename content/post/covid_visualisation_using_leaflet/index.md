@@ -1,7 +1,7 @@
 ---
-title: "Visualising COVID data using leaflet"
-subtitle: "Data visualisation series (#2)"
-summary: "Data visualisation using leaflet"
+title: "Visualising COVID data using R and leaflet"
+subtitle: "Data visualisation series (Post #2)"
+summary: "Data visualisation using R and leaflet"
 author: "royr2"
 date: 2021-09-12
 categories: ["R", "Data Visualisation", "leaflet"]
@@ -11,7 +11,7 @@ comments: true
 
 
 
-Here's a short post on how to use `leaflet` to visualise some COVID-19 data.
+`Leaflet` is a JavaScript library for interactive maps. Leaflet for R is super easy to use and a great way to visualise data that has a spatial dimension. Below are some examples on how to use the `leaflet` package in R to visualise some COVID-19 data.
 
 ## Packages
 

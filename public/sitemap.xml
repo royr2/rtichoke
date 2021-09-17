@@ -2,18 +2,54 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://rtichoke.netlify.app/categories/</loc>
-    <lastmod>2021-09-11T00:00:00Z</lastmod>
+    <lastmod>2021-09-12T00:00:00Z</lastmod>
   </url>
   <url>
-    <loc>https://rtichoke.netlify.app/post/charting_functions_with_ggplot/</loc>
-    <lastmod>2021-09-11T00:00:00Z</lastmod>
+    <loc>https://rtichoke.netlify.app/tags/covid19/</loc>
+    <lastmod>2021-09-12T00:00:00Z</lastmod>
   </url>
   <url>
     <loc>https://rtichoke.netlify.app/categories/data-visualisation/</loc>
-    <lastmod>2021-09-11T00:00:00Z</lastmod>
+    <lastmod>2021-09-12T00:00:00Z</lastmod>
   </url>
   <url>
     <loc>https://rtichoke.netlify.app/tags/data-visualisation/</loc>
+    <lastmod>2021-09-12T00:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/tags/leaflet/</loc>
+    <lastmod>2021-09-12T00:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/categories/leaflet/</loc>
+    <lastmod>2021-09-12T00:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/post/</loc>
+    <lastmod>2021-09-12T00:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/tags/r/</loc>
+    <lastmod>2021-09-12T00:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/categories/r/</loc>
+    <lastmod>2021-09-12T00:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/</loc>
+    <lastmod>2021-09-12T00:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/tags/</loc>
+    <lastmod>2021-09-12T00:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/post/covid_visualisation_using_leaflet/</loc>
+    <lastmod>2021-09-12T00:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/post/charting_functions_with_ggplot/</loc>
     <lastmod>2021-09-11T00:00:00Z</lastmod>
   </url>
   <url>
@@ -22,26 +58,6 @@
   </url>
   <url>
     <loc>https://rtichoke.netlify.app/categories/ggplot2/</loc>
-    <lastmod>2021-09-11T00:00:00Z</lastmod>
-  </url>
-  <url>
-    <loc>https://rtichoke.netlify.app/post/</loc>
-    <lastmod>2021-09-11T00:00:00Z</lastmod>
-  </url>
-  <url>
-    <loc>https://rtichoke.netlify.app/tags/r/</loc>
-    <lastmod>2021-09-11T00:00:00Z</lastmod>
-  </url>
-  <url>
-    <loc>https://rtichoke.netlify.app/categories/r/</loc>
-    <lastmod>2021-09-11T00:00:00Z</lastmod>
-  </url>
-  <url>
-    <loc>https://rtichoke.netlify.app/</loc>
-    <lastmod>2021-09-11T00:00:00Z</lastmod>
-  </url>
-  <url>
-    <loc>https://rtichoke.netlify.app/tags/</loc>
     <lastmod>2021-09-11T00:00:00Z</lastmod>
   </url>
   <url>

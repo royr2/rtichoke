@@ -1,6 +1,6 @@
 ---
 title: "Visualising COVID data using R and leaflet"
-subtitle: "Data visualisation series (#2)"
+subtitle: "Data visualisation series (Post #2)"
 summary: "Data visualisation using R and leaflet"
 author: "royr2"
 date: 2021-09-12

@@ -13,7 +13,7 @@ comments: true
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-While `R` has variety of options to choose from when it comes to 2D graphics and data visualisation, it is hard to beat `ggplot2` in terms of features, functionality and overall visual quality. While there are many tutorials on how to use `ggplot2`, I wanted to share my take on how to use the package which is, to make customised charting functions for specific chart types using `ggplot2` as the underlying visualisation engine. 
+While `R` has variety of options to choose from when it comes to 2D graphics and data visualisation, it is hard to beat `ggplot2` in terms of features, functionality and overall visual quality. I wanted to share my take on how to use the package which is, to make customised charting functions for specific chart types using `ggplot2` as the underlying visualisation engine. 
 
 ## Libraries
 ```{r eval = F}
