@@ -3,7 +3,7 @@ title: "Monotonic binning using XGBOOST"
 subtitle: "Credit risk series (Post #2)"
 summary: "How to create a discrete data bins with monotonic event rates using xgboost"
 author: "royr2"
-date: 2021-09-18
+date: 2021-09-18T00:00:00-05:30
 categories: ["R", "Credit risk analytics", "Binning", "xgboost"]
 tags: ["R", "risk", "analytics", "credit risk", "xgboost", "binning"]  
 comments: true
