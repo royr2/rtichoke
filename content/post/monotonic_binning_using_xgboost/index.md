@@ -3,7 +3,7 @@ title: "Monotonic binning using XGBOOST"
 subtitle: "Credit risk series (Post #2)"
 summary: "How to create a discrete data bins with monotonic event rates using xgboost"
 author: "royr2"
-date: 2021-09-18
+date: 2021-09-18T00:00:00-05:30
 categories: ["R", "Credit risk analytics", "Binning", "xgboost"]
 tags: ["R", "risk", "analytics", "credit risk", "xgboost", "binning"]  
 comments: true
@@ -122,7 +122,7 @@ mdl <- xgboost(
   params = list(objective = "binary:logistic", ## Binary outcome
                 monotone_constraints = 1, 
                 max_depth = 10))  ## 1
-## [19:18:32] WARNING: amalgamation/../src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'binary:logistic' was changed from 'error' to 'logloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
+## [10:07:37] WARNING: amalgamation/../src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'binary:logistic' was changed from 'error' to 'logloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
 ## [1]	train-logloss:0.541928
 ```
 ## Retrieving splits
@@ -242,7 +242,7 @@ grid.arrange(v1$plot + labs(subtitle = "Fico Range High"),
              ncol = 2)
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.png" width="672" />
+![](chart3-1.png)
 
 And that's it! We can use what we just built to discretise variables we need, perform `one-hot-encoding` or `WOE-transformations` and feed the appropriate model matrix to our choice of statistical routine. 
 

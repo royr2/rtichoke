@@ -222,13 +222,15 @@ v3 <- create_bins(train$int_rate, train$bad_flag, max_depth = 10, plot = F)
 v4 <- create_bins(train$annual_inc, train$bad_flag, max_depth = 10, plot = F)
 ```
 
-```{r}
+```{r chart3, fig.show = 'hide', fig.path = ""}
 grid.arrange(v1$plot + labs(subtitle = "Fico Range High"), 
              v2$plot + labs(subtitle = "Delinq Amount"), 
              v3$plot + labs(subtitle = "Interest Rate"), 
              v4$plot + labs(subtitle = "Annual Income"), 
              ncol = 2)
 ```
+
+![](chart3-1.png)
 
 And that's it! We can use what we just built to discretise variables we need, perform `one-hot-encoding` or `WOE-transformations` and feed the appropriate model matrix to our choice of statistical routine. 
 
