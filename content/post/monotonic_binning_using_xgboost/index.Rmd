@@ -230,7 +230,7 @@ grid.arrange(v1$plot + labs(subtitle = "Fico Range High"),
              ncol = 2)
 ```
 
-![](chart3-1.png)
+![](chart3-1.png) 
 
 And that's it! We can use what we just built to discretise variables we need, perform `one-hot-encoding` or `WOE-transformations` and feed the appropriate model matrix to our choice of statistical routine. 
 
