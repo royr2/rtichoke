@@ -1,6 +1,6 @@
 ---
 title: "Measuring model performance using a gains table"
-subtitle: "Credit risk series (#1)"
+subtitle: "Credit risk series (Post #1)"
 summary: "How to create a gains table to measure the performance of a binary classification model"
 author: "royr2"
 date: 2021-09-06
@@ -37,7 +37,7 @@ p_load(dplyr, magrittr, knitr, scales)
 
 ## Sample dataset
 
-[Here's](https://github.com/royr2/blog/blob/main/download/credit_sample.csv) some sample data to play around with. The data set is small sample of the **Lending Club** dataset available on [kaggle](https://www.kaggle.com/wordsforthewise/lending-club).
+[Here's](https://github.com/royr2/blog/blob/main/download/credit_sample.csv) some sample data to play around with. The data set is small sample of the **Lending Club** dataset available on [Kaggle](https://www.kaggle.com/wordsforthewise/lending-club).
 
 
 

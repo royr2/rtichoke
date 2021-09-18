@@ -10,8 +10,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/">
   <link rel="icon" type="image/x-icon" href="/">
   <link rel="apple-touch-icon" href="/">
-  <link rel="canonical" href="https://rtichoke.netlify.app/tags/dplyr/">
-  <link rel="alternate" type="application/rss+xml" href="https://rtichoke.netlify.app/tags/dplyr/index.xml" hreflang="en-us">
+  <link rel="canonical" href="https://rtichoke.netlify.app/base/">
 <link rel="preload" as="style" href="/bundle.css?v=1631939995" media="all">
 <link rel="stylesheet" href="/bundle.css?v=1631939995" media="all">
 <style>.cdata pre{background-color:#1f2937;color:#e5e7eb}.cdata :not(pre)>code{background-color:#f3f4f6;color:#7c3aed}.chroma .err{background-color:#991b1b;color:#fecaca}.chroma .hl{background-color:#374151}.chroma .ln{color:#9ca3af}.chroma .k,.chroma .kc,.chroma .kd,.chroma .kn,.chroma .kp,.chroma .kr{color:#60a5fa}.chroma .kt{color:#a78bfa}.chroma .na,.chroma .nb{color:#fbbf24}.chroma .nc{color:#f87171}.chroma .no{color:#34d399}.chroma .nd{color:#f87171}.chroma .ne{color:#f87171}.chroma .nf{color:#fbbf24}.chroma .nt{color:#f87171}.chroma .l{color:#a78bfa}.chroma .dl,.chroma .ld,.chroma .s,.chroma .s2,.chroma .sa,.chroma .sb,.chroma .sc,.chroma .sd{color:#34d399}.chroma .se{color:#9ca3af}.chroma .s1,.chroma .sh,.chroma .si,.chroma .sr,.chroma .ss,.chroma .sx{color:#34d399}.chroma .il,.chroma .m,.chroma .mb,.chroma .mf,.chroma .mh,.chroma .mi,.chroma .mo{color:#a78bfa}.chroma .o,.chroma .ow{color:#93c5fd}.chroma .c,.chroma .c1,.chroma .ch,.chroma .cm,.chroma .cp,.chroma .cpf,.chroma .cs,.chroma .p{color:#9ca3af}.chroma .ge{font-style:italic}.chroma .gs{font-weight:700}
@@ -19,19 +18,19 @@
 
 
 
-<title>dplyr : R&#39;tichoke</title>
+<title>Score cutoff analysis : R&#39;tichoke</title>
 
-<meta property="og:title" content="dplyr">
+<meta property="og:title" content="Score cutoff analysis">
 <meta property="og:site_name" content="R&#39;tichoke">
-<meta property="og:url" content="https://rtichoke.netlify.app/tags/dplyr/">
+<meta property="og:url" content="https://rtichoke.netlify.app/base/">
 <link rel="image_src" href="https://rtichoke.netlify.app/">
 <meta property="og:image" content="https://rtichoke.netlify.app/">
 <meta property="og:image:width" content="">
 <meta property="og:image:height" content="">
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:locale" content="en_us">
-<meta property="og:description" content="">
-<meta name="description" content="">
+<meta property="og:description" content="How to perform cutoff analysis when deploying credit risk scorecards">
+<meta name="description" content="How to perform cutoff analysis when deploying credit risk scorecards">
 <meta property="og:updated_time" content="2021-09-18T00:00:00Z">
 <meta property="fb:app_id" content="">
 <meta name="author" content="Riddhiman">
@@ -42,15 +41,15 @@
 {
   "@context": "https://schema.org",
   "@type": "Article",
-  "headline": "dplyr",
-  "alternativeHeadline": "",
-  "url": "https://rtichoke.netlify.app/tags/dplyr/",
+  "headline": "Score cutoff analysis",
+  "alternativeHeadline": "Credit risk series (Part 2)",
+  "url": "https://rtichoke.netlify.app/base/",
   "image": "https://rtichoke.netlify.app/",
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://rtichoke.netlify.app/tags/dplyr/"
+    "@id": "https://rtichoke.netlify.app/base/"
   },
-  "description": "",
+  "description": "How to perform cutoff analysis when deploying credit risk scorecards",
   "author": {
     "@type": "Person",
     "name": "Riddhiman"
@@ -65,7 +64,7 @@
   },
   "datePublished": "2021-09-18T00:00:00Z",
   "dateModified": "2021-09-18T00:00:00Z",
-  "articleBody": ""
+  "articleBody": "\u003cp\u003eINTRODUCTION HERE\u003c/p\u003e\n\u003ch2 id=\"packages\"\u003ePackages\u003c/h2\u003e\n\u003cp\u003eLet\u0026rsquo;s get package installation out of the way first.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Pacman is a package management tool \u003c/span\u003e\n\u003cspan style=\"color:#a6e22e\"\u003einstall.packages\u003c/span\u003e(\u003cspan style=\"color:#e6db74\"\u003e\u0026#34;pacman\u0026#34;\u003c/span\u003e)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003elibrary\u003c/span\u003e(pacman)\n\u003cspan style=\"color:#75715e\"\u003e## Warning: package \u0026#39;pacman\u0026#39; was built under R version 4.1.1\u003c/span\u003e\n\n\u003cspan style=\"color:#75715e\"\u003e# p_load automatically installs packages if needed\u003c/span\u003e\n\u003cspan style=\"color:#a6e22e\"\u003ep_load\u003c/span\u003e(dplyr, magrittr, knitr, scales)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ch2 id=\"sample-dataset\"\u003eSample dataset\u003c/h2\u003e\n\u003cp\u003eHere\u0026rsquo;s some sample data to play around with. The data set is small sample of the \u003cstrong\u003eLending Club\u003c/strong\u003e dataset available on \u003ca href=\"https://www.kaggle.com/wordsforthewise/lending-club\"\u003ekaggle\u003c/a\u003e.\u003c/p\u003e\n\u003cp\u003eThe file is available for download \u003ca href=\"https://github.com/royr2/blog/blob/main/download/credit_sample.csv\"\u003ehere\u003c/a\u003e.\u003c/p\u003e"
 }
 </script>
 
@@ -108,31 +107,29 @@
   
 </header>
 
-  <main><div class="default-taxonomy">
+  <main>
+<div class="page-single">
   <div class="ax-content ax-l-o">
     <div class="ax-l-i max-w-4xl">
-      <h1 class="section-title font-content-sans font-semibold uppercase tracking-wide text-2xl text-raven-800">Tag: dplyr</h1>
-      <div class="mt-8">
-        <div class="summary sm:flex">
-  <div class="summary-content font-content-sans">
-    <a class="summary-title block font-semibold leading-tighter tracking-snug text-2xl text-raven-800 hover:text-raven-900" href="/base/">Score cutoff analysis</a>
-    <a class="summary-excerpt mt-2 block font-normal leading-tight tracking-normal text-base text-raven-500 hover:text-raven-600" href="/base/">Credit risk series (Part 2)</a>
-    <aside class="summary-meta mt-6 font-normal leading-snug tracking-normal text-sm text-raven-500"><time datetime="2021-09-18T00:00:00Z">Sep 18, 2021</time></aside>
-  </div>
-</div>
+      <h1 class="page-title font-content-title font-normal leading-tight tracking-default text-40">Score cutoff analysis</h1>
 
-      </div>
-      <div class="mt-8">
-        <div class="summary sm:flex">
-  <div class="summary-content font-content-sans">
-    <a class="summary-title block font-semibold leading-tighter tracking-snug text-2xl text-raven-800 hover:text-raven-900" href="/post/gains_table/">Measuring model performance using a gains table</a>
-    <a class="summary-excerpt mt-2 block font-normal leading-tight tracking-normal text-base text-raven-500 hover:text-raven-600" href="/post/gains_table/">Credit risk series (Post #1)</a>
-    <aside class="summary-meta mt-6 font-normal leading-snug tracking-normal text-sm text-raven-500"><time datetime="2021-09-06T00:00:00Z">Sep 6, 2021</time></aside>
-  </div>
-</div>
+      <article class="cdata mt-8">
+        <p>INTRODUCTION HERE</p>
+<h2 id="packages">Packages</h2>
+<p>Let&rsquo;s get package installation out of the way first.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Pacman is a package management tool </span>
+<span style="color:#a6e22e">install.packages</span>(<span style="color:#e6db74">&#34;pacman&#34;</span>)
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(pacman)
+<span style="color:#75715e">## Warning: package &#39;pacman&#39; was built under R version 4.1.1</span>
 
-      </div>
-</div>
+<span style="color:#75715e"># p_load automatically installs packages if needed</span>
+<span style="color:#a6e22e">p_load</span>(dplyr, magrittr, knitr, scales)
+</code></pre></div><h2 id="sample-dataset">Sample dataset</h2>
+<p>Here&rsquo;s some sample data to play around with. The data set is small sample of the <strong>Lending Club</strong> dataset available on <a href="https://www.kaggle.com/wordsforthewise/lending-club">kaggle</a>.</p>
+<p>The file is available for download <a href="https://github.com/royr2/blog/blob/main/download/credit_sample.csv">here</a>.</p>
+
+      </article>
+    </div>
   </div>
 </div>
 

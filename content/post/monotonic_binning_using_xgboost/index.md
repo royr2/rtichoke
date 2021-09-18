@@ -122,7 +122,7 @@ mdl <- xgboost(
   params = list(objective = "binary:logistic", ## Binary outcome
                 monotone_constraints = 1, 
                 max_depth = 10))  ## 1
-## [10:07:37] WARNING: amalgamation/../src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'binary:logistic' was changed from 'error' to 'logloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
+## [10:09:51] WARNING: amalgamation/../src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'binary:logistic' was changed from 'error' to 'logloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
 ## [1]	train-logloss:0.541928
 ```
 ## Retrieving splits
