@@ -37,6 +37,16 @@ url = "/rbloggers/"
 name = "R-Bloggers"
 weight = 3
 
+[[menu.main]]
+url = "/rbloggers/"
+name = "R-Bloggers"
+weight = 3
+
+[[menu.main]]
+url = "/rbloggers/"
+name = "R-Bloggers"
+weight = 3
+
 [params.social]
 github = "https://github.com/royr2"
 linkedin = "https://www.linkedin.com/in/riddhimanr"
