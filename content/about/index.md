@@ -1,11 +1,9 @@
 # About me 
-Hi :wave:, I am Riddhiman and an avid `R` user. The R programming language has been my tool of choice so far primarily due to the rich ecosystem that it provides (data / modelling / reporting / application development / documentation / pipelines). 
+Hi :wave:, thanks for visiting!
 
-Click [here](https://www.r-bloggers.com/) to visit *R-Bloggers* which is a blog aggregator for blogs that showcase `R` related content. 
-
-Thanks for visiting!
+I am an avid `R` user and I sometimes write about `R` and how to use it for analytics.
 
 <small> Built with :heart: using [Hugo](https://gohugo.io/), [Axiom](https://github.com/marketempower/axiom),   [Netlify](https://www.netlify.com/), [RStudio](https://www.rstudio.com/) and [Blogdown](https://bookdown.org/yihui/blogdown/)
-:metal: </small>
+</small>
 
 

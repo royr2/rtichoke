@@ -4,7 +4,7 @@ baseURL = "https://rtichoke.netlify.app/"
 languageCode = "en-us"
 defaultContentLanguage = "en"
 
-paginate = 3
+paginate = 5
 canonifyURLs = false
 summaryLength = 10
 rssLimit = 10
@@ -30,7 +30,12 @@ weight = 1
 [[menu.main]]
 url = "/about/"
 name = "About"
-weight = 1
+weight = 2
+
+[[menu.main]]
+url = "/rbloggers/"
+name = "R-Bloggers"
+weight = 3
 
 [params.social]
 github = "https://github.com/royr2"

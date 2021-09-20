@@ -112,4 +112,8 @@
     <loc>https://rtichoke.netlify.app/about/</loc>
     <priority>0</priority>
   </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/rbloggers/</loc>
+    <priority>0</priority>
+  </url>
 </urlset>
