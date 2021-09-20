@@ -1,5 +1,5 @@
-https://rtichoke.netlify.app/post/charting_functions_with_ggplot
-https://rtichoke.netlify.app/post/covid_visualisation_using_leaflet
-https://rtichoke.netlify.app/post/gains_table
-https://rtichoke.netlify.app/post/monotonic_binning_using_xgboost
+https://rtichoke.netlify.app/post/charting_functions_with_ggplot.html
+https://rtichoke.netlify.app/post/covid_visualisation_using_leaflet.html
+https://rtichoke.netlify.app/post/gains_table.html
+https://rtichoke.netlify.app/post/monotonic_binning_using_xgboost.html
 
