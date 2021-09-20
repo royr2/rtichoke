@@ -6,14 +6,182 @@
     <description>Recent content on R&#39;tichoke</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 18 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://rtichoke.netlify.app/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 17 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://rtichoke.netlify.app/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Score cutoff analysis</title>
-      <link>https://rtichoke.netlify.app/base/</link>
-      <pubDate>Sat, 18 Sep 2021 00:00:00 +0000</pubDate>
+      <title>Monotonic binning using XGBOOST</title>
+      <link>https://rtichoke.netlify.app/post/monotonic_binning_using_xgboost/</link>
+      <pubDate>Fri, 17 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://rtichoke.netlify.app/base/</guid>
-      <description>How to perform cutoff analysis when deploying credit risk scorecards</description>
+      <guid>https://rtichoke.netlify.app/post/monotonic_binning_using_xgboost/</guid>
+      <description>&lt;p&gt;When developing credit risk scorecards, it is generally a good idea to discretise (bin) numeric variables in a manner that ensures monotonically increasing or decreasing event rates as the variable increases or decreases. While discretising individual variables adds stability to the model, monotonic bins ensure that the model output is consistent and interpretable (i.e. if variable &amp;lsquo;x&amp;rsquo; increases, the computed score increases across each bin). We&amp;rsquo;ll explore how to do create monotonic bins in &lt;code&gt;R&lt;/code&gt; using &lt;code&gt;xgboost&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;libraries&#34;&gt;Libraries&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Pacman is a package management tool &lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;install.packages&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;pacman&amp;#34;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;library&lt;/span&gt;(pacman)
+
+&lt;span style=&#34;color:#75715e&#34;&gt;# p_load automatically installs packages if needed&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;p_load&lt;/span&gt;(recipes, dplyr, ggplot2, xgboost, gridExtra)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;sample-dataset&#34;&gt;Sample dataset&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/royr2/blog/blob/main/download/credit_sample.csv&#34;&gt;Here&amp;rsquo;s&lt;/a&gt; a small sample sample of the &lt;strong&gt;Lending Club&lt;/strong&gt; dataset available on &lt;a href=&#34;https://www.kaggle.com/wordsforthewise/lending-club&#34;&gt;Kaggle&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;sample &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;read.csv&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;credit_sample.csv&amp;#34;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;dim&lt;/span&gt;(sample)
+&lt;span style=&#34;color:#75715e&#34;&gt;## [1] 10000   153&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;class&lt;/span&gt;(sample)
+&lt;span style=&#34;color:#75715e&#34;&gt;## [1] &amp;#34;data.frame&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;create-a-target&#34;&gt;Create a target&lt;/h2&gt;
+&lt;p&gt;Like in my previous &lt;a href=&#34;https://rtichoke.netlify.app/post/gains_table&#34;&gt;post&lt;/a&gt;, I&amp;rsquo;ll use the &lt;code&gt;loan_status&lt;/code&gt; column as the target variable.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Specific values to be tagged as &amp;#39;bad&amp;#39;&lt;/span&gt;
+codes &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Charged Off&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Does not meet the credit policy. Status:Charged Off&amp;#34;&lt;/span&gt;)
+
+model_data &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; sample &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(bad_flag &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ifelse&lt;/span&gt;(loan_status &lt;span style=&#34;color:#f92672&#34;&gt;%in%&lt;/span&gt; codes, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;data-prep&#34;&gt;Data prep&lt;/h2&gt;
+&lt;p&gt;We&amp;rsquo;ll use the &lt;code&gt;recipes&lt;/code&gt; package to remove non numeric variables and impute missing values using. For additional details, see the &lt;a href=&#34;https://recipes.tidymodels.org/&#34;&gt;documentation&lt;/a&gt; for &lt;code&gt;recipes&lt;/code&gt;. Note that the formula inside the &lt;code&gt;recipe()&lt;/code&gt; function decides which columns are predictors and which column is the target.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Specify basic recipe&lt;/span&gt;
+rec &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;recipe&lt;/span&gt;(bad_flag &lt;span style=&#34;color:#f92672&#34;&gt;~&lt;/span&gt; ., data &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; model_data) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;step_select&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;where&lt;/span&gt;(is.numeric)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;step_impute_median&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;all_predictors&lt;/span&gt;())
+
+rec &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;prep&lt;/span&gt;(rec, training &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; model_data)
+
+&lt;span style=&#34;color:#75715e&#34;&gt;# Not doing a test/train split &lt;/span&gt;
+train &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;bake&lt;/span&gt;(rec, new_data &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; model_data)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;analysing-directional-trend&#34;&gt;Analysing directional trend&lt;/h2&gt;
+&lt;p&gt;Now that we have a clean training dataset, its important to ascertain how the event rate &lt;em&gt;should&lt;/em&gt; change when a particular variable changes. This is important since this directional trend will dictate how we constraint the &lt;code&gt;xgboost&lt;/code&gt; model.&lt;/p&gt;
+&lt;p&gt;A good way to do this is to use both data and intuition. As an example, consider the variable &lt;code&gt;inq_last_6mths&lt;/code&gt; (number of inquiries in the last 6 months). Intuitively, as the number of inquiries increase, one would expect the event rate (chance of default) to increase. We can validate this using a simple bar chart like the one shown below.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;data.frame&lt;/span&gt;(x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; model_data&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;inq_last_6mths,
+           y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; model_data&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;bad_flag) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;filter&lt;/span&gt;(x &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;group_by&lt;/span&gt;(x) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;summarise&lt;/span&gt;(count &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;n&lt;/span&gt;(), 
+            events &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(y)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(pct &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; events&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;count) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;ggplot&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;aes&lt;/span&gt;(x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;factor&lt;/span&gt;(x), y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; pct)) &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;geom_col&lt;/span&gt;() &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;theme_minimal&lt;/span&gt;() &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;labs&lt;/span&gt;(x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;# of inquiries in past 6 months&amp;#34;&lt;/span&gt;, 
+       y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Default rate&amp;#34;&lt;/span&gt;, 
+       title &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Default rate vs number of inquiries in past 6 months&amp;#34;&lt;/span&gt;, 
+       subtitle &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Positive relationship&amp;#34;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;chart1-1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;This confirms our hypothesis and also tells us that we need to constraint the &lt;code&gt;xgboost&lt;/code&gt; model such the probability outcome increases as the value of the variable &lt;code&gt;inq_last_6mths&lt;/code&gt; increases.&lt;/p&gt;
+&lt;h2 id=&#34;xgboost-model&#34;&gt;xgboost model&lt;/h2&gt;
+&lt;p&gt;We&amp;rsquo;ll create an xgb model with the following specs:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;One boosting iteration&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;monotone_constraints&lt;/code&gt; = 1 (i.e. splits which only increase the probability outcome)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;max_depth&lt;/code&gt; = 10 (as an example, can be deeper if one needs additional bins)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;mdl &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;xgboost&lt;/span&gt;(
+  data &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; train &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;select&lt;/span&gt;(inq_last_6mths) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;  &lt;span style=&#34;color:#75715e&#34;&gt;## Select only inq_last_6mths&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;as.matrix&lt;/span&gt;(),  &lt;span style=&#34;color:#75715e&#34;&gt;## convert to matrix since the xgboost() interface only accepts matrices&lt;/span&gt;
+  label &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; train[[&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;bad_flag&amp;#34;&lt;/span&gt;]],  &lt;span style=&#34;color:#75715e&#34;&gt;## Target variable&lt;/span&gt;
+  nrounds &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;,  &lt;span style=&#34;color:#75715e&#34;&gt;## Only one boosting iteration&lt;/span&gt;
+  params &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;list&lt;/span&gt;(objective &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;binary:logistic&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#75715e&#34;&gt;## Binary outcome&lt;/span&gt;
+                monotone_constraints &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, 
+                max_depth &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;))  &lt;span style=&#34;color:#75715e&#34;&gt;## 1&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## [07:07:34] WARNING: amalgamation/../src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective &amp;#39;binary:logistic&amp;#39; was changed from &amp;#39;error&amp;#39; to &amp;#39;logloss&amp;#39;. Explicitly set eval_metric if you&amp;#39;d like to restore the old behavior.&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## [1]	train-logloss:0.541928&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;retrieving-splits&#34;&gt;Retrieving splits&lt;/h2&gt;
+&lt;p&gt;Now that we have a model, we need to retrieve the split points and evaluate whether the binning scheme is intuitive (or not).&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Convert model into a dataframe like output&lt;/span&gt;
+splits &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;xgb.model.dt.tree&lt;/span&gt;(model &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; mdl)  
+
+&lt;span style=&#34;color:#75715e&#34;&gt;# Add +/- Inf to provide coverage for values not observed &lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;# in the training dataset&lt;/span&gt;
+cuts &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt;(&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;Inf&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;sort&lt;/span&gt;(splits&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;Split), &lt;span style=&#34;color:#66d9ef&#34;&gt;Inf&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Plot bins and event rates&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;data.frame&lt;/span&gt;(target &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; train&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;bad_flag,
+           buckets &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;cut&lt;/span&gt;(train&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;inq_last_6mths, 
+                         breaks &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; cuts, 
+                         include.lowest &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T, 
+                         right &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T, 
+                         ordered_result &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;group_by&lt;/span&gt;(buckets) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;summarise&lt;/span&gt;(total &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;n&lt;/span&gt;(),
+            events &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(target &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(pct &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; events&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;total) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;ggplot&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;aes&lt;/span&gt;(x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; buckets, y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; pct)) &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;geom_col&lt;/span&gt;() &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;theme_minimal&lt;/span&gt;() &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;labs&lt;/span&gt;(x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Bins&amp;#34;&lt;/span&gt;, 
+       y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Default rate&amp;#34;&lt;/span&gt;, 
+       title &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Monotonic binning for number of inquiries in past 6 months&amp;#34;&lt;/span&gt;, 
+       subtitle &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Monotonically increasing event rate&amp;#34;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;chart2-1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;creating-a-function&#34;&gt;Creating a function&lt;/h2&gt;
+&lt;p&gt;Finally, we can encapsulate everything we have done so far inside a function for better usability.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;create_bins &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;function&lt;/span&gt;(var, outcome, max_depth &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;, plot &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T){
+  
+  &lt;span style=&#34;color:#75715e&#34;&gt;# Check if relationship is positive or negative &lt;/span&gt;
+  &lt;span style=&#34;color:#75715e&#34;&gt;# Using spearman since it measures strength of monotonic relationship &lt;/span&gt;
+  corr &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;cor&lt;/span&gt;(var, outcome, method &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;spearman&amp;#34;&lt;/span&gt;)
+  direction &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ifelse&lt;/span&gt;(corr &lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;-1&lt;/span&gt;)
+  
+  &lt;span style=&#34;color:#75715e&#34;&gt;# Build XGB model &lt;/span&gt;
+  mdl &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;xgboost&lt;/span&gt;(
+    verbose &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;,
+    data &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;as.matrix&lt;/span&gt;(var),
+    label &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; outcome,
+    nrounds &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;,  
+    params &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;list&lt;/span&gt;(objective &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;binary:logistic&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#75715e&#34;&gt;## Binary outcome&lt;/span&gt;
+                  monotone_constraints &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; direction, 
+                  max_depth &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; max_depth, 
+                  eval_metric &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;auc&amp;#34;&lt;/span&gt;))
+  
+  &lt;span style=&#34;color:#75715e&#34;&gt;# Retrieve splits &lt;/span&gt;
+  splits &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;xgb.model.dt.tree&lt;/span&gt;(model &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; mdl)
+  cuts &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt;(&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;Inf&lt;/span&gt;, &lt;span style=&#34;color:#a6e22e&#34;&gt;sort&lt;/span&gt;(splits&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;Split), &lt;span style=&#34;color:#66d9ef&#34;&gt;Inf&lt;/span&gt;)
+  binned &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;cut&lt;/span&gt;(var, 
+                breaks &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; cuts, 
+                include.lowest &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T, 
+                right &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T, 
+                ordered_result &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T)
+  
+  &lt;span style=&#34;color:#75715e&#34;&gt;# Create an event rate plot&lt;/span&gt;
+  plt &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;data.frame&lt;/span&gt;(outcome, binned) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+      &lt;span style=&#34;color:#a6e22e&#34;&gt;group_by&lt;/span&gt;(binned) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;
+      &lt;span style=&#34;color:#a6e22e&#34;&gt;summarise&lt;/span&gt;(total &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;n&lt;/span&gt;(),
+                events &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(outcome &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;
+      &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(pct &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; events&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;total) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;
+      &lt;span style=&#34;color:#a6e22e&#34;&gt;ggplot&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;aes&lt;/span&gt;(x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; binned, y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; pct)) &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+      &lt;span style=&#34;color:#a6e22e&#34;&gt;geom_col&lt;/span&gt;() &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+      &lt;span style=&#34;color:#a6e22e&#34;&gt;theme_minimal&lt;/span&gt;() &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+      &lt;span style=&#34;color:#a6e22e&#34;&gt;labs&lt;/span&gt;(x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Bins&amp;#34;&lt;/span&gt;, 
+           y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Event Rate&amp;#34;&lt;/span&gt;, 
+           title &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Monotonic binning output&amp;#34;&lt;/span&gt;)
+    
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;if&lt;/span&gt;(plot &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; T){
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;print&lt;/span&gt;(plt)
+  }
+  
+  &lt;span style=&#34;color:#75715e&#34;&gt;# List to be returned&lt;/span&gt;
+  lst &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;list&lt;/span&gt;(
+    var &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; var, 
+    binned_var &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; binned, 
+    cor &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; corr, 
+    plot &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; plt
+  )
+  
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;return&lt;/span&gt;(lst)
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Test function&lt;/span&gt;
+v1 &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;create_bins&lt;/span&gt;(train&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;fico_range_high, train&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;bad_flag, max_depth &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;, plot &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; F)
+v2 &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;create_bins&lt;/span&gt;(train&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;delinq_amnt, train&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;bad_flag, max_depth &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;, plot &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; F)
+v3 &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;create_bins&lt;/span&gt;(train&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;int_rate, train&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;bad_flag, max_depth &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;, plot &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; F)
+v4 &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;create_bins&lt;/span&gt;(train&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;annual_inc, train&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;bad_flag, max_depth &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;, plot &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; F)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;grid.arrange&lt;/span&gt;(v1&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;plot &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;labs&lt;/span&gt;(subtitle &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Fico Range High&amp;#34;&lt;/span&gt;), 
+             v2&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;plot &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;labs&lt;/span&gt;(subtitle &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Delinq Amount&amp;#34;&lt;/span&gt;), 
+             v3&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;plot &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;labs&lt;/span&gt;(subtitle &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Interest Rate&amp;#34;&lt;/span&gt;), 
+             v4&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;plot &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;labs&lt;/span&gt;(subtitle &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Annual Income&amp;#34;&lt;/span&gt;), 
+             ncol &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;chart3-1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;And that&amp;rsquo;s it! We can use what we just built to discretise variables we need, perform &lt;code&gt;one-hot-encoding&lt;/code&gt; or &lt;code&gt;WOE-transformations&lt;/code&gt; and feed the appropriate model matrix to our choice of statistical routine.&lt;/p&gt;
+&lt;h2 id=&#34;parting-notes&#34;&gt;Parting notes&lt;/h2&gt;
+&lt;p&gt;Check out this package called &lt;a href=&#34;https://github.com/statcompute/mob&#34;&gt;&lt;code&gt;MonotonicOptimalBinning&lt;/code&gt;&lt;/a&gt; by Wensui Liu which offers multiple binning strategies like isotonic binning, quantile binning and k-means binning.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Thoughts? Comments? Helpful? Not helpful? Like to see anything else added in here? Let me know!&lt;/em&gt;&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -22,7 +190,108 @@
       <pubDate>Sun, 12 Sep 2021 00:00:00 +0000</pubDate>
       
       <guid>https://rtichoke.netlify.app/post/covid_visualisation_using_leaflet/</guid>
-      <description>Data visualisation using R and leaflet</description>
+      <description>&lt;p&gt;&lt;code&gt;Leaflet&lt;/code&gt; is a JavaScript library for interactive maps. Leaflet for R is super easy to use and a great way to visualise data that has a spatial dimension. Below are some examples on how to use the &lt;code&gt;leaflet&lt;/code&gt; package in R to visualise some COVID-19 data.&lt;/p&gt;
+&lt;h2 id=&#34;packages&#34;&gt;Packages&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Pacman is a package management tool &lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;install.packages&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;pacman&amp;#34;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;library&lt;/span&gt;(pacman)
+
+&lt;span style=&#34;color:#75715e&#34;&gt;# p_load automatically installs packages if needed&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;p_load&lt;/span&gt;(dplyr, leaflet)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;sample-dataset&#34;&gt;Sample dataset&lt;/h2&gt;
+&lt;p&gt;A summarised version of the COVID-19 Data Repository hosted by &lt;a href=&#34;https://github.com/CSSEGISandData/COVID-19&#34;&gt;JHU&lt;/a&gt; is available for download &lt;a href=&#34;https://github.com/royr2/blog/blob/main/download/covid_data.csv&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;df &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;read.csv&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;covid_data.csv&amp;#34;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;confirmed-cases-across-countries&#34;&gt;Confirmed cases across countries&lt;/h2&gt;
+&lt;p&gt;Let&amp;rsquo;s say we wanted to visualise how the cumulative case load is distributed across different countries on a map (as of a certain date).&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;plt &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; df &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;filter&lt;/span&gt;(date &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;2021-09-01&amp;#34;&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Circle radius &lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Arbitrary scaling function for dramatic effect&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(rad &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sqrt&lt;/span&gt;(confirmed&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;max&lt;/span&gt;(confirmed)) &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Leaflet&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;leaflet&lt;/span&gt;(options &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;leafletOptions&lt;/span&gt;(minZoom &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;, maxZoom &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt;)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Base map layer&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Lots of other options see https://rstudio.github.io/leaflet/basemaps.html&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;addProviderTiles&lt;/span&gt;(providers&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;Stamen.Toner,
+                     options &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;providerTileOptions&lt;/span&gt;(opacity &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.6&lt;/span&gt;)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;
+    
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;addCircleMarkers&lt;/span&gt;(lng &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;~&lt;/span&gt;Longitude, 
+                     lat &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;~&lt;/span&gt;Latitude, 
+                     radius &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;~&lt;/span&gt;rad, 
+                     popup &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;~&lt;/span&gt;text,  &lt;span style=&#34;color:#75715e&#34;&gt;## Pop-ups understand html (see df$text)&lt;/span&gt;
+                     weight &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.7&lt;/span&gt;,
+                     stroke &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;T, 
+                     color &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;#000000&amp;#34;&lt;/span&gt;,
+                     fillColor &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;#79B4B7&amp;#34;&lt;/span&gt;, 
+                     fillOpacity &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.3&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;plt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;iframe src = &#34;map1.html&#34; height = &#34;600&#34; width = &#34;900&#34;&gt;&lt;/iframe&gt;
+&lt;p&gt;The nice thing about leaflet is that visualisations are interactive (try clicking one of the bubbles). Note that the labels have already been generated.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;head&lt;/span&gt;(df&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;text)
+&lt;span style=&#34;color:#75715e&#34;&gt;## [1] &amp;#34;&amp;lt;b&amp;gt;Afghanistan&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Confirmed: &amp;lt;b&amp;gt;0.0&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Death: &amp;lt;b&amp;gt;0.0&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Fatality Ratio: &amp;lt;b&amp;gt;0.0%&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## [2] &amp;#34;&amp;lt;b&amp;gt;Afghanistan&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Confirmed: &amp;lt;b&amp;gt;0.0&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Death: &amp;lt;b&amp;gt;0.0&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Fatality Ratio: &amp;lt;b&amp;gt;0.0%&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## [3] &amp;#34;&amp;lt;b&amp;gt;Afghanistan&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Confirmed: &amp;lt;b&amp;gt;0.0&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Death: &amp;lt;b&amp;gt;0.0&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Fatality Ratio: &amp;lt;b&amp;gt;0.0%&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## [4] &amp;#34;&amp;lt;b&amp;gt;Afghanistan&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Confirmed: &amp;lt;b&amp;gt;0.0&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Death: &amp;lt;b&amp;gt;0.0&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Fatality Ratio: &amp;lt;b&amp;gt;0.0%&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## [5] &amp;#34;&amp;lt;b&amp;gt;Afghanistan&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Confirmed: &amp;lt;b&amp;gt;0.0&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Death: &amp;lt;b&amp;gt;0.0&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Fatality Ratio: &amp;lt;b&amp;gt;0.0%&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## [6] &amp;#34;&amp;lt;b&amp;gt;Afghanistan&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Confirmed: &amp;lt;b&amp;gt;0.0&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Death: &amp;lt;b&amp;gt;0.0&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Fatality Ratio: &amp;lt;b&amp;gt;0.0%&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;tracking-confirmed-cases-over-time&#34;&gt;Tracking confirmed cases over time&lt;/h2&gt;
+&lt;p&gt;Now say we wanted to understand how the number of confirmed cases were distributed across countries at different points in time. Leaflet has a nice feature which allows users to add layers to the same graphic and UI elements (like radio buttons) to help switch between layers using the &lt;code&gt;group&lt;/code&gt; argument and the &lt;code&gt;addLayersControl()&lt;/code&gt; function.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;# Date series (every 21 days)&lt;/span&gt;
+vec &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;seq.Date&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;as.Date&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;2020-03-01&amp;#34;&lt;/span&gt;), to &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;as.Date&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;2021-09-01&amp;#34;&lt;/span&gt;), by &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;21 days&amp;#34;&lt;/span&gt;)
+vec &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;as.character&lt;/span&gt;(vec)
+
+plt &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; df &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Track the top 20 countries for each date&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;group_by&lt;/span&gt;(date) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;arrange&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;desc&lt;/span&gt;(confirmed)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;filter&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;row_number&lt;/span&gt;() &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;50&lt;/span&gt;, 
+           date &lt;span style=&#34;color:#f92672&#34;&gt;%in%&lt;/span&gt; vec) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Circle radius &lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Arbitrary scaling function for dramatic effect&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(rad &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sqrt&lt;/span&gt;(confirmed&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;max&lt;/span&gt;(confirmed)) &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;80&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Leaflet&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;leaflet&lt;/span&gt;(options &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;leafletOptions&lt;/span&gt;(minZoom &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;, maxZoom &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;6&lt;/span&gt;, )) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Base map layer&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Lots of other options see https://rstudio.github.io/leaflet/basemaps.html&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;addProviderTiles&lt;/span&gt;(providers&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;Stamen.TonerLite,
+                     options &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;providerTileOptions&lt;/span&gt;(opacity &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.8&lt;/span&gt;)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;
+    
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;addCircleMarkers&lt;/span&gt;(lng &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;~&lt;/span&gt;Longitude, 
+                     lat &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;~&lt;/span&gt;Latitude, 
+                     radius &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;~&lt;/span&gt;rad, 
+                     popup &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;~&lt;/span&gt;text,
+                     weight &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.7&lt;/span&gt;,
+                     stroke &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T, 
+                     color &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;#000000&amp;#34;&lt;/span&gt;,
+                     fillColor &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;#525c63&amp;#34;&lt;/span&gt;, 
+                     fillOpacity &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.5&lt;/span&gt;, 
+                     group &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;~&lt;/span&gt;date, 
+                     labelOptions &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;labelOptions&lt;/span&gt;(noHide &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; F)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Layer control&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;addLayersControl&lt;/span&gt;(
+        
+        &lt;span style=&#34;color:#75715e&#34;&gt;# Using baseGroups adds radio buttons which makes it easier to switch&lt;/span&gt;
+        baseGroups &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; vec,
+        
+        &lt;span style=&#34;color:#75715e&#34;&gt;# Using overlayGroups adds checkboxes        &lt;/span&gt;
+        &lt;span style=&#34;color:#75715e&#34;&gt;# overlayGroups = vec&lt;/span&gt;
+        
+        options &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;layersControlOptions&lt;/span&gt;(collapsed &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;FALSE&lt;/span&gt;))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;plt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;iframe src = &#34;map2.html&#34; height = &#34;600&#34; width = &#34;900&#34;&gt;&lt;/iframe&gt;
+&lt;p&gt;It is interesting to note which countries were affected by COVID-19 in early 2020, how it then rapidly spread across Europe, the impact of lock-downs onthe number of confirmed cases, India&amp;rsquo;s terrible second wave in mid 2021 and now the increasing number of cases in South East Asia.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Thoughts? Comments? Helpful? Not helpful? Like to see anything else added in here? Let me know!&lt;/em&gt;&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -31,7 +300,169 @@
       <pubDate>Sat, 11 Sep 2021 00:00:00 +0000</pubDate>
       
       <guid>https://rtichoke.netlify.app/post/charting_functions_with_ggplot/</guid>
-      <description>How to create a customised charting function using ggplot2</description>
+      <description>&lt;p&gt;While &lt;code&gt;R&lt;/code&gt; has variety of options to choose from when it comes to 2D graphics and data visualisation, it is hard to beat &lt;code&gt;ggplot2&lt;/code&gt; in terms of features, functionality and overall visual quality. I wanted to share my take on how to use the package which is, to make customised charting functions for specific chart types using &lt;code&gt;ggplot2&lt;/code&gt; as the underlying visualisation engine.&lt;/p&gt;
+&lt;h2 id=&#34;libraries&#34;&gt;Libraries&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Pacman is a package management tool &lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;install.packages&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;pacman&amp;#34;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;library&lt;/span&gt;(pacman)
+
+&lt;span style=&#34;color:#75715e&#34;&gt;# p_load automatically installs packages if needed&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;p_load&lt;/span&gt;(dplyr, ggplot2, scales, stringr)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;sample-dataset&#34;&gt;Sample dataset&lt;/h2&gt;
+&lt;p&gt;A summarised version of the COVID-19 Data Repository hosted by &lt;a href=&#34;https://github.com/CSSEGISandData/COVID-19&#34;&gt;JHU&lt;/a&gt; is available for download &lt;a href=&#34;https://github.com/royr2/blog/blob/main/download/covid_data.csv&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;df &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;read.csv&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;covid_data.csv&amp;#34;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Something of interest could be the daily number of confirmed cases for the top five countries (by volume). Some amount of data prep is needed to get to these numbers.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get top 5 countries&lt;/span&gt;
+top_countries &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; df &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;group_by&lt;/span&gt;(country) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;summarise&lt;/span&gt;(count &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(deaths_daily)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;top_n&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  .$country
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;print&lt;/span&gt;(top_countries)
+&lt;span style=&#34;color:#75715e&#34;&gt;## [1] &amp;#34;Brazil&amp;#34; &amp;#34;India&amp;#34;  &amp;#34;Mexico&amp;#34; &amp;#34;Peru&amp;#34;   &amp;#34;US&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Create a data frame with the required information&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;# Note that a centered 7 day moving average is used&lt;/span&gt;
+plotdf &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; df &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(date &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;as.Date&lt;/span&gt;(date)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;filter&lt;/span&gt;(country &lt;span style=&#34;color:#f92672&#34;&gt;%in%&lt;/span&gt; top_countries, 
+         date &lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;2020-05-01&amp;#34;&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;group_by&lt;/span&gt;(country, date) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;summarise&lt;/span&gt;(count &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(confirmed_daily)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;arrange&lt;/span&gt;(country, date) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;group_by&lt;/span&gt;(country) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(MA &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; zoo&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;rollapply&lt;/span&gt;(count, FUN &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; mean, width &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;7&lt;/span&gt;, by &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, fill &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;NA&lt;/span&gt;, align &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;center&amp;#34;&lt;/span&gt;))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;simple-example&#34;&gt;Simple example&lt;/h2&gt;
+&lt;p&gt;Say we needed a line chart visualising the data we just prepared. Note the use &lt;code&gt;aes_string()&lt;/code&gt; instead of just &lt;code&gt;aes()&lt;/code&gt;. This lets us supply arguments to &lt;code&gt;ggplot2&lt;/code&gt; as strings.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Function definition.&lt;/span&gt;
+line_chart &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;function&lt;/span&gt;(df, x, y, group_color &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;NULL&lt;/span&gt;, line_width &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, line_type &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;){
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;ggplot&lt;/span&gt;(df, &lt;span style=&#34;color:#a6e22e&#34;&gt;aes_string&lt;/span&gt;(x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; x, y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; y, color &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; group_color)) &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;geom_line&lt;/span&gt;(size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; line_width, linetype &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; line_type)
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Test run&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;line_chart&lt;/span&gt;(plotdf, x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;date&amp;#34;&lt;/span&gt;, y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;MA&amp;#34;&lt;/span&gt;, group_color &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;country&amp;#34;&lt;/span&gt;, 
+           line_type &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, line_width &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1.2&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;chart1-1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;customised-theme&#34;&gt;Customised theme&lt;/h2&gt;
+&lt;p&gt;Now that we know how to encapsulate the call to &lt;code&gt;ggplot2&lt;/code&gt; in a more intuitive manner, we can create a customised theme for our charts. This is useful since this theme can be applied to any chart.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;custom_theme &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;function&lt;/span&gt;(plt, base_size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;11&lt;/span&gt;, base_line_size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, palette &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Set1&amp;#34;&lt;/span&gt;){
+  
+  &lt;span style=&#34;color:#75715e&#34;&gt;# Note the use of &amp;#34;+&amp;#34; and not &amp;#34;%&amp;gt;%&amp;#34;&lt;/span&gt;
+  plt &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Adjust overall font size&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;theme_minimal&lt;/span&gt;(base_size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; base_size, base_line_size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; base_line_size) &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Put legend at the bottom&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;theme&lt;/span&gt;(legend.position &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;bottom&amp;#34;&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Different colour scale&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;scale_color_brewer&lt;/span&gt;(palette &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; palette)
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Test run&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;line_chart&lt;/span&gt;(plotdf, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;date&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;MA&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;country&amp;#34;&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;custom_theme&lt;/span&gt;()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;chart2-1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;adding-bells-and-whistles&#34;&gt;Adding bells and whistles&lt;/h2&gt;
+&lt;p&gt;Now that we have some of the basic components, we can add some additional features to our &lt;code&gt;line_chart()&lt;/code&gt; function.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;line_chart &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;function&lt;/span&gt;(df, x, y, group_color &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;NULL&lt;/span&gt;, 
+                       line_width &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, line_type &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, 
+                       xlab &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;NULL&lt;/span&gt;, ylab &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;NULL&lt;/span&gt;, 
+                       title &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;NULL&lt;/span&gt;, subtitle &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;NULL&lt;/span&gt;, caption &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;NULL&lt;/span&gt;){
+  &lt;span style=&#34;color:#75715e&#34;&gt;# Base plot&lt;/span&gt;
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;ggplot&lt;/span&gt;(df, &lt;span style=&#34;color:#a6e22e&#34;&gt;aes_string&lt;/span&gt;(x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; x, y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; y, color &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; group_color)) &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Line chart &lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;geom_line&lt;/span&gt;(size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; line_width, linetype &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; line_type) &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Titles and subtitles&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;labs&lt;/span&gt;(x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; xlab, y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; ylab, title &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; title, subtitle &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; subtitle, caption &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; caption)
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;We&amp;rsquo;ll also tinker with our &lt;code&gt;custom_theme()&lt;/code&gt; function.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;custom_theme &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;function&lt;/span&gt;(plt, 
+                         palette &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Set1&amp;#34;&lt;/span&gt;, 
+                         format_x_axis_as &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;NULL&lt;/span&gt;, format_y_axis_as &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;NULL&lt;/span&gt;, 
+                         x_axis_scale &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, y_axis_scale &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, 
+                         x_axis_text_size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;, y_axis_text_size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;, 
+                         base_size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;11&lt;/span&gt;, base_line_size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;){
+  
+  mappings &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;names&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;unlist&lt;/span&gt;(plt&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;mapping))
+  
+  p &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; plt &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Adjust overall font size&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;theme_minimal&lt;/span&gt;(base_size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; base_size, base_line_size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; base_line_size) &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Put legend at the bottom&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;theme&lt;/span&gt;(legend.position &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;bottom&amp;#34;&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Different colour palette&lt;/span&gt;
+    {&lt;span style=&#34;color:#a6e22e&#34;&gt;if&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;colour&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;%in%&lt;/span&gt; mappings) &lt;span style=&#34;color:#a6e22e&#34;&gt;scale_color_brewer&lt;/span&gt;(palette &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; palette)}&lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt;
+    
+    {&lt;span style=&#34;color:#a6e22e&#34;&gt;if&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;fill&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;%in%&lt;/span&gt; mappings) &lt;span style=&#34;color:#a6e22e&#34;&gt;scale_fill_brewer&lt;/span&gt;(palette &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; palette)}&lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt;
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Change some theme options&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;theme&lt;/span&gt;(plot.background &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;element_rect&lt;/span&gt;(fill &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;#f7f7f7&amp;#34;&lt;/span&gt;), 
+          plot.subtitle &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;element_text&lt;/span&gt;(face &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;italic&amp;#34;&lt;/span&gt;), 
+          axis.title.x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;element_text&lt;/span&gt;(face &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;bold&amp;#34;&lt;/span&gt;, 
+                                      size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; x_axis_text_size), 
+          axis.title.y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;element_text&lt;/span&gt;(face &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;bold&amp;#34;&lt;/span&gt;, 
+                                      size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; y_axis_text_size)) &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Change x-axis formatting&lt;/span&gt;
+    {&lt;span style=&#34;color:#a6e22e&#34;&gt;if&lt;/span&gt;(&lt;span style=&#34;color:#f92672&#34;&gt;!&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;is.null&lt;/span&gt;(format_x_axis_as))
+      &lt;span style=&#34;color:#a6e22e&#34;&gt;switch&lt;/span&gt;(format_x_axis_as, 
+             &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;date&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;scale_x_date&lt;/span&gt;(breaks &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;pretty_breaks&lt;/span&gt;(n &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;12&lt;/span&gt;)), 
+             &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;number&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;scale_x_continuous&lt;/span&gt;(labels &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;number_format&lt;/span&gt;(accuracy &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1&lt;/span&gt;, 
+                                                                  decimal.mark &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;,&amp;#34;&lt;/span&gt;, 
+                                                                  scale &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; x_axis_scale)), 
+             &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;percent&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;scale_x_continuous&lt;/span&gt;(labels &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; percent))} &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# Change y-axis formatting&lt;/span&gt;
+    {&lt;span style=&#34;color:#a6e22e&#34;&gt;if&lt;/span&gt;(&lt;span style=&#34;color:#f92672&#34;&gt;!&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;is.null&lt;/span&gt;(format_y_axis_as))
+      
+      &lt;span style=&#34;color:#a6e22e&#34;&gt;switch&lt;/span&gt;(format_y_axis_as, 
+             &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;date&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;scale_y_date&lt;/span&gt;(breaks &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;pretty_breaks&lt;/span&gt;(n &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;12&lt;/span&gt;)), 
+             &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;number&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;scale_y_continuous&lt;/span&gt;(labels &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;number_format&lt;/span&gt;(accuracy &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1&lt;/span&gt;, 
+                                                                  decimal.mark &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;,&amp;#34;&lt;/span&gt;, 
+                                                                  scale &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; y_axis_scale)), 
+             &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;percent&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;scale_y_continuous&lt;/span&gt;(labels &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; percent))}
+  
+  &lt;span style=&#34;color:#75715e&#34;&gt;# Capitalise all names&lt;/span&gt;
+  vec &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;lapply&lt;/span&gt;(p&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;labels, str_to_title)
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;names&lt;/span&gt;(vec) &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;names&lt;/span&gt;(p&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;labels)
+  p&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;labels &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; vec
+  
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;return&lt;/span&gt;(p)
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Now let&amp;rsquo;s see how it all comes together.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;line_chart&lt;/span&gt;(plotdf,
+           x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;date&amp;#34;&lt;/span&gt;, 
+           y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;MA&amp;#34;&lt;/span&gt;, 
+           group_color &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;country&amp;#34;&lt;/span&gt;, 
+           xlab &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Date&amp;#34;&lt;/span&gt;, 
+           ylab &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Moving Avg. (in &amp;#39;000)&amp;#34;&lt;/span&gt;, 
+           title &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Daily COVID19 Case Load&amp;#34;&lt;/span&gt;, 
+           subtitle &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Top 5 countries by volume&amp;#34;&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;custom_theme&lt;/span&gt;(format_x_axis_as &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;date&amp;#34;&lt;/span&gt;, 
+               format_y_axis_as &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;number&amp;#34;&lt;/span&gt;, 
+               y_axis_scale &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.001&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;chart3-1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;bar-chart-example&#34;&gt;Bar chart example&lt;/h2&gt;
+&lt;p&gt;The good thing about the &lt;code&gt;custom_theme()&lt;/code&gt; function is that it can be applied to any &lt;code&gt;ggplot2&lt;/code&gt; object.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;p &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; plotdf &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt;  
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(month &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;format&lt;/span&gt;(date, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;%m-%b&amp;#34;&lt;/span&gt;)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;ggplot&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;aes&lt;/span&gt;(x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; month, y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; MA, fill &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; country)) &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;geom_col&lt;/span&gt;(position &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;dodge&amp;#34;&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;labs&lt;/span&gt;(title &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Monthly COVID19 Case load trend&amp;#34;&lt;/span&gt;, 
+       subtitle &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Top 5 countries&amp;#34;&lt;/span&gt;, 
+       x &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Month&amp;#34;&lt;/span&gt;, 
+       y &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Moving Average (&amp;#39;000)&amp;#34;&lt;/span&gt;)
+
+&lt;span style=&#34;color:#a6e22e&#34;&gt;custom_theme&lt;/span&gt;(p, palette &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Set1&amp;#34;&lt;/span&gt;, format_y_axis_as &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;number&amp;#34;&lt;/span&gt;, y_axis_scale &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.001&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;chart4-1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;parting-notes&#34;&gt;Parting notes&lt;/h2&gt;
+&lt;p&gt;It is worth noting that building customised charting functions using &lt;code&gt;ggplot2&lt;/code&gt; is most useful when you need to create the same type of chart(s) again and again. When doing any kind of exploratory work, using &lt;code&gt;ggplot2&lt;/code&gt; directly is easier and more useful since you can build all kinds of charts (or layer charts of different types) within the same pipeline.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Thoughts? Comments? Helpful? Not helpful? Like to see anything else added in here? Let me know!&lt;/em&gt;&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -40,7 +471,768 @@
       <pubDate>Mon, 06 Sep 2021 00:00:00 +0000</pubDate>
       
       <guid>https://rtichoke.netlify.app/post/gains_table/</guid>
-      <description>How to create a gains table to measure the performance of a binary classification model</description>
+      <description>&lt;p&gt;Modellers/analysts developing credit scores generally use something known as the &lt;code&gt;gains table&lt;/code&gt; (or a &lt;code&gt;ks table&lt;/code&gt;) to measure and quantify the performance of such models. We&amp;rsquo;ll explore how to build such a table in this post.&lt;/p&gt;
+&lt;p&gt;The idea is to first discretise the population under consideration (say the testing or validation set) into groups based on the model&amp;rsquo;s output (probability/log odds/scores). Typically, this is done in a way such that each group represents 10% of the total population (or deciles). Then, summary statistics are generated for each group and  cumulative distributions of events and non-events are analysed and the model&amp;rsquo;s performance is quantified.&lt;/p&gt;
+&lt;p&gt;We&amp;rsquo;ll use &lt;code&gt;dplyr&lt;/code&gt; in this post. Doing it this way is nice since it&amp;rsquo;s easier to read and the code would need minimal changes if using &lt;code&gt;sparklyr&lt;/code&gt; (say within a big data environment where one might need to run this directly on a &lt;em&gt;hadoop&lt;/em&gt; table).&lt;/p&gt;
+&lt;h2 id=&#34;packages&#34;&gt;Packages&lt;/h2&gt;
+&lt;p&gt;Let&amp;rsquo;s get package installation out of the way first.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Pacman is a package management tool &lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;install.packages&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;pacman&amp;#34;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;library&lt;/span&gt;(pacman)
+&lt;span style=&#34;color:#75715e&#34;&gt;## Warning: package &amp;#39;pacman&amp;#39; was built under R version 4.1.1&lt;/span&gt;
+
+&lt;span style=&#34;color:#75715e&#34;&gt;# p_load automatically installs packages if needed&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;p_load&lt;/span&gt;(dplyr, magrittr, knitr, scales)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;sample-dataset&#34;&gt;Sample dataset&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/royr2/blog/blob/main/download/credit_sample.csv&#34;&gt;Here&amp;rsquo;s&lt;/a&gt; some sample data to play around with. The data set is small sample of the &lt;strong&gt;Lending Club&lt;/strong&gt; dataset available on &lt;a href=&#34;https://www.kaggle.com/wordsforthewise/lending-club&#34;&gt;Kaggle&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;sample &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;read.csv&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;credit_sample.csv&amp;#34;&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;dim&lt;/span&gt;(sample)
+&lt;span style=&#34;color:#75715e&#34;&gt;## [1] 10000   153&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;class&lt;/span&gt;(sample)
+&lt;span style=&#34;color:#75715e&#34;&gt;## [1] &amp;#34;data.frame&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;defining-a-target&#34;&gt;Defining a target&lt;/h2&gt;
+&lt;p&gt;First, we need to create a target (outcome) to model for. Since this is a credit risk use case, we are looking to create a target which identifies borrowers who defaulted on (or missed) their payments consecutively.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;unique&lt;/span&gt;(sample&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;loan_status)
+&lt;span style=&#34;color:#75715e&#34;&gt;## [1] &amp;#34;Fully Paid&amp;#34;                                         &lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## [2] &amp;#34;Current&amp;#34;                                            &lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## [3] &amp;#34;Charged Off&amp;#34;                                        &lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## [4] &amp;#34;Late (31-120 days)&amp;#34;                                 &lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## [5] &amp;#34;Late (16-30 days)&amp;#34;                                  &lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## [6] &amp;#34;In Grace Period&amp;#34;                                    &lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## [7] &amp;#34;Does not meet the credit policy. Status:Fully Paid&amp;#34; &lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## [8] &amp;#34;Does not meet the credit policy. Status:Charged Off&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# For simplicity we&amp;#39;ll just use &lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;# 1. &amp;#34;Charged Off&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;# 2. &amp;#34;Does not meet the credit policy. Status:Charged Off&amp;#34;&lt;/span&gt;
+codes &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Charged Off&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Does not meet the credit policy. Status:Charged Off&amp;#34;&lt;/span&gt;)
+
+&lt;span style=&#34;color:#75715e&#34;&gt;# For details on the %&amp;lt;&amp;gt;% operator please look at the &lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;# documentation for the magrittr package. &lt;/span&gt;
+sample &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;lt;&amp;gt;%&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(bad_flag &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;ifelse&lt;/span&gt;(loan_status &lt;span style=&#34;color:#f92672&#34;&gt;%in%&lt;/span&gt; codes, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Let&amp;rsquo;s also check for overall event rates.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;sample &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;summarise&lt;/span&gt;(events &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(bad_flag &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;), 
+            non_events &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(bad_flag &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(event_rate &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; events&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;(events &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; non_events))
+&lt;span style=&#34;color:#75715e&#34;&gt;##   events non_events event_rate&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;## 1   1162       8838     0.1162&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;building-a-model&#34;&gt;Building a model&lt;/h2&gt;
+&lt;p&gt;Next lets build a quick and dirty model, the output of which we will use to build the gains table.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Check out available features (not shown here for brevity)&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;colnames&lt;/span&gt;(sample)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;We&amp;rsquo;ll need to do some data cleaning first.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Replace all NA values with a default value&lt;/span&gt;
+sample&lt;span style=&#34;color:#a6e22e&#34;&gt;[is.na&lt;/span&gt;(sample)] &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;-1&lt;/span&gt;
+
+sample &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;lt;&amp;gt;%&lt;/span&gt; 
+  
+  &lt;span style=&#34;color:#75715e&#34;&gt;# Remove cases where home ownership and payment plan are not reported&lt;/span&gt;
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;filter&lt;/span&gt;(&lt;span style=&#34;color:#f92672&#34;&gt;!&lt;/span&gt; home_ownership &lt;span style=&#34;color:#f92672&#34;&gt;%in%&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;NONE&amp;#34;&lt;/span&gt;),
+         pymnt_plan &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  
+  &lt;span style=&#34;color:#75715e&#34;&gt;# Convert these two variables into factors&lt;/span&gt;
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(home_ownership &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;factor&lt;/span&gt;(home_ownership), 
+         pymnt_plan &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;factor&lt;/span&gt;(pymnt_plan))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Train Test split&lt;/span&gt;
+idx &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sample&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;:&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;nrow&lt;/span&gt;(sample), size &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0.7&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;nrow&lt;/span&gt;(sample), replace &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; F)
+train &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; sample[idx,]
+test &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; sample[&lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;idx,]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;dim&lt;/span&gt;(train)
+&lt;span style=&#34;color:#75715e&#34;&gt;## [1] 6999  153&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;dim&lt;/span&gt;(test)
+&lt;span style=&#34;color:#75715e&#34;&gt;## [1] 3000  153&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Using a GLM model for simplicity&lt;/span&gt;
+mdl &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;glm&lt;/span&gt;(
+  formula &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; bad_flag &lt;span style=&#34;color:#f92672&#34;&gt;~&lt;/span&gt; 
+    loan_amnt &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; term &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; mths_since_last_delinq &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; total_pymnt &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    home_ownership &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; acc_now_delinq &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    inq_last_6mths &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; delinq_amnt &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    mths_since_last_record &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; mths_since_recent_revol_delinq &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    mths_since_last_major_derog &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; mths_since_recent_inq &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 
+    mths_since_recent_bc &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; num_accts_ever_120_pd,
+  family &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;binomial&amp;#34;&lt;/span&gt;, 
+  data &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; train
+)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;While we are at it, let&amp;rsquo;s also attach the model predictions to the test dataset.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;test&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;pred &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;predict&lt;/span&gt;(mdl, newdata &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; test)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;creating-the-gains-table&#34;&gt;Creating the Gains Table&lt;/h2&gt;
+&lt;p&gt;The table has a few important components:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Bins in decreasing/increasing order of model output (probability/log odds/scores)&lt;/li&gt;
+&lt;li&gt;Population percentages contained in each bin&lt;/li&gt;
+&lt;li&gt;Observed event rates in each bin&lt;/li&gt;
+&lt;li&gt;Cumulative events and non events distributions&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Discretise predictions based on quantiles&lt;/span&gt;
+q &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;quantile&lt;/span&gt;(test&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;pred, probs &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;seq&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, length.out &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;11&lt;/span&gt;))
+
+&lt;span style=&#34;color:#75715e&#34;&gt;# Add bins to test dataset&lt;/span&gt;
+test&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;bins &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;cut&lt;/span&gt;(test&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;pred, breaks &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; q, include.lowest &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T, right &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T, ordered_result &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex items-center justify-center font-content-sans rounded bg-raven-100 px-4 py-4&#34; role=&#34;alert&#34;&gt;
+  &lt;span class=&#34;text-xs font-bold uppercase leading-none rounded-full text-raven-100 bg-raven-500 px-2 py-1 mr-3&#34;&gt;info&lt;/span&gt;
+  &lt;span class=&#34;font-semibold text-raven-700&#34;&gt;Note that the output from cut is arranged in increasing order of value&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;levels&lt;/span&gt;(test&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;bins)
+&lt;span style=&#34;color:#75715e&#34;&gt;##  [1] &amp;#34;[-5.19,-3.4]&amp;#34;  &amp;#34;(-3.4,-2.96]&amp;#34;  &amp;#34;(-2.96,-2.68]&amp;#34; &amp;#34;(-2.68,-2.45]&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;##  [5] &amp;#34;(-2.45,-2.28]&amp;#34; &amp;#34;(-2.28,-2.1]&amp;#34;  &amp;#34;(-2.1,-1.89]&amp;#34;  &amp;#34;(-1.89,-1.66]&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;##  [9] &amp;#34;(-1.66,-1.28]&amp;#34; &amp;#34;(-1.28,0.458]&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Using the bins we created above, we can now start to put the table together&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Start with the test dataset and summarise&lt;/span&gt;
+gains_table &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; test &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;group_by&lt;/span&gt;(bins) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;summarise&lt;/span&gt;(total &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;n&lt;/span&gt;(), 
+            events &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(bad_flag &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;), 
+            non_events &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(bad_flag &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;At this point the table should look something like this:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;kable&lt;/span&gt;(gains_table)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;bins&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;total&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;events&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;non_events&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;[-5.19,-3.4]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;6&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;294&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-3.4,-2.96]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;13&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;287&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.96,-2.68]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;10&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;290&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.68,-2.45]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;19&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;281&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.45,-2.28]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;26&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;274&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.28,-2.1]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;35&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;265&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.1,-1.89]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;45&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;255&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.89,-1.66]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;52&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;248&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.66,-1.28]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;67&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;233&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.28,0.458]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;80&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;220&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Next, we&amp;rsquo;ll add the event rate columns. Let&amp;rsquo;s also make the table presentable - I&amp;rsquo;ll use the &lt;code&gt;percent()&lt;/code&gt; function in the &lt;code&gt;scales&lt;/code&gt; package to show numbers as percentages.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;gains_table &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;lt;&amp;gt;%&lt;/span&gt;
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(event_rate &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;percent&lt;/span&gt;(events &lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt; total, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;))
+
+&lt;span style=&#34;color:#a6e22e&#34;&gt;kable&lt;/span&gt;(gains_table)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;bins&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;total&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;events&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;non_events&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;event_rate&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;[-5.19,-3.4]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;6&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;294&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;2.0%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-3.4,-2.96]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;13&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;287&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;4.3%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.96,-2.68]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;10&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;290&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;3.3%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.68,-2.45]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;19&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;281&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;6.3%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.45,-2.28]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;26&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;274&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;8.7%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.28,-2.1]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;35&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;265&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;11.7%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.1,-1.89]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;45&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;255&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;15.0%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.89,-1.66]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;52&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;248&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;17.3%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.66,-1.28]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;67&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;233&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;22.3%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.28,0.458]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;80&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;220&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;26.7%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;To this we&amp;rsquo;ll add some columns quantifying how events and non events are distributed across each bin.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;gains_table &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;lt;&amp;gt;%&lt;/span&gt;
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(pop_pct &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;percent&lt;/span&gt;(total&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(total), &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;), 
+         
+         &lt;span style=&#34;color:#75715e&#34;&gt;# Not formatting these as percentages just yet&lt;/span&gt;
+         c.events_pct &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;cumsum&lt;/span&gt;(events) &lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(events),
+         c.non_events_pct &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;cumsum&lt;/span&gt;(non_events) &lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(non_events))
+
+&lt;span style=&#34;color:#a6e22e&#34;&gt;kable&lt;/span&gt;(gains_table) 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;bins&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;total&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;events&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;non_events&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;event_rate&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;pop_pct&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;c.events_pct&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;c.non_events_pct&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;[-5.19,-3.4]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;6&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;294&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;2.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.0169972&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.1110691&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-3.4,-2.96]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;13&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;287&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;4.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.0538244&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.2194938&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.96,-2.68]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;10&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;290&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;3.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.0821530&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.3290518&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.68,-2.45]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;19&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;281&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;6.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.1359773&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.4352097&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.45,-2.28]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;26&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;274&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;8.7%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.2096317&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.5387231&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.28,-2.1]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;35&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;265&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;11.7%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.3087819&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.6388364&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.1,-1.89]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;45&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;255&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;15.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.4362606&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.7351719&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.89,-1.66]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;52&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;248&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;17.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.5835694&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.8288629&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.66,-1.28]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;67&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;233&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;22.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.7733711&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.9168870&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.28,0.458]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;80&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;220&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;26.7%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;1.0000000&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;1.0000000&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Almost done - just need a few more columns namely:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A column computing the difference between the two cumulative distribution columns we created previously. The maximum value of this column will become the primary performance metric known as the &lt;code&gt;KS statistic&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Two additional columns computing &lt;code&gt;event capture rates&lt;/code&gt; and &lt;code&gt;cumulative event rates&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;gains_table &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;lt;&amp;gt;%&lt;/span&gt;
+  &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(ks &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;round&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;abs&lt;/span&gt;(c.events_pct &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt; c.non_events_pct), &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;), 
+         cap_rate &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;percent&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;cumsum&lt;/span&gt;(events)&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(events), &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;), 
+         c_event_rate &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;percent&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;cumsum&lt;/span&gt;(events)&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;cumsum&lt;/span&gt;(total), &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;), 
+         
+         &lt;span style=&#34;color:#75715e&#34;&gt;# Format pending columns&lt;/span&gt;
+         c.events_pct &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;percent&lt;/span&gt;(c.events_pct, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;),
+         c.non_events_pct &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;percent&lt;/span&gt;(c.non_events_pct, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;))
+
+&lt;span style=&#34;color:#a6e22e&#34;&gt;kable&lt;/span&gt;(gains_table)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;bins&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;total&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;events&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;non_events&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;event_rate&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;pop_pct&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;c.events_pct&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;c.non_events_pct&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;ks&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;cap_rate&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;c_event_rate&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;[-5.19,-3.4]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;6&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;294&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;2.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;1.7%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;11.1%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.09&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;2%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;2.0%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-3.4,-2.96]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;13&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;287&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;4.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;5.4%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;21.9%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.17&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;5%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;3.2%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.96,-2.68]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;10&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;290&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;3.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;8.2%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;32.9%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.25&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;8%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;3.2%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.68,-2.45]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;19&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;281&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;6.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;13.6%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;43.5%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.30&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;14%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;4.0%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.45,-2.28]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;26&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;274&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;8.7%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;21.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;53.9%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.33&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;21%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;4.9%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.28,-2.1]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;35&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;265&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;11.7%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;30.9%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;63.9%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.33&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;31%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;6.1%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.1,-1.89]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;45&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;255&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;15.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;43.6%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;73.5%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.30&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;44%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;7.3%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.89,-1.66]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;52&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;248&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;17.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;58.4%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;82.9%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.25&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;58%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;8.6%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.66,-1.28]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;67&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;233&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;22.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;77.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;91.7%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.14&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;77%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.1%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.28,0.458]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;80&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;220&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;26.7%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;100.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;100.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.00&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;100%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;11.8%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;creating-a-function&#34;&gt;Creating a function&lt;/h2&gt;
+&lt;p&gt;Finally, we can encapsulate all of the above code in a single function. Note that we actually do not need the full test/train dataset, just the actual classes and predicted outcomes (log odds/probability/score).&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;gains_table &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;function&lt;/span&gt;(act, pred, increasing &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T, nBins &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;){
+  
+  q &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;quantile&lt;/span&gt;(pred, probs &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;seq&lt;/span&gt;(&lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, length.out &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; nBins &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;))
+  bins &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;cut&lt;/span&gt;(pred, breaks &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; q, include.lowest &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T, right &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T, ordered_result &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; T)
+  
+  df &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;data.frame&lt;/span&gt;(act, pred, bins)
+  
+  df &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;group_by&lt;/span&gt;(bins) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;summarise&lt;/span&gt;(total &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;n&lt;/span&gt;(), 
+              events &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(act &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;), 
+              non_events &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(act &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(event_rate &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;percent&lt;/span&gt;(events &lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt; total, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;)) &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#75715e&#34;&gt;# This odd looking format is to ensure that the if-else &lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;# condition is part of the dplyr chain&lt;/span&gt;
+    {&lt;span style=&#34;color:#a6e22e&#34;&gt;if&lt;/span&gt;(increasing &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TRUE&lt;/span&gt;){
+      &lt;span style=&#34;color:#a6e22e&#34;&gt;arrange&lt;/span&gt;(., bins)
+    }else{
+      &lt;span style=&#34;color:#a6e22e&#34;&gt;arrange&lt;/span&gt;(., &lt;span style=&#34;color:#a6e22e&#34;&gt;desc&lt;/span&gt;(bins))
+    }} &lt;span style=&#34;color:#f92672&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+    
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;mutate&lt;/span&gt;(pop_pct &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;percent&lt;/span&gt;(total&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(total), &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;), 
+           c.events_pct &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;cumsum&lt;/span&gt;(events) &lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(events),
+           c.non_events_pct &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;cumsum&lt;/span&gt;(non_events) &lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(non_events), 
+           ks &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;round&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;abs&lt;/span&gt;(c.events_pct &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt; c.non_events_pct), &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;), 
+           cap_rate &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;percent&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;cumsum&lt;/span&gt;(events)&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;sum&lt;/span&gt;(events), &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;), 
+           c_event_rate &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;percent&lt;/span&gt;(&lt;span style=&#34;color:#a6e22e&#34;&gt;cumsum&lt;/span&gt;(events)&lt;span style=&#34;color:#f92672&#34;&gt;/&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;cumsum&lt;/span&gt;(total), &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;), 
+           c.events_pct &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;percent&lt;/span&gt;(c.events_pct, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;),
+           c.non_events_pct &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;percent&lt;/span&gt;(c.non_events_pct, &lt;span style=&#34;color:#ae81ff&#34;&gt;0.1&lt;/span&gt;, &lt;span style=&#34;color:#ae81ff&#34;&gt;100&lt;/span&gt;))
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It is worth noting here that since the capture rate is being computed from &lt;strong&gt;top to bottom&lt;/strong&gt;, it is important that the table is arranged in an appropriate manner. That is, when modelling for &lt;code&gt;bads&lt;/code&gt;, the table should be arrange in &lt;strong&gt;descending&lt;/strong&gt; order of the model output (i.e. higher event rates at the top) and vice versa.&lt;/p&gt;
+&lt;p&gt;Also, if you are planning on using this with &lt;code&gt;sparklyr&lt;/code&gt;, consider looking into the &lt;code&gt;ft_quantile_discretizer()&lt;/code&gt; function. It would replace &lt;code&gt;cut()&lt;/code&gt; here.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Test the function&lt;/span&gt;
+tab &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;gains_table&lt;/span&gt;(test&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;bad_flag, test&lt;span style=&#34;color:#f92672&#34;&gt;$&lt;/span&gt;pred, F, &lt;span style=&#34;color:#ae81ff&#34;&gt;10&lt;/span&gt;)
+&lt;span style=&#34;color:#a6e22e&#34;&gt;kable&lt;/span&gt;(tab)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;bins&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;total&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;events&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;non_events&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;event_rate&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;pop_pct&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;c.events_pct&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;c.non_events_pct&lt;/th&gt;
+&lt;th style=&#34;text-align:right&#34;&gt;ks&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;cap_rate&lt;/th&gt;
+&lt;th style=&#34;text-align:left&#34;&gt;c_event_rate&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.28,0.458]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;80&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;220&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;26.7%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;22.7%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;8.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.14&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;23%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;26.7%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.66,-1.28]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;67&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;233&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;22.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;41.6%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;17.1%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.25&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;42%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;24.5%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-1.89,-1.66]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;52&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;248&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;17.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;56.4%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;26.5%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.30&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;56%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;22.1%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.1,-1.89]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;45&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;255&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;15.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;69.1%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;36.1%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.33&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;69%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;20.3%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.28,-2.1]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;35&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;265&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;11.7%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;79.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;46.1%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.33&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;79%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;18.6%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.45,-2.28]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;26&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;274&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;8.7%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;86.4%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;56.5%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.30&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;86%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;16.9%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.68,-2.45]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;19&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;281&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;6.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;91.8%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;67.1%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.25&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;92%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;15.4%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-2.96,-2.68]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;10&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;290&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;3.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;94.6%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;78.1%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.17&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;95%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;13.9%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;(-3.4,-2.96]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;13&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;287&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;4.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;98.3%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;88.9%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.09&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;98%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;12.9%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;[-5.19,-3.4]&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;300&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;6&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;294&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;2.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;10.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;100.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;100.0%&lt;/td&gt;
+&lt;td style=&#34;text-align:right&#34;&gt;0.00&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;100%&lt;/td&gt;
+&lt;td style=&#34;text-align:left&#34;&gt;11.8%&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;interpretation&#34;&gt;Interpretation&lt;/h2&gt;
+&lt;p&gt;Some notes on how to interpret such a table:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Since scoring models aim to risk-rank borrowers, the first thing to look for is whether or not the event rates are consistently increasing  (or decreasing) across bins. If not, when using the actual model, one might not be able to confidently conclude if borrower A is better (or worse) than borrower B.&lt;/li&gt;
+&lt;li&gt;If bin sizes are not consistent (in this case ~10%) it would imply that the model is assigning the same output/score to a lot of borrowers (clumping). This could pose issues later on (say when deciding cutoffs). The ideal solution is to add additional variables that can help differentiate between good and bad borrowers.&lt;/li&gt;
+&lt;li&gt;While the ideal cutoff would be the bin where the &lt;code&gt;KS&lt;/code&gt; statistic is at its maximum, additional aspects like capture rates and approval rates should be taken into account.&lt;/li&gt;
+&lt;li&gt;Typically, analysts would look for a model which achieves the maximum value of the &lt;code&gt;KS&lt;/code&gt; statistic within the first 2/3 deciles. That way, when creating underwriting policies, you would only end up rejecting 20%-30% of the applicant pool.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Thoughts? Comments? Helpful? Not helpful? Like to see anything else added in here? Let me know!&lt;/em&gt;&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -49,7 +1241,13 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://rtichoke.netlify.app/about/</guid>
-      <description>About me Hi 👋, I am Riddhiman and a long time R user.</description>
+      <description>&lt;h1 id=&#34;about-me&#34;&gt;About me&lt;/h1&gt;
+&lt;p&gt;Hi 👋, I am Riddhiman and an avid &lt;code&gt;R&lt;/code&gt; user. The R programming language has been my tool of choice so far primarily due to the rich ecosystem that it provides (data / modelling / reporting / application development / documentation / pipelines).&lt;/p&gt;
+&lt;p&gt;Click &lt;a href=&#34;https://www.r-bloggers.com/&#34;&gt;here&lt;/a&gt; to visit &lt;em&gt;R-Bloggers&lt;/em&gt; which is a blog aggregator for blogs that showcase &lt;code&gt;R&lt;/code&gt; related content.&lt;/p&gt;
+&lt;p&gt;Thanks for visiting!&lt;/p&gt;
+&lt;p&gt;&lt;small&gt; Built with ❤️ using &lt;a href=&#34;https://gohugo.io/&#34;&gt;Hugo&lt;/a&gt;, &lt;a href=&#34;https://github.com/marketempower/axiom&#34;&gt;Axiom&lt;/a&gt;,   &lt;a href=&#34;https://www.netlify.com/&#34;&gt;Netlify&lt;/a&gt;, &lt;a href=&#34;https://www.rstudio.com/&#34;&gt;RStudio&lt;/a&gt; and &lt;a href=&#34;https://bookdown.org/yihui/blogdown/&#34;&gt;Blogdown&lt;/a&gt;
+🤘 &lt;/small&gt;&lt;/p&gt;
+</description>
     </item>
     
   </channel>
