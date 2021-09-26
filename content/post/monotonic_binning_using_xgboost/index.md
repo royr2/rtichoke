@@ -4,7 +4,7 @@ subtitle: "Credit risk series (Post #2)"
 summary: "How to create a discrete data bins with monotonic event rates using xgboost"
 author: "royr2"
 date: 2021-09-17
-categories: ["R", "Credit risk analytics", "Binning", "xgboost"]
+categories: ["R", "Credit risk analytics"]
 tags: ["R", "risk", "analytics", "credit risk", "xgboost", "binning"]  
 comments: true
 ---
@@ -39,6 +39,7 @@ p_load(recipes, dplyr, ggplot2, xgboost, gridExtra)
 ```r
 sample <- read.csv("credit_sample.csv")
 ```
+
 
 ```r
 dim(sample)
@@ -122,7 +123,7 @@ mdl <- xgboost(
   params = list(objective = "binary:logistic", ## Binary outcome
                 monotone_constraints = 1, 
                 max_depth = 10))  ## 1
-## [10:48:08] WARNING: amalgamation/../src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'binary:logistic' was changed from 'error' to 'logloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
+## [20:12:21] WARNING: amalgamation/../src/learner.cc:1095: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'binary:logistic' was changed from 'error' to 'logloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
 ## [1]	train-logloss:0.541928
 ```
 ## Retrieving splits

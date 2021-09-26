@@ -4,7 +4,7 @@ subtitle: "Data visualisation series (Post #2)"
 summary: "Data visualisation using R and leaflet"
 author: "royr2"
 date: 2021-09-12
-categories: ["R", "Data Visualisation", "leaflet"]
+categories: ["R", "Data Visualisation"]
 tags: ["R", "leaflet", "data visualisation", "covid19"]  
 comments: true
 ---

@@ -4,7 +4,7 @@ subtitle: "Data visualisation series (Post #1)"
 summary: "How to create a customised charting function using ggplot2"
 author: "royr2"
 date: 2021-09-11
-categories: ["R", "Data Visualisation", "ggplot2"]
+categories: ["R", "Data Visualisation"]
 tags: ["R", "ggplot2", "data visualisation"]  
 comments: true
 ---

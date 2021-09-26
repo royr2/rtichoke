@@ -8,15 +8,6 @@
     <language>en-us</language>
     <lastBuildDate>Fri, 17 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://rtichoke.netlify.app/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Binning</title>
-      <link>https://rtichoke.netlify.app/categories/binning/</link>
-      <pubDate>Fri, 17 Sep 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://rtichoke.netlify.app/categories/binning/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Credit Risk Analytics</title>
       <link>https://rtichoke.netlify.app/categories/credit-risk-analytics/</link>
       <pubDate>Fri, 17 Sep 2021 00:00:00 +0000</pubDate>
@@ -35,38 +26,11 @@
     </item>
     
     <item>
-      <title>xgboost</title>
-      <link>https://rtichoke.netlify.app/categories/xgboost/</link>
-      <pubDate>Fri, 17 Sep 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://rtichoke.netlify.app/categories/xgboost/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Data Visualisation</title>
       <link>https://rtichoke.netlify.app/categories/data-visualisation/</link>
       <pubDate>Sun, 12 Sep 2021 00:00:00 +0000</pubDate>
       
       <guid>https://rtichoke.netlify.app/categories/data-visualisation/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>leaflet</title>
-      <link>https://rtichoke.netlify.app/categories/leaflet/</link>
-      <pubDate>Sun, 12 Sep 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://rtichoke.netlify.app/categories/leaflet/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>ggplot2</title>
-      <link>https://rtichoke.netlify.app/categories/ggplot2/</link>
-      <pubDate>Sat, 11 Sep 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://rtichoke.netlify.app/categories/ggplot2/</guid>
       <description></description>
     </item>
     
