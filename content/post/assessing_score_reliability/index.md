@@ -1,7 +1,7 @@
 ---
-title: "Assessing reliability using bootstrapped sampling"
+title: "Assessing variability in predictions using bootstrapped sampling"
 subtitle: "Credit risk series (Post #3)"
-summary: "How to assess reliability of a credit scoe using bootstrapped sampling"
+summary: "How to assess reliability of a credit scoring model using bootstrapped sampling"
 author: "royr2"
 date: 2021-09-30
 categories: ["R", "Credit risk analytics"]
@@ -50,11 +50,11 @@ sample_99_quantile <- apply(samples, 1, quantile, p = 0.99)
 
 ```r
 sd(sample_means)/mean(sample_means)
-## [1] 0.01013089
+## [1] 0.009884222
 sd(sample_75_quantile)/mean(sample_75_quantile)
-## [1] 0.01293746
+## [1] 0.01262652
 sd(sample_95_quantile)/mean(sample_75_quantile)
-## [1] 0.01909639
+## [1] 0.01822227
 ```
 
 
@@ -140,8 +140,8 @@ head(boot_sample, 3)
 ##   splits               id          
 ##   <list>               <chr>       
 ## 1 <split [10000/3653]> Bootstrap001
-## 2 <split [10000/3643]> Bootstrap002
-## 3 <split [10000/3702]> Bootstrap003
+## 2 <split [10000/3670]> Bootstrap002
+## 3 <split [10000/3647]> Bootstrap003
 ```
 
 
@@ -158,11 +158,11 @@ Each row represents a separate bootstrapped sample whereas within each sample, t
 # Show the first 5 rows and 5 columns of the first sample
 analysis(boot_sample$splits[[1]]) %>% .[1:5, 1:5]
 ##         V1        id member_id loan_amnt funded_amnt
-## 9039 60953  88768015        -1     28000       28000
-## 7055 28648  43719453        -1     12000       12000
-## 6800  8822  10116519        -1     11000       11000
-## 2658 45576 118953988        -1      5000        5000
-## 532  77311  91584421        -1      3600        3600
+## 1168 81298 104744388        -1     12000       12000
+## 1102 22339 124978291        -1     10000       10000
+## 8874 49313  45644374        -1     10000       10000
+## 9877 56719  79805315        -1     16000       16000
+## 6776 41437 129724819        -1     30000       30000
 ```
 
 The [getting started](https://rsample.tidymodels.org/articles/rsample.html) page of the `rsample` package has additional information.
@@ -196,10 +196,11 @@ train <- analysis(boot_sample$splits[[1]])
 
 # Predict
 pred <- glm_model(train)
+## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
 
 # Check output
 range(pred)  # Output is on log odds scale
-## [1] -25.64987   1.85059
+## [1] -55.7245790   0.9599213
 ```
 ## Fitting the model repeatedly
 Now we need to fit the model repeatedly on each of the bootstrapped samples and store the fitted values. And since we are using `R`, for-loops are not allowed :laughing:
@@ -218,7 +219,7 @@ output <- lapply(boot_sample$splits, function(x){
 # Collate all predictions into a vector 
 boot_preds <- do.call(c, output)
 range(boot_preds)
-## [1] -128.577163    5.676025
+## [1] -118.238136    5.395562
 ```
 
 
@@ -236,7 +237,7 @@ boot_preds[boot_preds > q_high] <- q_high
 boot_preds[boot_preds < q_low] <- q_low
 
 range(boot_preds)
-## [1] -5.044394 -0.235342
+## [1] -5.0704831 -0.2168814
 ```
 
 ```r
@@ -244,12 +245,12 @@ boot_preds <- data.frame(pred = boot_preds,
                          id = rep(1:length(boot_sample$splits), each = nrow(sample)))
 head(boot_preds)
 ##        pred id
-## 1 -1.425018  1
-## 2 -2.294115  1
-## 3 -2.884219  1
-## 4 -2.167304  1
-## 5 -2.638829  1
-## 6 -1.303889  1
+## 1 -2.224806  1
+## 2 -1.431793  1
+## 3 -2.150621  1
+## 4 -2.754994  1
+## 5 -1.967312  1
+## 6 -1.964916  1
 ```
 
 ## Scaling the output

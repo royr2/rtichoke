@@ -1,7 +1,7 @@
 ---
-title: "Assessing reliability using bootstrapped sampling"
+title: "Assessing variability in predictions using bootstrapped sampling"
 subtitle: "Credit risk series (Post #3)"
-summary: "How to assess reliability of a credit scoe using bootstrapped sampling"
+summary: "How to assess reliability of a credit scoring model using bootstrapped sampling"
 author: "royr2"
 date: 2021-09-30
 categories: ["R", "Credit risk analytics"]

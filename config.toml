@@ -16,7 +16,7 @@ pluralizelisttitles = false
 posts = "/:filename"
 
 [params]
-copyrightYear = 2020
+copyrightYear = 2021
 dateFormat = "Jan 2, 2006"
 maxWidthContent = "max-w-4xl"
 maxWidthTitle = "max-w-4xl"
