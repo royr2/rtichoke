@@ -76,7 +76,7 @@ legend("topright",
 
 ![](chart1-1.png)
 
-It is easy to notice that the variability in estimating the sample 99% quantile is much higher than the variability in estimating the sample mean. We will now try to extend this idea to a scorecard model.
+It is easy to notice that the uncertainty in estimating the sample 99% quantile is much higher than the uncertainty in estimating the sample mean. We will now try to extend this idea to a scorecard model.
 
 ## Libraries
 ```{r}
@@ -115,7 +115,7 @@ table(sample$bad_flag)
 ```
 
 ## Sampling
-We'll use `bootstrapped sampling` to create multiple training sets. We will then repeatedly train a model on each training set and assess how volatile model predictions are across score ranges. We'll use the `bootstraps()` function in the `rsample` package.
+We'll use `bootstrapped sampling` to create multiple training sets. We will then repeatedly train a model on each training set and assess the variability in volatile model predictions across score ranges. We'll use the `bootstraps()` function in the `rsample` package.
 
 ```{r}
 # Create 100 samples
@@ -203,12 +203,13 @@ boot_preds[boot_preds < q_low] <- q_low
 range(boot_preds)
 ```
 ```{r}
+# Convert to a data frame
 boot_preds <- data.frame(pred = boot_preds, 
                          id = rep(1:length(boot_sample$splits), each = nrow(sample)))
 head(boot_preds)
 ```
 
-## Scaling the output
+## Scaling model predictions
 Given `log-odds`, we can now scale the output and make it look like a credit score. We'll use the industry standard **points to double odds** methodology.
 
 ```{r}
@@ -243,7 +244,7 @@ ggplot(boot_preds, aes(x = scores, color = factor(id))) +
 
 ![](chart2-1.png)
 
-## Assessing reliability 
+## Assessing variability 
 Now that we have model predictions for each bootstrapped sample scaled in the form of a score, we can evaluate the variability in these predictions in a visual manner. 
 
 ```{r}

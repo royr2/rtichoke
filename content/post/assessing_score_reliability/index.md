@@ -50,11 +50,11 @@ sample_99_quantile <- apply(samples, 1, quantile, p = 0.99)
 
 ```r
 sd(sample_means)/mean(sample_means)
-## [1] 0.009884222
+## [1] 0.01004958
 sd(sample_75_quantile)/mean(sample_75_quantile)
-## [1] 0.01262652
+## [1] 0.01257408
 sd(sample_95_quantile)/mean(sample_75_quantile)
-## [1] 0.01822227
+## [1] 0.01908979
 ```
 
 
@@ -81,7 +81,7 @@ legend("topright",
 
 ![](chart1-1.png)
 
-It is easy to notice that the variability in estimating the sample 99% quantile is much higher than the variability in estimating the sample mean. We will now try to extend this idea to a scorecard model.
+It is easy to notice that the uncertainty in estimating the sample 99% quantile is much higher than the uncertainty in estimating the sample mean. We will now try to extend this idea to a scorecard model.
 
 ## Libraries
 
@@ -125,7 +125,7 @@ table(sample$bad_flag)
 ```
 
 ## Sampling
-We'll use `bootstrapped sampling` to create multiple training sets. We will then repeatedly train a model on each training set and assess how volatile model predictions are across score ranges. We'll use the `bootstraps()` function in the `rsample` package.
+We'll use `bootstrapped sampling` to create multiple training sets. We will then repeatedly train a model on each training set and assess the variability in volatile model predictions across score ranges. We'll use the `bootstraps()` function in the `rsample` package.
 
 
 ```r
@@ -139,16 +139,16 @@ head(boot_sample, 3)
 ## # A tibble: 3 x 2
 ##   splits               id          
 ##   <list>               <chr>       
-## 1 <split [10000/3653]> Bootstrap001
-## 2 <split [10000/3670]> Bootstrap002
-## 3 <split [10000/3647]> Bootstrap003
+## 1 <split [10000/3673]> Bootstrap001
+## 2 <split [10000/3659]> Bootstrap002
+## 3 <split [10000/3711]> Bootstrap003
 ```
 
 
 ```r
 boot_sample$splits[[1]]
 ## <Analysis/Assess/Total>
-## <10000/3653/10000>
+## <10000/3673/10000>
 ```
 
 Each row represents a separate bootstrapped sample whereas within each sample, there are two sub-samples namely an `analysis set` and an `assessment set`. To retrieve a bootstrapped sample as a `data.frame`, the package provides two helper functions -  `analysis()` and `assessment()`
@@ -158,11 +158,11 @@ Each row represents a separate bootstrapped sample whereas within each sample, t
 # Show the first 5 rows and 5 columns of the first sample
 analysis(boot_sample$splits[[1]]) %>% .[1:5, 1:5]
 ##         V1        id member_id loan_amnt funded_amnt
-## 1168 81298 104744388        -1     12000       12000
-## 1102 22339 124978291        -1     10000       10000
-## 8874 49313  45644374        -1     10000       10000
-## 9877 56719  79805315        -1     16000       16000
-## 6776 41437 129724819        -1     30000       30000
+## 8187 11625 124888250        -1      6025        6025
+## 9570 71335  43479717        -1      5400        5400
+## 8876 15514    724509        -1     10200       10200
+## 1855 95785  95275253        -1      8000        8000
+## 7685  7428  33991869        -1     12000       12000
 ```
 
 The [getting started](https://rsample.tidymodels.org/articles/rsample.html) page of the `rsample` package has additional information.
@@ -196,11 +196,10 @@ train <- analysis(boot_sample$splits[[1]])
 
 # Predict
 pred <- glm_model(train)
-## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
 
 # Check output
 range(pred)  # Output is on log odds scale
-## [1] -55.7245790   0.9599213
+## [1] -7.536032  1.738245
 ```
 ## Fitting the model repeatedly
 Now we need to fit the model repeatedly on each of the bootstrapped samples and store the fitted values. And since we are using `R`, for-loops are not allowed :laughing:
@@ -219,7 +218,7 @@ output <- lapply(boot_sample$splits, function(x){
 # Collate all predictions into a vector 
 boot_preds <- do.call(c, output)
 range(boot_preds)
-## [1] -118.238136    5.395562
+## [1] -129.630894    4.291622
 ```
 
 
@@ -237,23 +236,24 @@ boot_preds[boot_preds > q_high] <- q_high
 boot_preds[boot_preds < q_low] <- q_low
 
 range(boot_preds)
-## [1] -5.0704831 -0.2168814
+## [1] -5.0393835 -0.2245903
 ```
 
 ```r
+# Convert to a data frame
 boot_preds <- data.frame(pred = boot_preds, 
                          id = rep(1:length(boot_sample$splits), each = nrow(sample)))
 head(boot_preds)
-##        pred id
-## 1 -2.224806  1
-## 2 -1.431793  1
-## 3 -2.150621  1
-## 4 -2.754994  1
-## 5 -1.967312  1
-## 6 -1.964916  1
+##         pred id
+## 1 -2.0468697  1
+## 2 -0.9876973  1
+## 3 -1.3107322  1
+## 4 -3.1588607  1
+## 5 -1.8256056  1
+## 6 -2.9387325  1
 ```
 
-## Scaling the output
+## Scaling model predictions
 Given `log-odds`, we can now scale the output and make it look like a credit score. We'll use the industry standard **points to double odds** methodology.
 
 
@@ -291,7 +291,7 @@ ggplot(boot_preds, aes(x = scores, color = factor(id))) +
 
 ![](chart2-1.png)
 
-## Assessing reliability 
+## Assessing variability 
 Now that we have model predictions for each bootstrapped sample scaled in the form of a score, we can evaluate the variability in these predictions in a visual manner. 
 
 
