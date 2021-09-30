@@ -1,5 +1,5 @@
 ---
-title: "Assessing variability in predictions using bootstrapped sampling"
+title: "Using bootstrapped sampling to assess variability in score predictions "
 subtitle: "Credit risk series (Post #3)"
 summary: "How to assess reliability of a credit scoring model using bootstrapped sampling"
 author: "royr2"
@@ -11,7 +11,7 @@ comments: true
 
 
 
-When building risk scorecards, apart from the variety of performance metrics, analysts also assess something known as  `risk-ranking` i.e. whether or not the observed event rates increase (or decrease) monotonically with increasing (or decreasing) scores. Sometimes, models are not able to risk-rank borrowers in the tails (regions of very high or very low scores). While this is expected, it would be nice if we could quantify this effect and one way to do this would be to use bootstrapped samples to assess variability in model predictions. 
+When building risk scorecards, apart from the variety of performance metrics, analysts also assess something known as  `risk-ranking` i.e. whether or not the observed event rates increase (or decrease) monotonically with increasing (or decreasing) scores. Sometimes, models are not able to risk-rank borrowers in the tails (regions of very high or very low scores). While this is expected, it would be nice if we could quantify this effect. One way to do this would be to use bootstrapped samples to assess variability in model predictions. 
 
 ## Basic idea
 The underlying idea is very simple - less available data for estimation equates to lower quality of estimation. As a simple example, we can observe this effect when trying to estimate quantiles of a probability distribution. 
@@ -50,11 +50,11 @@ sample_99_quantile <- apply(samples, 1, quantile, p = 0.99)
 
 ```r
 sd(sample_means)/mean(sample_means)
-## [1] 0.01004958
+## [1] 0.01037065
 sd(sample_75_quantile)/mean(sample_75_quantile)
-## [1] 0.01257408
+## [1] 0.01286825
 sd(sample_95_quantile)/mean(sample_75_quantile)
-## [1] 0.01908979
+## [1] 0.01863516
 ```
 
 
@@ -139,16 +139,16 @@ head(boot_sample, 3)
 ## # A tibble: 3 x 2
 ##   splits               id          
 ##   <list>               <chr>       
-## 1 <split [10000/3673]> Bootstrap001
-## 2 <split [10000/3659]> Bootstrap002
-## 3 <split [10000/3711]> Bootstrap003
+## 1 <split [10000/3707]> Bootstrap001
+## 2 <split [10000/3672]> Bootstrap002
+## 3 <split [10000/3693]> Bootstrap003
 ```
 
 
 ```r
 boot_sample$splits[[1]]
 ## <Analysis/Assess/Total>
-## <10000/3673/10000>
+## <10000/3707/10000>
 ```
 
 Each row represents a separate bootstrapped sample whereas within each sample, there are two sub-samples namely an `analysis set` and an `assessment set`. To retrieve a bootstrapped sample as a `data.frame`, the package provides two helper functions -  `analysis()` and `assessment()`
@@ -158,11 +158,11 @@ Each row represents a separate bootstrapped sample whereas within each sample, t
 # Show the first 5 rows and 5 columns of the first sample
 analysis(boot_sample$splits[[1]]) %>% .[1:5, 1:5]
 ##         V1        id member_id loan_amnt funded_amnt
-## 8187 11625 124888250        -1      6025        6025
-## 9570 71335  43479717        -1      5400        5400
-## 8876 15514    724509        -1     10200       10200
-## 1855 95785  95275253        -1      8000        8000
-## 7685  7428  33991869        -1     12000       12000
+## 5256 19892  12655541        -1      6000        6000
+## 5177 24764 128929872        -1     25000       25000
+## 9891 28499  65843284        -1     35000       35000
+## 2897 22006 129404959        -1      5000        5000
+## 7101 81089  92768503        -1     20000       20000
 ```
 
 The [getting started](https://rsample.tidymodels.org/articles/rsample.html) page of the `rsample` package has additional information.
@@ -199,7 +199,7 @@ pred <- glm_model(train)
 
 # Check output
 range(pred)  # Output is on log odds scale
-## [1] -7.536032  1.738245
+## [1] -28.006863   1.384457
 ```
 ## Fitting the model repeatedly
 Now we need to fit the model repeatedly on each of the bootstrapped samples and store the fitted values. And since we are using `R`, for-loops are not allowed :laughing:
@@ -218,7 +218,7 @@ output <- lapply(boot_sample$splits, function(x){
 # Collate all predictions into a vector 
 boot_preds <- do.call(c, output)
 range(boot_preds)
-## [1] -129.630894    4.291622
+## [1] -126.44347    3.51811
 ```
 
 
@@ -236,7 +236,7 @@ boot_preds[boot_preds > q_high] <- q_high
 boot_preds[boot_preds < q_low] <- q_low
 
 range(boot_preds)
-## [1] -5.0393835 -0.2245903
+## [1] -5.0545134 -0.2178373
 ```
 
 ```r
@@ -244,13 +244,13 @@ range(boot_preds)
 boot_preds <- data.frame(pred = boot_preds, 
                          id = rep(1:length(boot_sample$splits), each = nrow(sample)))
 head(boot_preds)
-##         pred id
-## 1 -2.0468697  1
-## 2 -0.9876973  1
-## 3 -1.3107322  1
-## 4 -3.1588607  1
-## 5 -1.8256056  1
-## 6 -2.9387325  1
+##        pred id
+## 1 -2.724139  1
+## 2 -1.747598  1
+## 3 -3.629159  1
+## 4 -2.005192  1
+## 5 -3.006106  1
+## 6 -3.200158  1
 ```
 
 ## Scaling model predictions
@@ -312,7 +312,7 @@ boot_preds %>%
   theme_minimal() + 
   theme(axis.text.x = element_text(angle = 90)) + 
   theme(legend.position = "none") + 
-  labs(title = "Variability in model predictions across score ranges", 
+  labs(title = "Variability in model predictions across samples", 
        subtitle = "(measured using standard deviation)", 
        x = "Score Range", 
        y = "Standard Deviation")
@@ -325,6 +325,6 @@ As expected, the model's predictions are more reliable within a certain range of
 ## Parting notes 
 While the outcome of this experiment is not unexpected, an interesting question could be - should analysts and model users define an **operating range** for their models? In this example, we could set lower and upper limits at `700` and `800` respectively and any borrower receiving a score beyond these thresholds could be assigned a generic value of `700-` or `800+`.
 
-That said, binning (WOE or otherwise) mitigates this to a certain extent since the model cannot generate predictions beyond a certain range of values. 
+That said, binning features mitigates this to a certain extent since the model cannot generate predictions beyond a certain range of values. 
 
 *Thoughts? Comments? Helpful? Not helpful? Like to see anything else added in here? Let me know!*

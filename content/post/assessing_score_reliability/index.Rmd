@@ -1,5 +1,5 @@
 ---
-title: "Assessing variability in predictions using bootstrapped sampling"
+title: "Using bootstrapped sampling to assess variability in score predictions "
 subtitle: "Credit risk series (Post #3)"
 summary: "How to assess reliability of a credit scoring model using bootstrapped sampling"
 author: "royr2"
@@ -13,7 +13,7 @@ comments: true
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-When building risk scorecards, apart from the variety of performance metrics, analysts also assess something known as  `risk-ranking` i.e. whether or not the observed event rates increase (or decrease) monotonically with increasing (or decreasing) scores. Sometimes, models are not able to risk-rank borrowers in the tails (regions of very high or very low scores). While this is expected, it would be nice if we could quantify this effect and one way to do this would be to use bootstrapped samples to assess variability in model predictions. 
+When building risk scorecards, apart from the variety of performance metrics, analysts also assess something known as  `risk-ranking` i.e. whether or not the observed event rates increase (or decrease) monotonically with increasing (or decreasing) scores. Sometimes, models are not able to risk-rank borrowers in the tails (regions of very high or very low scores). While this is expected, it would be nice if we could quantify this effect. One way to do this would be to use bootstrapped samples to assess variability in model predictions. 
 
 ## Basic idea
 The underlying idea is very simple - less available data for estimation equates to lower quality of estimation. As a simple example, we can observe this effect when trying to estimate quantiles of a probability distribution. 
@@ -263,7 +263,7 @@ boot_preds %>%
   theme_minimal() + 
   theme(axis.text.x = element_text(angle = 90)) + 
   theme(legend.position = "none") + 
-  labs(title = "Variability in model predictions across score ranges", 
+  labs(title = "Variability in model predictions across samples", 
        subtitle = "(measured using standard deviation)", 
        x = "Score Range", 
        y = "Standard Deviation")
@@ -276,6 +276,6 @@ As expected, the model's predictions are more reliable within a certain range of
 ## Parting notes 
 While the outcome of this experiment is not unexpected, an interesting question could be - should analysts and model users define an **operating range** for their models? In this example, we could set lower and upper limits at `700` and `800` respectively and any borrower receiving a score beyond these thresholds could be assigned a generic value of `700-` or `800+`.
 
-That said, binning (WOE or otherwise) mitigates this to a certain extent since the model cannot generate predictions beyond a certain range of values. 
+That said, binning features mitigates this to a certain extent since the model cannot generate predictions beyond a certain range of values. 
 
 *Thoughts? Comments? Helpful? Not helpful? Like to see anything else added in here? Let me know!*
