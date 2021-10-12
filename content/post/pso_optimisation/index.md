@@ -89,15 +89,15 @@ Or to put it more formally:
 
 Say we are operating in 2 dimensions (x and y coordinates). Then, for each particle `i`
 
-$$x_{t+1}^i = x_{t}^i + \delta{x_t}^i$$
-$$y_{t+1}^i = y_{t}^i + \delta{y_t}^i$$
+`$$x_{t+1}^i = x_{t}^i + \delta{x_t}^i$$`
+`$$y_{t+1}^i = y_{t}^i + \delta{y_t}^i$$`
 
 And, 
 
-$$\delta{x_t}^i = w\delta{x_{t-1}^i} + c_1r_1(x_{localBest} - x_i) + c_2r_2(x_{globalBest} - x_i)$$
-$$\delta{y_t}^i = w\delta{y_{t-1}^i} + c_1r_1(y_{localBest} - y_i) + c_2r_2(y_{globalBest} - y_i)$$
+`$$\delta{x_t}^i = w\delta{x_{t-1}^i} + c_1r_1(x_{localBest} - x_i) + c_2r_2(x_{globalBest} - x_i)$$`
+`$$\delta{y_t}^i = w\delta{y_{t-1}^i} + c_1r_1(y_{localBest} - y_i) + c_2r_2(y_{globalBest} - y_i)$$`
 
-Where `w`, `c1`, `c2`, `r1`, `r2` are positive constants. `r1` and `r2` are uniformly distributed (positive) random numbers. These random numebrs need to be positive because the direction in which each particle will move is decided by where `localBest` and `globalBest` are. Again, `localBest` is the optimal function value observed by the `ith` particle and `globalBest` is the optimal function value across all particles.
+Where `w`, `c1`, `c2`, `r1`, `r2` are positive constants. `r1` and `r2` are uniformly distributed (positive) random numbers. These random numbers need to be positive because the direction in which each particle will move is decided by where `localBest` and `globalBest` are. Again, `localBest` is the optimal function value observed by the `ith` particle and `globalBest` is the optimal function value across all particles.
 
 ## Implementing a single iteration
 
@@ -297,7 +297,7 @@ out <- pso_optim(obj_func,
 ```r
 # Global minimum is at (1,1)
 out$obj_loc
-## [1] "1.00003636379052,1.0000437367785"
+## [1] "0.999987552893311,0.999977303579515"
 ```
 
 ## Animating results
