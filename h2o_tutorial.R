@@ -10,3 +10,4 @@ h2o.init()
 h2o.df <- as.h2o(model_data)
 
 h2o.
+N

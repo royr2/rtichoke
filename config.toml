@@ -11,6 +11,7 @@ rssLimit = 10
 enableEmoji = true
 enableRobotsTXT = true
 pluralizelisttitles = false
+math = true
 
 [permalinks]
 posts = "/:filename"
