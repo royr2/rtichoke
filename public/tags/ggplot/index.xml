@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ggplot on R&#39;tichoke</title>
+    <link>https://rtichoke.netlify.app/tags/ggplot/</link>
+    <description>Recent content in ggplot on R&#39;tichoke</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 02 Nov 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://rtichoke.netlify.app/tags/ggplot/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Find optimal portfolios using particle swarm optimisation in R</title>
+      <link>https://rtichoke.netlify.app/post/portfolio_optimisation_using_pso/</link>
+      <pubDate>Tue, 02 Nov 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://rtichoke.netlify.app/post/portfolio_optimisation_using_pso/</guid>
+      <description>How to perform portfolio optimisation using particle swarm optimisation in R</description>
+    </item>
+    
+    <item>
+      <title>How to build a basic particle swarm optimiser from scratch in R</title>
+      <link>https://rtichoke.netlify.app/post/pso_optimisation/</link>
+      <pubDate>Tue, 12 Oct 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://rtichoke.netlify.app/post/pso_optimisation/</guid>
+      <description>How to create a particle swarm optimiser in R from scratch</description>
+    </item>
+    
+  </channel>
+</rss>

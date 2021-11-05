@@ -6,7 +6,16 @@
     <description>Recent content in credit risk on R&#39;tichoke</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 17 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://rtichoke.netlify.app/tags/credit-risk/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 30 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://rtichoke.netlify.app/tags/credit-risk/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Using bootstrapped sampling to assess variability in score predictions </title>
+      <link>https://rtichoke.netlify.app/post/assessing_score_reliability/</link>
+      <pubDate>Thu, 30 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://rtichoke.netlify.app/post/assessing_score_reliability/</guid>
+      <description>How to assess reliability of a credit scoring model using bootstrapped sampling</description>
+    </item>
+    
     <item>
       <title>Monotonic binning using XGBOOST</title>
       <link>https://rtichoke.netlify.app/post/monotonic_binning_using_xgboost/</link>
