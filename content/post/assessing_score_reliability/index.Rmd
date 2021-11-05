@@ -278,4 +278,71 @@ While the outcome of this experiment is not unexpected, an interesting question 
 
 That said, binning features mitigates this to a certain extent since the model cannot generate predictions beyond a certain range of values. 
 
+## An useful extension 
+
+<small>*Special thanks to [Richard Warnung](https://disqus.com/by/richardwarnung/) for his comments*</small>
+
+In the above analysis, not only did we fit the model repeatedly on different datasets, but we made predictions on different datasets as well. We can remove the effects of the latter if we make predictions on the same test dataset. Here's some code to do this. 
+
+```{r eval = F}
+
+# Create overall training and testing datasets 
+id <- sample(1:nrow(sample), size = nrow(sample)*0.8, replace = F)
+
+train_data <- sample[id,]
+test_data <- sample[-id,]
+
+# Bootstrapped samples are now pulled only from the overall training dataset
+boot_sample <- bootstraps(data = train_data, times = 80)
+
+# Using the same function from before but predicting on the same test dataset
+glm_model <- function(train, test){
+  
+  mdl <- glm(bad_flag ~
+               loan_amnt + funded_amnt + annual_inc + delinq_2yrs +
+               inq_last_6mths + mths_since_last_delinq + fico_range_low +
+               mths_since_last_record + revol_util + total_pymnt,
+             family = "binomial",
+             data = train)
+  
+  return(predict(mdl, newdata = test))
+}
+
+# Train and predict repeatedly
+output <- lapply(boot_sample$splits, function(x){
+  train <- analysis(x)
+  pred <- glm_model(train, test_data)
+
+  return(pred)
+})
+
+# Collate data into a single data.frame
+boot_preds <- do.call(c, output)
+boot_preds <- data.frame(pred = boot_preds, 
+                         id = rep(1:length(boot_sample$splits), each = nrow(sample)))
+
+boot_preds$scores <- scaling_func(boot_preds$pred, 30, 2, 700)
+
+# Forcing scores to a range
+boot_preds$scores <- sapply(boot_preds$scores, min, 900)
+
+# Bin the outputs for easier charting 
+breaks <- quantile(boot_preds$scores, probs = seq(0, 1, length.out = 20))
+boot_preds$bins <- cut(boot_preds$scores, breaks = unique(breaks), include.lowest = T, right = T)
+
+# Chart
+boot_preds %>%
+  group_by(bins) %>%
+  summarise(std_dev = sd(scores)) %>%
+  ggplot(aes(x = bins, y = std_dev)) +
+  geom_col(color = "black", fill = "#90AACB") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 90)) + 
+  theme(legend.position = "none") + 
+  labs(title = "Variability in model predictions across samples", 
+       subtitle = "Prediction set is fixed", 
+       x = "Score Range", 
+       y = "Standard Deviation")
+``` 
+
 *Thoughts? Comments? Helpful? Not helpful? Like to see anything else added in here? Let me know!*

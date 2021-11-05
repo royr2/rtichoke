@@ -50,11 +50,11 @@ sample_99_quantile <- apply(samples, 1, quantile, p = 0.99)
 
 ```r
 sd(sample_means)/mean(sample_means)
-## [1] 0.009920227
+## [1] 0.01009095
 sd(sample_75_quantile)/mean(sample_75_quantile)
-## [1] 0.01267011
+## [1] 0.0126789
 sd(sample_95_quantile)/mean(sample_75_quantile)
-## [1] 0.01808169
+## [1] 0.01935812
 ```
 
 
@@ -139,16 +139,16 @@ head(boot_sample, 3)
 ## # A tibble: 3 x 2
 ##   splits               id          
 ##   <list>               <chr>       
-## 1 <split [10000/3687]> Bootstrap001
-## 2 <split [10000/3684]> Bootstrap002
-## 3 <split [10000/3673]> Bootstrap003
+## 1 <split [10000/3685]> Bootstrap001
+## 2 <split [10000/3661]> Bootstrap002
+## 3 <split [10000/3706]> Bootstrap003
 ```
 
 
 ```r
 boot_sample$splits[[1]]
 ## <Analysis/Assess/Total>
-## <10000/3687/10000>
+## <10000/3685/10000>
 ```
 
 Each row represents a separate bootstrapped sample whereas within each sample, there are two sub-samples namely an `analysis set` and an `assessment set`. To retrieve a bootstrapped sample as a `data.frame`, the package provides two helper functions -  `analysis()` and `assessment()`
@@ -158,11 +158,11 @@ Each row represents a separate bootstrapped sample whereas within each sample, t
 # Show the first 5 rows and 5 columns of the first sample
 analysis(boot_sample$splits[[1]]) %>% .[1:5, 1:5]
 ##         V1        id member_id loan_amnt funded_amnt
-## 6954 18600  96884749        -1     10000       10000
-## 9594 76420 118163954        -1      2400        2400
-## 1449 36265  61493581        -1      1000        1000
-## 3545 99641  86433757        -1      8000        8000
-## 6888  8023 143049068        -1     23500       23500
+## 5951 80692    550253        -1      2000        2000
+## 8110  1508 141620649        -1     11000       11000
+## 5967 32655 145429387        -1     22000       22000
+## 4470 31631  57793181        -1      5000        5000
+## 4962 73667 113597640        -1      5000        5000
 ```
 
 The [getting started](https://rsample.tidymodels.org/articles/rsample.html) page of the `rsample` package has additional information.
@@ -199,7 +199,7 @@ pred <- glm_model(train)
 
 # Check output
 range(pred)  # Output is on log odds scale
-## [1] -9.494565  1.306407
+## [1] -22.420948   1.261281
 ```
 ## Fitting the model repeatedly
 Now we need to fit the model repeatedly on each of the bootstrapped samples and store the fitted values. And since we are using `R`, for-loops are not allowed :laughing:
@@ -218,7 +218,7 @@ output <- lapply(boot_sample$splits, function(x){
 # Collate all predictions into a vector 
 boot_preds <- do.call(c, output)
 range(boot_preds)
-## [1] -137.316419    7.034918
+## [1] -141.7950    5.5045
 ```
 
 
@@ -236,7 +236,7 @@ boot_preds[boot_preds > q_high] <- q_high
 boot_preds[boot_preds < q_low] <- q_low
 
 range(boot_preds)
-## [1] -5.0325237 -0.2229331
+## [1] -5.0462719 -0.2328358
 ```
 
 ```r
@@ -245,12 +245,12 @@ boot_preds <- data.frame(pred = boot_preds,
                          id = rep(1:length(boot_sample$splits), each = nrow(sample)))
 head(boot_preds)
 ##         pred id
-## 1 -2.6100002  1
-## 2 -1.3568856  1
-## 3 -1.9188004  1
-## 4 -2.3304986  1
-## 5 -0.2229331  1
-## 6 -0.4803189  1
+## 1 -1.8864076  1
+## 2 -0.7738626  1
+## 3 -0.2656913  1
+## 4 -1.4904858  1
+## 5 -2.0865013  1
+## 6 -3.5733041  1
 ```
 
 ## Scaling model predictions
@@ -326,5 +326,73 @@ As expected, the model's predictions are more reliable within a certain range of
 While the outcome of this experiment is not unexpected, an interesting question could be - should analysts and model users define an **operating range** for their models? In this example, we could set lower and upper limits at `700` and `800` respectively and any borrower receiving a score beyond these thresholds could be assigned a generic value of `700-` or `800+`.
 
 That said, binning features mitigates this to a certain extent since the model cannot generate predictions beyond a certain range of values. 
+
+## An useful extension 
+
+<small>*Special thanks to [Richard Warnung](https://disqus.com/by/richardwarnung/) for his comments*</small>
+
+In the above analysis, not only did we fit the model repeatedly on different datasets, but we made predictions on different datasets as well. We can remove the effects of the latter if we make predictions on the same test dataset. Here's some code to do this. 
+
+
+```r
+
+# Create overall training and testing datasets 
+id <- sample(1:nrow(sample), size = nrow(sample)*0.8, replace = F)
+
+train_data <- sample[id,]
+test_data <- sample[-id,]
+
+# Bootstrapped samples are now pulled only from the overall training dataset
+boot_sample <- bootstraps(data = train_data, times = 80)
+
+# Using the same function from before but predicting on the same test dataset
+glm_model <- function(train, test){
+  
+  mdl <- glm(bad_flag ~
+               loan_amnt + funded_amnt + annual_inc + delinq_2yrs +
+               inq_last_6mths + mths_since_last_delinq + fico_range_low +
+               mths_since_last_record + revol_util + total_pymnt,
+             family = "binomial",
+             data = train)
+  
+  return(predict(mdl, newdata = test))
+}
+
+# Train and predict repeatedly
+output <- lapply(boot_sample$splits, function(x){
+  train <- analysis(x)
+  pred <- glm_model(train, test_data)
+
+  return(pred)
+})
+
+# Collate data into a single data.frame
+boot_preds <- do.call(c, output)
+boot_preds <- data.frame(pred = boot_preds, 
+                         id = rep(1:length(boot_sample$splits), each = nrow(sample)))
+
+boot_preds$scores <- scaling_func(boot_preds$pred, 30, 2, 700)
+
+# Forcing scores to a range
+boot_preds$scores <- sapply(boot_preds$scores, min, 900)
+
+# Bin the outputs for easier charting 
+breaks <- quantile(boot_preds$scores, probs = seq(0, 1, length.out = 20))
+boot_preds$bins <- cut(boot_preds$scores, breaks = unique(breaks), include.lowest = T, right = T)
+
+# Chart
+boot_preds %>%
+  group_by(bins) %>%
+  summarise(std_dev = sd(scores)) %>%
+  ggplot(aes(x = bins, y = std_dev)) +
+  geom_col(color = "black", fill = "#90AACB") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 90)) + 
+  theme(legend.position = "none") + 
+  labs(title = "Variability in model predictions across samples", 
+       subtitle = "Prediction set is fixed", 
+       x = "Score Range", 
+       y = "Standard Deviation")
+```
 
 *Thoughts? Comments? Helpful? Not helpful? Like to see anything else added in here? Let me know!*
