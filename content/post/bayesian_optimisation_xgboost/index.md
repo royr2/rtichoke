@@ -3,7 +3,7 @@ title: "Using bayesian optimisation to tune a XGBOOST model in R"
 subtitle: "ML series (Post #1)"
 summary: "How to use bayesian optimisation to tune hyperparameters in a XGBOOST model in R"
 author: "royr2"
-date: 2022-01-09
+date: 2022-01-08
 categories: ["R", "risk analytics", "xgboost", "bayesian optimisation", "machine learning"]
 tags: ["R", "analytics", "machine learning"]  
 comments: true
@@ -314,7 +314,7 @@ predicted <- test_df %>%
 ```r
 # Compute MAPE
 mean(abs(actuals - predicted)/actuals)
-## [1] 0.008325121
+## [1] 0.008391282
 ```
 ## Compare with grid search 
 
@@ -395,7 +395,7 @@ pred <- test_df %>%
 
 ```r
 mean(abs(act - pred)/act)
-## [1] 0.009543707
+## [1] 0.009407723
 ```
 
 While both the methods offer similar final results, the bayesian optimiser completed its search in less than a minute where as the grid search took over seven minutes. Also, I find that I can use bayesian optimisation to search a larger parameter space more quickly than a traditional grid search. 
