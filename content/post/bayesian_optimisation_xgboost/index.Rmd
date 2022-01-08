@@ -3,7 +3,7 @@ title: "Using bayesian optimisation to tune a XGBOOST model in R"
 subtitle: "ML series (Post #1)"
 summary: "How to use bayesian optimisation to tune hyperparameters in a XGBOOST model in R"
 author: "royr2"
-date: 2022-01-09
+date: 2022-01-08
 categories: ["R", "risk analytics", "xgboost", "bayesian optimisation", "machine learning"]
 tags: ["R", "analytics", "machine learning"]  
 comments: true
