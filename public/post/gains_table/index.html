@@ -11,8 +11,8 @@
   <link rel="icon" type="image/x-icon" href="/">
   <link rel="apple-touch-icon" href="/">
   <link rel="canonical" href="https://rtichoke.netlify.app/post/gains_table/">
-<link rel="preload" as="style" href="/bundle.css?v=1636045864" media="all">
-<link rel="stylesheet" href="/bundle.css?v=1636045864" media="all">
+<link rel="preload" as="style" href="/bundle.css?v=1641649589" media="all">
+<link rel="stylesheet" href="/bundle.css?v=1641649589" media="all">
 <style>.cdata pre{background-color:#1f2937;color:#e5e7eb}.cdata :not(pre)>code{background-color:#f3f4f6;color:#7c3aed}.chroma .err{background-color:#991b1b;color:#fecaca}.chroma .hl{background-color:#374151}.chroma .ln{color:#9ca3af}.chroma .k,.chroma .kc,.chroma .kd,.chroma .kn,.chroma .kp,.chroma .kr{color:#60a5fa}.chroma .kt{color:#a78bfa}.chroma .na,.chroma .nb{color:#fbbf24}.chroma .nc{color:#f87171}.chroma .no{color:#34d399}.chroma .nd{color:#f87171}.chroma .ne{color:#f87171}.chroma .nf{color:#fbbf24}.chroma .nt{color:#f87171}.chroma .l{color:#a78bfa}.chroma .dl,.chroma .ld,.chroma .s,.chroma .s2,.chroma .sa,.chroma .sb,.chroma .sc,.chroma .sd{color:#34d399}.chroma .se{color:#9ca3af}.chroma .s1,.chroma .sh,.chroma .si,.chroma .sr,.chroma .ss,.chroma .sx{color:#34d399}.chroma .il,.chroma .m,.chroma .mb,.chroma .mf,.chroma .mh,.chroma .mi,.chroma .mo{color:#a78bfa}.chroma .o,.chroma .ow{color:#93c5fd}.chroma .c,.chroma .c1,.chroma .ch,.chroma .cm,.chroma .cp,.chroma .cpf,.chroma .cs,.chroma .p{color:#9ca3af}.chroma .ge{font-style:italic}.chroma .gs{font-weight:700}
 </style>
 
@@ -64,11 +64,11 @@
   },
   "datePublished": "2021-09-06T00:00:00Z",
   "dateModified": "2021-09-06T00:00:00Z",
-  "articleBody": "\u003cp\u003eModellers/analysts developing credit scores generally use something known as the \u003ccode\u003egains table\u003c/code\u003e (or a \u003ccode\u003eks table\u003c/code\u003e) to measure and quantify the performance of such models. We\u0026rsquo;ll explore how to build such a table in this post.\u003c/p\u003e\n\u003cp\u003eThe idea is to first discretise the population under consideration (say the testing or validation set) into groups based on the model\u0026rsquo;s output (probability/log odds/scores). Typically, this is done in a way such that each group represents 10% of the total population (or deciles). Then, summary statistics are generated for each group and  cumulative distributions of events and non-events are analysed and the model\u0026rsquo;s performance is quantified.\u003c/p\u003e\n\u003cp\u003eWe\u0026rsquo;ll use \u003ccode\u003edplyr\u003c/code\u003e in this post. Doing it this way is nice since it\u0026rsquo;s easier to read and the code would need minimal changes if using \u003ccode\u003esparklyr\u003c/code\u003e (say within a big data environment where one might need to run this directly on a \u003cem\u003ehadoop\u003c/em\u003e table).\u003c/p\u003e\n\u003ch2 id=\"packages\"\u003ePackages\u003c/h2\u003e\n\u003cp\u003eLet\u0026rsquo;s get package installation out of the way first.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Pacman is a package management tool \u003c/span\u003e\n\u003cspan style=\"color:#a6e22e\"\u003einstall.packages\u003c/span\u003e(\u003cspan style=\"color:#e6db74\"\u003e\u0026#34;pacman\u0026#34;\u003c/span\u003e)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003elibrary\u003c/span\u003e(pacman)\n\u003cspan style=\"color:#75715e\"\u003e## Warning: package \u0026#39;pacman\u0026#39; was built under R version 4.1.1\u003c/span\u003e\n\n\u003cspan style=\"color:#75715e\"\u003e# p_load automatically installs packages if needed\u003c/span\u003e\n\u003cspan style=\"color:#a6e22e\"\u003ep_load\u003c/span\u003e(dplyr, magrittr, knitr, scales)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ch2 id=\"sample-dataset\"\u003eSample dataset\u003c/h2\u003e\n\u003cp\u003e\u003ca href=\"https://github.com/royr2/blog/blob/main/download/credit_sample.csv\"\u003eHere\u0026rsquo;s\u003c/a\u003e some sample data to play around with. The data set is small sample of the \u003cstrong\u003eLending Club\u003c/strong\u003e dataset available on \u003ca href=\"https://www.kaggle.com/wordsforthewise/lending-club\"\u003eKaggle\u003c/a\u003e.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003esample \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eread.csv\u003c/span\u003e(\u003cspan style=\"color:#e6db74\"\u003e\u0026#34;credit_sample.csv\u0026#34;\u003c/span\u003e)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003edim\u003c/span\u003e(sample)\n\u003cspan style=\"color:#75715e\"\u003e## [1] 10000   153\u003c/span\u003e\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003eclass\u003c/span\u003e(sample)\n\u003cspan style=\"color:#75715e\"\u003e## [1] \u0026#34;data.frame\u0026#34;\u003c/span\u003e\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ch2 id=\"defining-a-target\"\u003eDefining a target\u003c/h2\u003e\n\u003cp\u003eFirst, we need to create a target (outcome) to model for. Since this is a credit risk use case, we are looking to create a target which identifies borrowers who defaulted on (or missed) their payments consecutively.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003eunique\u003c/span\u003e(sample\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003eloan_status)\n\u003cspan style=\"color:#75715e\"\u003e## [1] \u0026#34;Fully Paid\u0026#34;                                         \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## [2] \u0026#34;Current\u0026#34;                                            \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## [3] \u0026#34;Charged Off\u0026#34;                                        \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## [4] \u0026#34;Late (31-120 days)\u0026#34;                                 \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## [5] \u0026#34;Late (16-30 days)\u0026#34;                                  \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## [6] \u0026#34;In Grace Period\u0026#34;                                    \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## [7] \u0026#34;Does not meet the credit policy. Status:Fully Paid\u0026#34; \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## [8] \u0026#34;Does not meet the credit policy. Status:Charged Off\u0026#34;\u003c/span\u003e\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# For simplicity we\u0026#39;ll just use \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e# 1. \u0026#34;Charged Off\u0026#34;\u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e# 2. \u0026#34;Does not meet the credit policy. Status:Charged Off\u0026#34;\u003c/span\u003e\ncodes \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ec\u003c/span\u003e(\u003cspan style=\"color:#e6db74\"\u003e\u0026#34;Charged Off\u0026#34;\u003c/span\u003e, \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;Does not meet the credit policy. Status:Charged Off\u0026#34;\u003c/span\u003e)\n\n\u003cspan style=\"color:#75715e\"\u003e# For details on the %\u0026lt;\u0026gt;% operator please look at the \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e# documentation for the magrittr package. \u003c/span\u003e\nsample \u003cspan style=\"color:#f92672\"\u003e%\u0026lt;\u0026gt;%\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(bad_flag \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eifelse\u003c/span\u003e(loan_status \u003cspan style=\"color:#f92672\"\u003e%in%\u003c/span\u003e codes, \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e))\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eLet\u0026rsquo;s also check for overall event rates.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003esample \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n  \u003cspan style=\"color:#a6e22e\"\u003esummarise\u003c/span\u003e(events \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(bad_flag \u003cspan style=\"color:#f92672\"\u003e==\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e), \n            non_events \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(bad_flag \u003cspan style=\"color:#f92672\"\u003e==\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e)) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n  \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(event_rate \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e events\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e(events \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e non_events))\n\u003cspan style=\"color:#75715e\"\u003e##   events non_events event_rate\u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## 1   1162       8838     0.1162\u003c/span\u003e\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ch2 id=\"building-a-model\"\u003eBuilding a model\u003c/h2\u003e\n\u003cp\u003eNext lets build a quick and dirty model, the output of which we will use to build the gains table.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Check out available features (not shown here for brevity)\u003c/span\u003e\n\u003cspan style=\"color:#a6e22e\"\u003ecolnames\u003c/span\u003e(sample)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eWe\u0026rsquo;ll need to do some data cleaning first.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Replace all NA values with a default value\u003c/span\u003e\nsample\u003cspan style=\"color:#a6e22e\"\u003e[is.na\u003c/span\u003e(sample)] \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e-1\u003c/span\u003e\n\nsample \u003cspan style=\"color:#f92672\"\u003e%\u0026lt;\u0026gt;%\u003c/span\u003e \n  \n  \u003cspan style=\"color:#75715e\"\u003e# Remove cases where home ownership and payment plan are not reported\u003c/span\u003e\n  \u003cspan style=\"color:#a6e22e\"\u003efilter\u003c/span\u003e(\u003cspan style=\"color:#f92672\"\u003e!\u003c/span\u003e home_ownership \u003cspan style=\"color:#f92672\"\u003e%in%\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ec\u003c/span\u003e(\u003cspan style=\"color:#e6db74\"\u003e\u0026#34;\u0026#34;\u003c/span\u003e, \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;NONE\u0026#34;\u003c/span\u003e),\n         pymnt_plan \u003cspan style=\"color:#f92672\"\u003e!=\u003c/span\u003e \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;\u0026#34;\u003c/span\u003e) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n  \n  \u003cspan style=\"color:#75715e\"\u003e# Convert these two variables into factors\u003c/span\u003e\n  \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(home_ownership \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003efactor\u003c/span\u003e(home_ownership), \n         pymnt_plan \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003efactor\u003c/span\u003e(pymnt_plan))\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Train Test split\u003c/span\u003e\nidx \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esample\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e\u003cspan style=\"color:#f92672\"\u003e:\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003enrow\u003c/span\u003e(sample), size \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0.7\u003c/span\u003e \u003cspan style=\"color:#f92672\"\u003e*\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003enrow\u003c/span\u003e(sample), replace \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e F)\ntrain \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e sample[idx,]\ntest \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e sample[\u003cspan style=\"color:#f92672\"\u003e-\u003c/span\u003eidx,]\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003edim\u003c/span\u003e(train)\n\u003cspan style=\"color:#75715e\"\u003e## [1] 6999  153\u003c/span\u003e\n\u003cspan style=\"color:#a6e22e\"\u003edim\u003c/span\u003e(test)\n\u003cspan style=\"color:#75715e\"\u003e## [1] 3000  153\u003c/span\u003e\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Using a GLM model for simplicity\u003c/span\u003e\nmdl \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eglm\u003c/span\u003e(\n  formula \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e bad_flag \u003cspan style=\"color:#f92672\"\u003e~\u003c/span\u003e \n    loan_amnt \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e term \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e mths_since_last_delinq \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e total_pymnt \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e \n    home_ownership \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e acc_now_delinq \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e \n    inq_last_6mths \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e delinq_amnt \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e \n    mths_since_last_record \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e mths_since_recent_revol_delinq \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e \n    mths_since_last_major_derog \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e mths_since_recent_inq \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e \n    mths_since_recent_bc \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e num_accts_ever_120_pd,\n  family \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;binomial\u0026#34;\u003c/span\u003e, \n  data \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e train\n)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eWhile we are at it, let\u0026rsquo;s also attach the model predictions to the test dataset.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003etest\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003epred \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epredict\u003c/span\u003e(mdl, newdata \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e test)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ch2 id=\"creating-the-gains-table\"\u003eCreating the Gains Table\u003c/h2\u003e\n\u003cp\u003eThe table has a few important components:\u003c/p\u003e\n\u003cul\u003e\n\u003cli\u003eBins in decreasing/increasing order of model output (probability/log odds/scores)\u003c/li\u003e\n\u003cli\u003ePopulation percentages contained in each bin\u003c/li\u003e\n\u003cli\u003eObserved event rates in each bin\u003c/li\u003e\n\u003cli\u003eCumulative events and non events distributions\u003c/li\u003e\n\u003c/ul\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Discretise predictions based on quantiles\u003c/span\u003e\nq \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003equantile\u003c/span\u003e(test\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003epred, probs \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eseq\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, length.out \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e11\u003c/span\u003e))\n\n\u003cspan style=\"color:#75715e\"\u003e# Add bins to test dataset\u003c/span\u003e\ntest\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003ebins \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ecut\u003c/span\u003e(test\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003epred, breaks \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e q, include.lowest \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e T, right \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e T, ordered_result \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e T)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"flex items-center justify-center font-content-sans rounded bg-raven-100 px-4 py-4\" role=\"alert\"\u003e\n  \u003cspan class=\"text-xs font-bold uppercase leading-none rounded-full text-raven-100 bg-raven-500 px-2 py-1 mr-3\"\u003einfo\u003c/span\u003e\n  \u003cspan class=\"font-semibold text-raven-700\"\u003eNote that the output from cut is arranged in increasing order of value\u003c/span\u003e\n\u003c/div\u003e\n\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003elevels\u003c/span\u003e(test\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003ebins)\n\u003cspan style=\"color:#75715e\"\u003e##  [1] \u0026#34;[-6.47,-3.39]\u0026#34; \u0026#34;(-3.39,-2.94]\u0026#34; \u0026#34;(-2.94,-2.65]\u0026#34; \u0026#34;(-2.65,-2.44]\u0026#34;\u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e##  [5] \u0026#34;(-2.44,-2.25]\u0026#34; \u0026#34;(-2.25,-2.06]\u0026#34; \u0026#34;(-2.06,-1.84]\u0026#34; \u0026#34;(-1.84,-1.59]\u0026#34;\u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e##  [9] \u0026#34;(-1.59,-1.22]\u0026#34; \u0026#34;(-1.22,2.59]\u0026#34;\u003c/span\u003e\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eUsing the bins we created above, we can now start to put the table together\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Start with the test dataset and summarise\u003c/span\u003e\ngains_table \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e test \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n  \u003cspan style=\"color:#a6e22e\"\u003egroup_by\u003c/span\u003e(bins) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n  \u003cspan style=\"color:#a6e22e\"\u003esummarise\u003c/span\u003e(total \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003en\u003c/span\u003e(), \n            events \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(bad_flag \u003cspan style=\"color:#f92672\"\u003e==\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e), \n            non_events \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(bad_flag \u003cspan style=\"color:#f92672\"\u003e==\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e))\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eAt this point the table should look something like this:\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003ekable\u003c/span\u003e(gains_table)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ctable\u003e\n\u003cthead\u003e\n\u003ctr\u003e\n\u003cth style=\"text-align:left\"\u003ebins\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003etotal\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003eevents\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003enon_events\u003c/th\u003e\n\u003c/tr\u003e\n\u003c/thead\u003e\n\u003ctbody\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e[-6.47,-3.39]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e5\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e295\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-3.39,-2.94]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e8\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e292\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.94,-2.65]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e12\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e288\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.65,-2.44]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e22\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e278\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.44,-2.25]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e25\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e275\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.25,-2.06]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e40\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e260\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.06,-1.84]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e56\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e244\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.84,-1.59]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e46\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e254\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.59,-1.22]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e62\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e238\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.22,2.59]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e66\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e234\u003c/td\u003e\n\u003c/tr\u003e\n\u003c/tbody\u003e\n\u003c/table\u003e\n\u003cp\u003eNext, we\u0026rsquo;ll add the event rate columns. Let\u0026rsquo;s also make the table presentable - I\u0026rsquo;ll use the \u003ccode\u003epercent()\u003c/code\u003e function in the \u003ccode\u003escales\u003c/code\u003e package to show numbers as percentages.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003egains_table \u003cspan style=\"color:#f92672\"\u003e%\u0026lt;\u0026gt;%\u003c/span\u003e\n  \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(event_rate \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(events \u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e total, \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e))\n\n\u003cspan style=\"color:#a6e22e\"\u003ekable\u003c/span\u003e(gains_table)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ctable\u003e\n\u003cthead\u003e\n\u003ctr\u003e\n\u003cth style=\"text-align:left\"\u003ebins\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003etotal\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003eevents\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003enon_events\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003eevent_rate\u003c/th\u003e\n\u003c/tr\u003e\n\u003c/thead\u003e\n\u003ctbody\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e[-6.47,-3.39]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e5\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e295\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e1.7%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-3.39,-2.94]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e8\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e292\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e2.7%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.94,-2.65]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e12\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e288\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e4.0%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.65,-2.44]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e22\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e278\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e7.3%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.44,-2.25]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e25\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e275\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e8.3%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.25,-2.06]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e40\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e260\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e13.3%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.06,-1.84]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e56\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e244\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e18.7%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.84,-1.59]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e46\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e254\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e15.3%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.59,-1.22]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e62\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e238\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e20.7%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.22,2.59]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e66\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e234\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e22.0%\u003c/td\u003e\n\u003c/tr\u003e\n\u003c/tbody\u003e\n\u003c/table\u003e\n\u003cp\u003eTo this we\u0026rsquo;ll add some columns quantifying how events and non events are distributed across each bin.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003egains_table \u003cspan style=\"color:#f92672\"\u003e%\u0026lt;\u0026gt;%\u003c/span\u003e\n  \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(pop_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(total\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(total), \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e), \n         \n         \u003cspan style=\"color:#75715e\"\u003e# Not formatting these as percentages just yet\u003c/span\u003e\n         c.events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(events) \u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(events),\n         c.non_events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(non_events) \u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(non_events))\n\n\u003cspan style=\"color:#a6e22e\"\u003ekable\u003c/span\u003e(gains_table) \n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ctable\u003e\n\u003cthead\u003e\n\u003ctr\u003e\n\u003cth style=\"text-align:left\"\u003ebins\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003etotal\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003eevents\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003enon_events\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003eevent_rate\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003epop_pct\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003ec.events_pct\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003ec.non_events_pct\u003c/th\u003e\n\u003c/tr\u003e\n\u003c/thead\u003e\n\u003ctbody\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e[-6.47,-3.39]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e5\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e295\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e1.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.0146199\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.1109857\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-3.39,-2.94]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e8\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e292\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e2.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.0380117\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.2208427\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.94,-2.65]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e12\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e288\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e4.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.0730994\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.3291949\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.65,-2.44]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e22\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e278\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e7.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.1374269\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.4337848\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.44,-2.25]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e25\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e275\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e8.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.2105263\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.5372460\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.25,-2.06]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e40\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e260\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e13.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.3274854\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.6350640\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.06,-1.84]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e56\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e244\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e18.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.4912281\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.7268623\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.84,-1.59]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e46\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e254\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e15.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.6257310\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.8224229\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.59,-1.22]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e62\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e238\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e20.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.8070175\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.9119639\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.22,2.59]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e66\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e234\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e22.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1.0000000\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1.0000000\u003c/td\u003e\n\u003c/tr\u003e\n\u003c/tbody\u003e\n\u003c/table\u003e\n\u003cp\u003eAlmost done - just need a few more columns namely:\u003c/p\u003e\n\u003cul\u003e\n\u003cli\u003eA column computing the difference between the two cumulative distribution columns we created previously. The maximum value of this column will become the primary performance metric known as the \u003ccode\u003eKS statistic\u003c/code\u003e.\u003c/li\u003e\n\u003cli\u003eTwo additional columns computing \u003ccode\u003eevent capture rates\u003c/code\u003e and \u003ccode\u003ecumulative event rates\u003c/code\u003e.\u003c/li\u003e\n\u003c/ul\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003egains_table \u003cspan style=\"color:#f92672\"\u003e%\u0026lt;\u0026gt;%\u003c/span\u003e\n  \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(ks \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eround\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003eabs\u003c/span\u003e(c.events_pct \u003cspan style=\"color:#f92672\"\u003e-\u003c/span\u003e c.non_events_pct), \u003cspan style=\"color:#ae81ff\"\u003e2\u003c/span\u003e), \n         cap_rate \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(events)\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(events), \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e), \n         c_event_rate \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(events)\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(total), \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e), \n         \n         \u003cspan style=\"color:#75715e\"\u003e# Format pending columns\u003c/span\u003e\n         c.events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(c.events_pct, \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e),\n         c.non_events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(c.non_events_pct, \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e))\n\n\u003cspan style=\"color:#a6e22e\"\u003ekable\u003c/span\u003e(gains_table)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ctable\u003e\n\u003cthead\u003e\n\u003ctr\u003e\n\u003cth style=\"text-align:left\"\u003ebins\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003etotal\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003eevents\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003enon_events\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003eevent_rate\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003epop_pct\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ec.events_pct\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ec.non_events_pct\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003eks\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ecap_rate\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ec_event_rate\u003c/th\u003e\n\u003c/tr\u003e\n\u003c/thead\u003e\n\u003ctbody\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e[-6.47,-3.39]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e5\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e295\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e1.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e1.5%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e11.1%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.10\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e1%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e1.7%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-3.39,-2.94]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e8\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e292\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e2.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e3.8%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e22.1%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.18\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e4%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e2.2%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.94,-2.65]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e12\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e288\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e4.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e7.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e32.9%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.26\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e2.8%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.65,-2.44]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e22\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e278\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e7.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e13.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e43.4%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.30\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e14%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e3.9%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.44,-2.25]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e25\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e275\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e8.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e21.1%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e53.7%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.33\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e21%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e4.8%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.25,-2.06]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e40\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e260\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e13.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e32.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e63.5%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.31\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e33%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e6.2%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.06,-1.84]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e56\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e244\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e18.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e49.1%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e72.7%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.24\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e49%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e8.0%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.84,-1.59]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e46\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e254\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e15.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e62.6%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e82.2%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.20\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e63%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e8.9%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.59,-1.22]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e62\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e238\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e20.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e80.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e91.2%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.10\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e81%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.2%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.22,2.59]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e66\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e234\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e22.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e100.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e100.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.00\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e100%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e11.4%\u003c/td\u003e\n\u003c/tr\u003e\n\u003c/tbody\u003e\n\u003c/table\u003e\n\u003ch2 id=\"creating-a-function\"\u003eCreating a function\u003c/h2\u003e\n\u003cp\u003eFinally, we can encapsulate all of the above code in a single function. Note that we actually do not need the full test/train dataset, just the actual classes and predicted outcomes (log odds/probability/score).\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003egains_table \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003efunction\u003c/span\u003e(act, pred, increasing \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e T, nBins \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e10\u003c/span\u003e){\n  \n  q \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003equantile\u003c/span\u003e(pred, probs \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eseq\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, length.out \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e nBins \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e))\n  bins \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ecut\u003c/span\u003e(pred, breaks \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e q, include.lowest \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e T, right \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e T, ordered_result \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e T)\n  \n  df \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003edata.frame\u003c/span\u003e(act, pred, bins)\n  \n  df \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n    \n    \u003cspan style=\"color:#a6e22e\"\u003egroup_by\u003c/span\u003e(bins) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n    \u003cspan style=\"color:#a6e22e\"\u003esummarise\u003c/span\u003e(total \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003en\u003c/span\u003e(), \n              events \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(act \u003cspan style=\"color:#f92672\"\u003e==\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e), \n              non_events \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(act \u003cspan style=\"color:#f92672\"\u003e==\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e)) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n    \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(event_rate \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(events \u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e total, \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e)) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n    \n    \u003cspan style=\"color:#75715e\"\u003e# This odd looking format is to ensure that the if-else \u003c/span\u003e\n    \u003cspan style=\"color:#75715e\"\u003e# condition is part of the dplyr chain\u003c/span\u003e\n    {\u003cspan style=\"color:#a6e22e\"\u003eif\u003c/span\u003e(increasing \u003cspan style=\"color:#f92672\"\u003e==\u003c/span\u003e \u003cspan style=\"color:#66d9ef\"\u003eTRUE\u003c/span\u003e){\n      \u003cspan style=\"color:#a6e22e\"\u003earrange\u003c/span\u003e(., bins)\n    }else{\n      \u003cspan style=\"color:#a6e22e\"\u003earrange\u003c/span\u003e(., \u003cspan style=\"color:#a6e22e\"\u003edesc\u003c/span\u003e(bins))\n    }} \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n    \n    \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(pop_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(total\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(total), \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e), \n           c.events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(events) \u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(events),\n           c.non_events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(non_events) \u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(non_events), \n           ks \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eround\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003eabs\u003c/span\u003e(c.events_pct \u003cspan style=\"color:#f92672\"\u003e-\u003c/span\u003e c.non_events_pct), \u003cspan style=\"color:#ae81ff\"\u003e2\u003c/span\u003e), \n           cap_rate \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(events)\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(events), \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e), \n           c_event_rate \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(events)\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(total), \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e), \n           c.events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(c.events_pct, \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e),\n           c.non_events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(c.non_events_pct, \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e))\n}\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eIt is worth noting here that since the capture rate is being computed from \u003cstrong\u003etop to bottom\u003c/strong\u003e, it is important that the table is arranged in an appropriate manner. That is, when modelling for \u003ccode\u003ebads\u003c/code\u003e, the table should be arrange in \u003cstrong\u003edescending\u003c/strong\u003e order of the model output (i.e. higher event rates at the top) and vice versa.\u003c/p\u003e\n\u003cp\u003eAlso, if you are planning on using this with \u003ccode\u003esparklyr\u003c/code\u003e, consider looking into the \u003ccode\u003eft_quantile_discretizer()\u003c/code\u003e function. It would replace \u003ccode\u003ecut()\u003c/code\u003e here.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Test the function\u003c/span\u003e\ntab \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003egains_table\u003c/span\u003e(test\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003ebad_flag, test\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003epred, F, \u003cspan style=\"color:#ae81ff\"\u003e10\u003c/span\u003e)\n\u003cspan style=\"color:#a6e22e\"\u003ekable\u003c/span\u003e(tab)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ctable\u003e\n\u003cthead\u003e\n\u003ctr\u003e\n\u003cth style=\"text-align:left\"\u003ebins\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003etotal\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003eevents\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003enon_events\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003eevent_rate\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003epop_pct\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ec.events_pct\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ec.non_events_pct\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003eks\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ecap_rate\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ec_event_rate\u003c/th\u003e\n\u003c/tr\u003e\n\u003c/thead\u003e\n\u003ctbody\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.22,2.59]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e66\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e234\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e22.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e19.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e8.8%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.10\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e19%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e22.0%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.59,-1.22]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e62\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e238\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e20.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e37.4%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e17.8%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.20\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e37%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e21.3%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.84,-1.59]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e46\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e254\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e15.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e50.9%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e27.3%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.24\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e51%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e19.3%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.06,-1.84]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e56\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e244\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e18.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e67.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e36.5%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.31\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e67%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e19.2%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.25,-2.06]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e40\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e260\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e13.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e78.9%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e46.3%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.33\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e79%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e18.0%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.44,-2.25]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e25\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e275\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e8.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e86.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e56.6%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.30\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e86%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e16.4%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.65,-2.44]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e22\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e278\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e7.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e92.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e67.1%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.26\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e93%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e15.1%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.94,-2.65]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e12\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e288\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e4.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e96.2%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e77.9%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.18\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e96%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e13.7%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-3.39,-2.94]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e8\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e292\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e2.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e98.5%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e88.9%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.10\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e99%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e12.5%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e[-6.47,-3.39]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e5\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e295\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e1.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e100.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e100.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.00\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e100%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e11.4%\u003c/td\u003e\n\u003c/tr\u003e\n\u003c/tbody\u003e\n\u003c/table\u003e\n\u003ch2 id=\"interpretation\"\u003eInterpretation\u003c/h2\u003e\n\u003cp\u003eSome notes on how to interpret such a table:\u003c/p\u003e\n\u003cul\u003e\n\u003cli\u003eSince scoring models aim to risk-rank borrowers, the first thing to look for is whether or not the event rates are consistently increasing  (or decreasing) across bins. If not, when using the actual model, one might not be able to confidently conclude if borrower A is better (or worse) than borrower B.\u003c/li\u003e\n\u003cli\u003eIf bin sizes are not consistent (in this case ~10%) it would imply that the model is assigning the same output/score to a lot of borrowers (clumping). This could pose issues later on (say when deciding cutoffs). The ideal solution is to add additional variables that can help differentiate between good and bad borrowers.\u003c/li\u003e\n\u003cli\u003eWhile the ideal cutoff would be the bin where the \u003ccode\u003eKS\u003c/code\u003e statistic is at its maximum, additional aspects like capture rates and approval rates should be taken into account.\u003c/li\u003e\n\u003cli\u003eTypically, analysts would look for a model which achieves the maximum value of the \u003ccode\u003eKS\u003c/code\u003e statistic within the first 2/3 deciles. That way, when creating underwriting policies, you would only end up rejecting 20%-30% of the applicant pool.\u003c/li\u003e\n\u003c/ul\u003e\n\u003cp\u003e\u003cem\u003eThoughts? Comments? Helpful? Not helpful? Like to see anything else added in here? Let me know!\u003c/em\u003e\u003c/p\u003e"
+  "articleBody": "\u003cp\u003eModellers/analysts developing credit scores generally use something known as the \u003ccode\u003egains table\u003c/code\u003e (or a \u003ccode\u003eks table\u003c/code\u003e) to measure and quantify the performance of such models. We\u0026rsquo;ll explore how to build such a table in this post.\u003c/p\u003e\n\u003cp\u003eThe idea is to first discretise the population under consideration (say the testing or validation set) into groups based on the model\u0026rsquo;s output (probability/log odds/scores). Typically, this is done in a way such that each group represents 10% of the total population (or deciles). Then, summary statistics are generated for each group and  cumulative distributions of events and non-events are analysed and the model\u0026rsquo;s performance is quantified.\u003c/p\u003e\n\u003cp\u003eWe\u0026rsquo;ll use \u003ccode\u003edplyr\u003c/code\u003e in this post. Doing it this way is nice since it\u0026rsquo;s easier to read and the code would need minimal changes if using \u003ccode\u003esparklyr\u003c/code\u003e (say within a big data environment where one might need to run this directly on a \u003cem\u003ehadoop\u003c/em\u003e table).\u003c/p\u003e\n\u003ch2 id=\"packages\"\u003ePackages\u003c/h2\u003e\n\u003cp\u003eLet\u0026rsquo;s get package installation out of the way first.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Pacman is a package management tool \u003c/span\u003e\n\u003cspan style=\"color:#a6e22e\"\u003einstall.packages\u003c/span\u003e(\u003cspan style=\"color:#e6db74\"\u003e\u0026#34;pacman\u0026#34;\u003c/span\u003e)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003elibrary\u003c/span\u003e(pacman)\n\n\u003cspan style=\"color:#75715e\"\u003e# p_load automatically installs packages if needed\u003c/span\u003e\n\u003cspan style=\"color:#a6e22e\"\u003ep_load\u003c/span\u003e(dplyr, magrittr, knitr, scales)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ch2 id=\"sample-dataset\"\u003eSample dataset\u003c/h2\u003e\n\u003cp\u003e\u003ca href=\"https://github.com/royr2/blog/blob/main/download/credit_sample.csv\"\u003eHere\u0026rsquo;s\u003c/a\u003e some sample data to play around with. The data set is small sample of the \u003cstrong\u003eLending Club\u003c/strong\u003e dataset available on \u003ca href=\"https://www.kaggle.com/wordsforthewise/lending-club\"\u003eKaggle\u003c/a\u003e.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003esample \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eread.csv\u003c/span\u003e(\u003cspan style=\"color:#e6db74\"\u003e\u0026#34;credit_sample.csv\u0026#34;\u003c/span\u003e)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003edim\u003c/span\u003e(sample)\n\u003cspan style=\"color:#75715e\"\u003e## [1] 10000   153\u003c/span\u003e\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003eclass\u003c/span\u003e(sample)\n\u003cspan style=\"color:#75715e\"\u003e## [1] \u0026#34;data.frame\u0026#34;\u003c/span\u003e\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ch2 id=\"defining-a-target\"\u003eDefining a target\u003c/h2\u003e\n\u003cp\u003eFirst, we need to create a target (outcome) to model for. Since this is a credit risk use case, we are looking to create a target which identifies borrowers who defaulted on (or missed) their payments consecutively.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003eunique\u003c/span\u003e(sample\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003eloan_status)\n\u003cspan style=\"color:#75715e\"\u003e## [1] \u0026#34;Fully Paid\u0026#34;                                         \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## [2] \u0026#34;Current\u0026#34;                                            \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## [3] \u0026#34;Charged Off\u0026#34;                                        \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## [4] \u0026#34;Late (31-120 days)\u0026#34;                                 \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## [5] \u0026#34;Late (16-30 days)\u0026#34;                                  \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## [6] \u0026#34;In Grace Period\u0026#34;                                    \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## [7] \u0026#34;Does not meet the credit policy. Status:Fully Paid\u0026#34; \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## [8] \u0026#34;Does not meet the credit policy. Status:Charged Off\u0026#34;\u003c/span\u003e\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# For simplicity we\u0026#39;ll just use \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e# 1. \u0026#34;Charged Off\u0026#34;\u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e# 2. \u0026#34;Does not meet the credit policy. Status:Charged Off\u0026#34;\u003c/span\u003e\ncodes \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ec\u003c/span\u003e(\u003cspan style=\"color:#e6db74\"\u003e\u0026#34;Charged Off\u0026#34;\u003c/span\u003e, \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;Does not meet the credit policy. Status:Charged Off\u0026#34;\u003c/span\u003e)\n\n\u003cspan style=\"color:#75715e\"\u003e# For details on the %\u0026lt;\u0026gt;% operator please look at the \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e# documentation for the magrittr package. \u003c/span\u003e\nsample \u003cspan style=\"color:#f92672\"\u003e%\u0026lt;\u0026gt;%\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(bad_flag \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eifelse\u003c/span\u003e(loan_status \u003cspan style=\"color:#f92672\"\u003e%in%\u003c/span\u003e codes, \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e))\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eLet\u0026rsquo;s also check for overall event rates.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003esample \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n  \u003cspan style=\"color:#a6e22e\"\u003esummarise\u003c/span\u003e(events \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(bad_flag \u003cspan style=\"color:#f92672\"\u003e==\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e), \n            non_events \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(bad_flag \u003cspan style=\"color:#f92672\"\u003e==\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e)) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n  \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(event_rate \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e events\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e(events \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e non_events))\n\u003cspan style=\"color:#75715e\"\u003e##   events non_events event_rate\u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e## 1   1162       8838     0.1162\u003c/span\u003e\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ch2 id=\"building-a-model\"\u003eBuilding a model\u003c/h2\u003e\n\u003cp\u003eNext lets build a quick and dirty model, the output of which we will use to build the gains table.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Check out available features (not shown here for brevity)\u003c/span\u003e\n\u003cspan style=\"color:#a6e22e\"\u003ecolnames\u003c/span\u003e(sample)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eWe\u0026rsquo;ll need to do some data cleaning first.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Replace all NA values with a default value\u003c/span\u003e\nsample\u003cspan style=\"color:#a6e22e\"\u003e[is.na\u003c/span\u003e(sample)] \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e-1\u003c/span\u003e\n\nsample \u003cspan style=\"color:#f92672\"\u003e%\u0026lt;\u0026gt;%\u003c/span\u003e \n  \n  \u003cspan style=\"color:#75715e\"\u003e# Remove cases where home ownership and payment plan are not reported\u003c/span\u003e\n  \u003cspan style=\"color:#a6e22e\"\u003efilter\u003c/span\u003e(\u003cspan style=\"color:#f92672\"\u003e!\u003c/span\u003e home_ownership \u003cspan style=\"color:#f92672\"\u003e%in%\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ec\u003c/span\u003e(\u003cspan style=\"color:#e6db74\"\u003e\u0026#34;\u0026#34;\u003c/span\u003e, \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;NONE\u0026#34;\u003c/span\u003e),\n         pymnt_plan \u003cspan style=\"color:#f92672\"\u003e!=\u003c/span\u003e \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;\u0026#34;\u003c/span\u003e) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n  \n  \u003cspan style=\"color:#75715e\"\u003e# Convert these two variables into factors\u003c/span\u003e\n  \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(home_ownership \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003efactor\u003c/span\u003e(home_ownership), \n         pymnt_plan \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003efactor\u003c/span\u003e(pymnt_plan))\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Train Test split\u003c/span\u003e\nidx \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esample\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e\u003cspan style=\"color:#f92672\"\u003e:\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003enrow\u003c/span\u003e(sample), size \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0.7\u003c/span\u003e \u003cspan style=\"color:#f92672\"\u003e*\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003enrow\u003c/span\u003e(sample), replace \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e F)\ntrain \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e sample[idx,]\ntest \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e sample[\u003cspan style=\"color:#f92672\"\u003e-\u003c/span\u003eidx,]\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003edim\u003c/span\u003e(train)\n\u003cspan style=\"color:#75715e\"\u003e## [1] 6999  153\u003c/span\u003e\n\u003cspan style=\"color:#a6e22e\"\u003edim\u003c/span\u003e(test)\n\u003cspan style=\"color:#75715e\"\u003e## [1] 3000  153\u003c/span\u003e\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Using a GLM model for simplicity\u003c/span\u003e\nmdl \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eglm\u003c/span\u003e(\n  formula \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e bad_flag \u003cspan style=\"color:#f92672\"\u003e~\u003c/span\u003e \n    loan_amnt \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e term \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e mths_since_last_delinq \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e total_pymnt \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e \n    home_ownership \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e acc_now_delinq \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e \n    inq_last_6mths \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e delinq_amnt \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e \n    mths_since_last_record \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e mths_since_recent_revol_delinq \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e \n    mths_since_last_major_derog \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e mths_since_recent_inq \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e \n    mths_since_recent_bc \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e num_accts_ever_120_pd,\n  family \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;binomial\u0026#34;\u003c/span\u003e, \n  data \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e train\n)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eWhile we are at it, let\u0026rsquo;s also attach the model predictions to the test dataset.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003etest\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003epred \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epredict\u003c/span\u003e(mdl, newdata \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e test)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ch2 id=\"creating-the-gains-table\"\u003eCreating the Gains Table\u003c/h2\u003e\n\u003cp\u003eThe table has a few important components:\u003c/p\u003e\n\u003cul\u003e\n\u003cli\u003eBins in decreasing/increasing order of model output (probability/log odds/scores)\u003c/li\u003e\n\u003cli\u003ePopulation percentages contained in each bin\u003c/li\u003e\n\u003cli\u003eObserved event rates in each bin\u003c/li\u003e\n\u003cli\u003eCumulative events and non events distributions\u003c/li\u003e\n\u003c/ul\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Discretise predictions based on quantiles\u003c/span\u003e\nq \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003equantile\u003c/span\u003e(test\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003epred, probs \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eseq\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, length.out \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e11\u003c/span\u003e))\n\n\u003cspan style=\"color:#75715e\"\u003e# Add bins to test dataset\u003c/span\u003e\ntest\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003ebins \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ecut\u003c/span\u003e(test\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003epred, breaks \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e q, include.lowest \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e T, right \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e T, ordered_result \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e T)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"flex items-center justify-center font-content-sans rounded bg-raven-100 px-4 py-4\" role=\"alert\"\u003e\n  \u003cspan class=\"text-xs font-bold uppercase leading-none rounded-full text-raven-100 bg-raven-500 px-2 py-1 mr-3\"\u003einfo\u003c/span\u003e\n  \u003cspan class=\"font-semibold text-raven-700\"\u003eNote that the output from cut is arranged in increasing order of value\u003c/span\u003e\n\u003c/div\u003e\n\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003elevels\u003c/span\u003e(test\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003ebins)\n\u003cspan style=\"color:#75715e\"\u003e##  [1] \u0026#34;[-5.97,-3.35]\u0026#34; \u0026#34;(-3.35,-2.9]\u0026#34;  \u0026#34;(-2.9,-2.64]\u0026#34;  \u0026#34;(-2.64,-2.44]\u0026#34;\u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e##  [5] \u0026#34;(-2.44,-2.26]\u0026#34; \u0026#34;(-2.26,-2.1]\u0026#34;  \u0026#34;(-2.1,-1.9]\u0026#34;   \u0026#34;(-1.9,-1.65]\u0026#34; \u003c/span\u003e\n\u003cspan style=\"color:#75715e\"\u003e##  [9] \u0026#34;(-1.65,-1.28]\u0026#34; \u0026#34;(-1.28,0.638]\u0026#34;\u003c/span\u003e\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eUsing the bins we created above, we can now start to put the table together\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Start with the test dataset and summarise\u003c/span\u003e\ngains_table \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e test \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n  \u003cspan style=\"color:#a6e22e\"\u003egroup_by\u003c/span\u003e(bins) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n  \u003cspan style=\"color:#a6e22e\"\u003esummarise\u003c/span\u003e(total \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003en\u003c/span\u003e(), \n            events \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(bad_flag \u003cspan style=\"color:#f92672\"\u003e==\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e), \n            non_events \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(bad_flag \u003cspan style=\"color:#f92672\"\u003e==\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e))\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eAt this point the table should look something like this:\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#a6e22e\"\u003ekable\u003c/span\u003e(gains_table)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ctable\u003e\n\u003cthead\u003e\n\u003ctr\u003e\n\u003cth style=\"text-align:left\"\u003ebins\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003etotal\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003eevents\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003enon_events\u003c/th\u003e\n\u003c/tr\u003e\n\u003c/thead\u003e\n\u003ctbody\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e[-5.97,-3.35]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e2\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e298\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-3.35,-2.9]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e15\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e285\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.9,-2.64]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e14\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e286\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.64,-2.44]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e19\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e281\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.44,-2.26]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e24\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e276\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.26,-2.1]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e38\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e262\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.1,-1.9]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e52\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e248\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.9,-1.65]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e56\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e244\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.65,-1.28]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e63\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e237\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.28,0.638]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e84\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e216\u003c/td\u003e\n\u003c/tr\u003e\n\u003c/tbody\u003e\n\u003c/table\u003e\n\u003cp\u003eNext, we\u0026rsquo;ll add the event rate columns. Let\u0026rsquo;s also make the table presentable - I\u0026rsquo;ll use the \u003ccode\u003epercent()\u003c/code\u003e function in the \u003ccode\u003escales\u003c/code\u003e package to show numbers as percentages.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003egains_table \u003cspan style=\"color:#f92672\"\u003e%\u0026lt;\u0026gt;%\u003c/span\u003e\n  \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(event_rate \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(events \u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e total, \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e))\n\n\u003cspan style=\"color:#a6e22e\"\u003ekable\u003c/span\u003e(gains_table)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ctable\u003e\n\u003cthead\u003e\n\u003ctr\u003e\n\u003cth style=\"text-align:left\"\u003ebins\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003etotal\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003eevents\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003enon_events\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003eevent_rate\u003c/th\u003e\n\u003c/tr\u003e\n\u003c/thead\u003e\n\u003ctbody\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e[-5.97,-3.35]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e2\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e298\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e0.7%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-3.35,-2.9]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e15\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e285\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e5.0%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.9,-2.64]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e14\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e286\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e4.7%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.64,-2.44]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e19\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e281\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e6.3%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.44,-2.26]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e24\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e276\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e8.0%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.26,-2.1]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e38\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e262\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e12.7%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.1,-1.9]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e52\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e248\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e17.3%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.9,-1.65]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e56\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e244\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e18.7%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.65,-1.28]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e63\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e237\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e21.0%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.28,0.638]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e84\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e216\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e28.0%\u003c/td\u003e\n\u003c/tr\u003e\n\u003c/tbody\u003e\n\u003c/table\u003e\n\u003cp\u003eTo this we\u0026rsquo;ll add some columns quantifying how events and non events are distributed across each bin.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003egains_table \u003cspan style=\"color:#f92672\"\u003e%\u0026lt;\u0026gt;%\u003c/span\u003e\n  \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(pop_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(total\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(total), \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e), \n         \n         \u003cspan style=\"color:#75715e\"\u003e# Not formatting these as percentages just yet\u003c/span\u003e\n         c.events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(events) \u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(events),\n         c.non_events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(non_events) \u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(non_events))\n\n\u003cspan style=\"color:#a6e22e\"\u003ekable\u003c/span\u003e(gains_table) \n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ctable\u003e\n\u003cthead\u003e\n\u003ctr\u003e\n\u003cth style=\"text-align:left\"\u003ebins\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003etotal\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003eevents\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003enon_events\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003eevent_rate\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003epop_pct\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003ec.events_pct\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003ec.non_events_pct\u003c/th\u003e\n\u003c/tr\u003e\n\u003c/thead\u003e\n\u003ctbody\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e[-5.97,-3.35]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e2\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e298\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e0.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.0054496\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.1131789\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-3.35,-2.9]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e15\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e285\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e5.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.0463215\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.2214204\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.9,-2.64]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e14\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e286\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e4.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.0844687\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.3300418\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.64,-2.44]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e19\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e281\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e6.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.1362398\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.4367641\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.44,-2.26]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e24\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e276\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e8.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.2016349\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.5415875\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.26,-2.1]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e38\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e262\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e12.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.3051771\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.6410938\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.1,-1.9]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e52\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e248\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e17.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.4468665\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.7352829\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.9,-1.65]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e56\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e244\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e18.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.5994550\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.8279529\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.65,-1.28]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e63\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e237\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e21.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.7711172\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.9179643\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.28,0.638]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e84\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e216\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e28.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1.0000000\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1.0000000\u003c/td\u003e\n\u003c/tr\u003e\n\u003c/tbody\u003e\n\u003c/table\u003e\n\u003cp\u003eAlmost done - just need a few more columns namely:\u003c/p\u003e\n\u003cul\u003e\n\u003cli\u003eA column computing the difference between the two cumulative distribution columns we created previously. The maximum value of this column will become the primary performance metric known as the \u003ccode\u003eKS statistic\u003c/code\u003e.\u003c/li\u003e\n\u003cli\u003eTwo additional columns computing \u003ccode\u003eevent capture rates\u003c/code\u003e and \u003ccode\u003ecumulative event rates\u003c/code\u003e.\u003c/li\u003e\n\u003c/ul\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003egains_table \u003cspan style=\"color:#f92672\"\u003e%\u0026lt;\u0026gt;%\u003c/span\u003e\n  \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(ks \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eround\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003eabs\u003c/span\u003e(c.events_pct \u003cspan style=\"color:#f92672\"\u003e-\u003c/span\u003e c.non_events_pct), \u003cspan style=\"color:#ae81ff\"\u003e2\u003c/span\u003e), \n         cap_rate \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(events)\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(events), \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e), \n         c_event_rate \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(events)\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(total), \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e), \n         \n         \u003cspan style=\"color:#75715e\"\u003e# Format pending columns\u003c/span\u003e\n         c.events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(c.events_pct, \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e),\n         c.non_events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(c.non_events_pct, \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e))\n\n\u003cspan style=\"color:#a6e22e\"\u003ekable\u003c/span\u003e(gains_table)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ctable\u003e\n\u003cthead\u003e\n\u003ctr\u003e\n\u003cth style=\"text-align:left\"\u003ebins\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003etotal\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003eevents\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003enon_events\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003eevent_rate\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003epop_pct\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ec.events_pct\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ec.non_events_pct\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003eks\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ecap_rate\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ec_event_rate\u003c/th\u003e\n\u003c/tr\u003e\n\u003c/thead\u003e\n\u003ctbody\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e[-5.97,-3.35]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e2\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e298\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e0.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e0.5%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e11.3%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.11\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e1%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e0.7%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-3.35,-2.9]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e15\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e285\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e5.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e4.6%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e22.1%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.18\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e5%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e2.8%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.9,-2.64]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e14\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e286\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e4.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e8.4%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e33.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.25\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e8%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e3.4%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.64,-2.44]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e19\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e281\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e6.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e13.6%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e43.7%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.30\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e14%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e4.2%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.44,-2.26]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e24\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e276\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e8.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e20.2%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e54.2%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.34\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e20%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e4.9%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.26,-2.1]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e38\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e262\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e12.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e30.5%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e64.1%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.34\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e31%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e6.2%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.1,-1.9]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e52\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e248\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e17.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e44.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e73.5%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.29\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e45%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e7.8%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.9,-1.65]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e56\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e244\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e18.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e59.9%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e82.8%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.23\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e60%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e9.2%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.65,-1.28]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e63\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e237\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e21.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e77.1%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e91.8%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.15\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e77%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.5%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.28,0.638]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e84\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e216\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e28.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e100.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e100.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.00\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e100%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e12.2%\u003c/td\u003e\n\u003c/tr\u003e\n\u003c/tbody\u003e\n\u003c/table\u003e\n\u003ch2 id=\"creating-a-function\"\u003eCreating a function\u003c/h2\u003e\n\u003cp\u003eFinally, we can encapsulate all of the above code in a single function. Note that we actually do not need the full test/train dataset, just the actual classes and predicted outcomes (log odds/probability/score).\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003egains_table \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003efunction\u003c/span\u003e(act, pred, increasing \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e T, nBins \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e10\u003c/span\u003e){\n  \n  q \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003equantile\u003c/span\u003e(pred, probs \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eseq\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, length.out \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e nBins \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e))\n  bins \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ecut\u003c/span\u003e(pred, breaks \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e q, include.lowest \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e T, right \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e T, ordered_result \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e T)\n  \n  df \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003edata.frame\u003c/span\u003e(act, pred, bins)\n  \n  df \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n    \n    \u003cspan style=\"color:#a6e22e\"\u003egroup_by\u003c/span\u003e(bins) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n    \u003cspan style=\"color:#a6e22e\"\u003esummarise\u003c/span\u003e(total \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003en\u003c/span\u003e(), \n              events \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(act \u003cspan style=\"color:#f92672\"\u003e==\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e), \n              non_events \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(act \u003cspan style=\"color:#f92672\"\u003e==\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e)) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n    \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(event_rate \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(events \u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e total, \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e)) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n    \n    \u003cspan style=\"color:#75715e\"\u003e# This odd looking format is to ensure that the if-else \u003c/span\u003e\n    \u003cspan style=\"color:#75715e\"\u003e# condition is part of the dplyr chain\u003c/span\u003e\n    {\u003cspan style=\"color:#a6e22e\"\u003eif\u003c/span\u003e(increasing \u003cspan style=\"color:#f92672\"\u003e==\u003c/span\u003e \u003cspan style=\"color:#66d9ef\"\u003eTRUE\u003c/span\u003e){\n      \u003cspan style=\"color:#a6e22e\"\u003earrange\u003c/span\u003e(., bins)\n    }else{\n      \u003cspan style=\"color:#a6e22e\"\u003earrange\u003c/span\u003e(., \u003cspan style=\"color:#a6e22e\"\u003edesc\u003c/span\u003e(bins))\n    }} \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n    \n    \u003cspan style=\"color:#a6e22e\"\u003emutate\u003c/span\u003e(pop_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(total\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(total), \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e), \n           c.events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(events) \u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(events),\n           c.non_events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(non_events) \u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(non_events), \n           ks \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eround\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003eabs\u003c/span\u003e(c.events_pct \u003cspan style=\"color:#f92672\"\u003e-\u003c/span\u003e c.non_events_pct), \u003cspan style=\"color:#ae81ff\"\u003e2\u003c/span\u003e), \n           cap_rate \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(events)\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003esum\u003c/span\u003e(events), \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e), \n           c_event_rate \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(events)\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003ecumsum\u003c/span\u003e(total), \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e), \n           c.events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(c.events_pct, \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e),\n           c.non_events_pct \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003epercent\u003c/span\u003e(c.non_events_pct, \u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e))\n}\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eIt is worth noting here that since the capture rate is being computed from \u003cstrong\u003etop to bottom\u003c/strong\u003e, it is important that the table is arranged in an appropriate manner. That is, when modelling for \u003ccode\u003ebads\u003c/code\u003e, the table should be arrange in \u003cstrong\u003edescending\u003c/strong\u003e order of the model output (i.e. higher event rates at the top) and vice versa.\u003c/p\u003e\n\u003cp\u003eAlso, if you are planning on using this with \u003ccode\u003esparklyr\u003c/code\u003e, consider looking into the \u003ccode\u003eft_quantile_discretizer()\u003c/code\u003e function. It would replace \u003ccode\u003ecut()\u003c/code\u003e here.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"color:#75715e\"\u003e# Test the function\u003c/span\u003e\ntab \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003egains_table\u003c/span\u003e(test\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003ebad_flag, test\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003epred, F, \u003cspan style=\"color:#ae81ff\"\u003e10\u003c/span\u003e)\n\u003cspan style=\"color:#a6e22e\"\u003ekable\u003c/span\u003e(tab)\n\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ctable\u003e\n\u003cthead\u003e\n\u003ctr\u003e\n\u003cth style=\"text-align:left\"\u003ebins\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003etotal\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003eevents\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003enon_events\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003eevent_rate\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003epop_pct\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ec.events_pct\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ec.non_events_pct\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003eks\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ecap_rate\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ec_event_rate\u003c/th\u003e\n\u003c/tr\u003e\n\u003c/thead\u003e\n\u003ctbody\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.28,0.638]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e84\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e216\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e28.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e22.9%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e8.2%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.15\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e23%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e28.0%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.65,-1.28]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e63\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e237\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e21.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e40.1%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e17.2%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.23\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e40%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e24.5%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-1.9,-1.65]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e56\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e244\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e18.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e55.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e26.5%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.29\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e55%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e22.6%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.1,-1.9]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e52\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e248\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e17.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e69.5%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e35.9%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.34\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e69%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e21.2%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.26,-2.1]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e38\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e262\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e12.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e79.8%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e45.8%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.34\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e80%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e19.5%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.44,-2.26]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e24\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e276\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e8.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e86.4%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e56.3%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.30\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e86%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e17.6%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.64,-2.44]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e19\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e281\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e6.3%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e91.6%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e67.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.25\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e92%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e16.0%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-2.9,-2.64]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e14\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e286\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e4.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e95.4%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e77.9%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.18\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e95%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e14.6%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e(-3.35,-2.9]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e15\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e285\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e5.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e99.5%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e88.7%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.11\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e99%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e13.5%\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e[-5.97,-3.35]\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e300\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e2\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e298\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e0.7%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e10.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e100.0%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e100.0%\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.00\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e100%\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e12.2%\u003c/td\u003e\n\u003c/tr\u003e\n\u003c/tbody\u003e\n\u003c/table\u003e\n\u003ch2 id=\"interpretation\"\u003eInterpretation\u003c/h2\u003e\n\u003cp\u003eSome notes on how to interpret such a table:\u003c/p\u003e\n\u003cul\u003e\n\u003cli\u003eSince scoring models aim to risk-rank borrowers, the first thing to look for is whether or not the event rates are consistently increasing  (or decreasing) across bins. If not, when using the actual model, one might not be able to confidently conclude if borrower A is better (or worse) than borrower B.\u003c/li\u003e\n\u003cli\u003eIf bin sizes are not consistent (in this case ~10%) it would imply that the model is assigning the same output/score to a lot of borrowers (clumping). This could pose issues later on (say when deciding cutoffs). The ideal solution is to add additional variables that can help differentiate between good and bad borrowers.\u003c/li\u003e\n\u003cli\u003eWhile the ideal cutoff would be the bin where the \u003ccode\u003eKS\u003c/code\u003e statistic is at its maximum, additional aspects like capture rates and approval rates should be taken into account.\u003c/li\u003e\n\u003cli\u003eTypically, analysts would look for a model which achieves the maximum value of the \u003ccode\u003eKS\u003c/code\u003e statistic within the first 2/3 deciles. That way, when creating underwriting policies, you would only end up rejecting 20%-30% of the applicant pool.\u003c/li\u003e\n\u003c/ul\u003e\n\u003cp\u003e\u003cem\u003eThoughts? Comments? Helpful? Not helpful? Like to see anything else added in here? Let me know!\u003c/em\u003e\u003c/p\u003e"
 }
 </script>
 
-<link rel="preload" as="script" href="/bundle.js?v=1636045864">
+<link rel="preload" as="script" href="/bundle.js?v=1641649589">
 
 <link rel="preconnect" href="https://www.google-analytics.com">
 <link rel="preconnect" href="https://stats.g.doubleclick.net">
@@ -161,7 +161,6 @@
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Pacman is a package management tool </span>
 <span style="color:#a6e22e">install.packages</span>(<span style="color:#e6db74">&#34;pacman&#34;</span>)
 </code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(pacman)
-<span style="color:#75715e">## Warning: package &#39;pacman&#39; was built under R version 4.1.1</span>
 
 <span style="color:#75715e"># p_load automatically installs packages if needed</span>
 <span style="color:#a6e22e">p_load</span>(dplyr, magrittr, knitr, scales)
@@ -256,9 +255,9 @@ test<span style="color:#f92672">$</span>bins <span style="color:#f92672">&lt;-</
 </div>
 
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">levels</span>(test<span style="color:#f92672">$</span>bins)
-<span style="color:#75715e">##  [1] &#34;[-6.47,-3.39]&#34; &#34;(-3.39,-2.94]&#34; &#34;(-2.94,-2.65]&#34; &#34;(-2.65,-2.44]&#34;</span>
-<span style="color:#75715e">##  [5] &#34;(-2.44,-2.25]&#34; &#34;(-2.25,-2.06]&#34; &#34;(-2.06,-1.84]&#34; &#34;(-1.84,-1.59]&#34;</span>
-<span style="color:#75715e">##  [9] &#34;(-1.59,-1.22]&#34; &#34;(-1.22,2.59]&#34;</span>
+<span style="color:#75715e">##  [1] &#34;[-5.97,-3.35]&#34; &#34;(-3.35,-2.9]&#34;  &#34;(-2.9,-2.64]&#34;  &#34;(-2.64,-2.44]&#34;</span>
+<span style="color:#75715e">##  [5] &#34;(-2.44,-2.26]&#34; &#34;(-2.26,-2.1]&#34;  &#34;(-2.1,-1.9]&#34;   &#34;(-1.9,-1.65]&#34; </span>
+<span style="color:#75715e">##  [9] &#34;(-1.65,-1.28]&#34; &#34;(-1.28,0.638]&#34;</span>
 </code></pre></div><p>Using the bins we created above, we can now start to put the table together</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Start with the test dataset and summarise</span>
 gains_table <span style="color:#f92672">&lt;-</span> test <span style="color:#f92672">%&gt;%</span> 
@@ -279,64 +278,64 @@ gains_table <span style="color:#f92672">&lt;-</span> test <span style="color:#f9
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">[-6.47,-3.39]</td>
+<td style="text-align:left">[-5.97,-3.35]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">5</td>
-<td style="text-align:right">295</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">298</td>
 </tr>
 <tr>
-<td style="text-align:left">(-3.39,-2.94]</td>
+<td style="text-align:left">(-3.35,-2.9]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">8</td>
-<td style="text-align:right">292</td>
+<td style="text-align:right">15</td>
+<td style="text-align:right">285</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.94,-2.65]</td>
+<td style="text-align:left">(-2.9,-2.64]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">12</td>
-<td style="text-align:right">288</td>
+<td style="text-align:right">14</td>
+<td style="text-align:right">286</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.65,-2.44]</td>
+<td style="text-align:left">(-2.64,-2.44]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">22</td>
-<td style="text-align:right">278</td>
+<td style="text-align:right">19</td>
+<td style="text-align:right">281</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.44,-2.25]</td>
+<td style="text-align:left">(-2.44,-2.26]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">25</td>
-<td style="text-align:right">275</td>
+<td style="text-align:right">24</td>
+<td style="text-align:right">276</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.25,-2.06]</td>
+<td style="text-align:left">(-2.26,-2.1]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">40</td>
-<td style="text-align:right">260</td>
+<td style="text-align:right">38</td>
+<td style="text-align:right">262</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.06,-1.84]</td>
+<td style="text-align:left">(-2.1,-1.9]</td>
+<td style="text-align:right">300</td>
+<td style="text-align:right">52</td>
+<td style="text-align:right">248</td>
+</tr>
+<tr>
+<td style="text-align:left">(-1.9,-1.65]</td>
 <td style="text-align:right">300</td>
 <td style="text-align:right">56</td>
 <td style="text-align:right">244</td>
 </tr>
 <tr>
-<td style="text-align:left">(-1.84,-1.59]</td>
+<td style="text-align:left">(-1.65,-1.28]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">46</td>
-<td style="text-align:right">254</td>
+<td style="text-align:right">63</td>
+<td style="text-align:right">237</td>
 </tr>
 <tr>
-<td style="text-align:left">(-1.59,-1.22]</td>
+<td style="text-align:left">(-1.28,0.638]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">62</td>
-<td style="text-align:right">238</td>
-</tr>
-<tr>
-<td style="text-align:left">(-1.22,2.59]</td>
-<td style="text-align:right">300</td>
-<td style="text-align:right">66</td>
-<td style="text-align:right">234</td>
+<td style="text-align:right">84</td>
+<td style="text-align:right">216</td>
 </tr>
 </tbody>
 </table>
@@ -357,74 +356,74 @@ gains_table <span style="color:#f92672">&lt;-</span> test <span style="color:#f9
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">[-6.47,-3.39]</td>
+<td style="text-align:left">[-5.97,-3.35]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">5</td>
-<td style="text-align:right">295</td>
-<td style="text-align:left">1.7%</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">298</td>
+<td style="text-align:left">0.7%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-3.39,-2.94]</td>
+<td style="text-align:left">(-3.35,-2.9]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">8</td>
-<td style="text-align:right">292</td>
-<td style="text-align:left">2.7%</td>
+<td style="text-align:right">15</td>
+<td style="text-align:right">285</td>
+<td style="text-align:left">5.0%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.94,-2.65]</td>
+<td style="text-align:left">(-2.9,-2.64]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">12</td>
-<td style="text-align:right">288</td>
-<td style="text-align:left">4.0%</td>
+<td style="text-align:right">14</td>
+<td style="text-align:right">286</td>
+<td style="text-align:left">4.7%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.65,-2.44]</td>
+<td style="text-align:left">(-2.64,-2.44]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">22</td>
-<td style="text-align:right">278</td>
-<td style="text-align:left">7.3%</td>
+<td style="text-align:right">19</td>
+<td style="text-align:right">281</td>
+<td style="text-align:left">6.3%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.44,-2.25]</td>
+<td style="text-align:left">(-2.44,-2.26]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">25</td>
-<td style="text-align:right">275</td>
-<td style="text-align:left">8.3%</td>
+<td style="text-align:right">24</td>
+<td style="text-align:right">276</td>
+<td style="text-align:left">8.0%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.25,-2.06]</td>
+<td style="text-align:left">(-2.26,-2.1]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">40</td>
-<td style="text-align:right">260</td>
-<td style="text-align:left">13.3%</td>
+<td style="text-align:right">38</td>
+<td style="text-align:right">262</td>
+<td style="text-align:left">12.7%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.06,-1.84]</td>
+<td style="text-align:left">(-2.1,-1.9]</td>
+<td style="text-align:right">300</td>
+<td style="text-align:right">52</td>
+<td style="text-align:right">248</td>
+<td style="text-align:left">17.3%</td>
+</tr>
+<tr>
+<td style="text-align:left">(-1.9,-1.65]</td>
 <td style="text-align:right">300</td>
 <td style="text-align:right">56</td>
 <td style="text-align:right">244</td>
 <td style="text-align:left">18.7%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-1.84,-1.59]</td>
+<td style="text-align:left">(-1.65,-1.28]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">46</td>
-<td style="text-align:right">254</td>
-<td style="text-align:left">15.3%</td>
+<td style="text-align:right">63</td>
+<td style="text-align:right">237</td>
+<td style="text-align:left">21.0%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-1.59,-1.22]</td>
+<td style="text-align:left">(-1.28,0.638]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">62</td>
-<td style="text-align:right">238</td>
-<td style="text-align:left">20.7%</td>
-</tr>
-<tr>
-<td style="text-align:left">(-1.22,2.59]</td>
-<td style="text-align:right">300</td>
-<td style="text-align:right">66</td>
-<td style="text-align:right">234</td>
-<td style="text-align:left">22.0%</td>
+<td style="text-align:right">84</td>
+<td style="text-align:right">216</td>
+<td style="text-align:left">28.0%</td>
 </tr>
 </tbody>
 </table>
@@ -452,101 +451,101 @@ gains_table <span style="color:#f92672">&lt;-</span> test <span style="color:#f9
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">[-6.47,-3.39]</td>
+<td style="text-align:left">[-5.97,-3.35]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">5</td>
-<td style="text-align:right">295</td>
-<td style="text-align:left">1.7%</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">298</td>
+<td style="text-align:left">0.7%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:right">0.0146199</td>
-<td style="text-align:right">0.1109857</td>
+<td style="text-align:right">0.0054496</td>
+<td style="text-align:right">0.1131789</td>
 </tr>
 <tr>
-<td style="text-align:left">(-3.39,-2.94]</td>
+<td style="text-align:left">(-3.35,-2.9]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">8</td>
-<td style="text-align:right">292</td>
-<td style="text-align:left">2.7%</td>
+<td style="text-align:right">15</td>
+<td style="text-align:right">285</td>
+<td style="text-align:left">5.0%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:right">0.0380117</td>
-<td style="text-align:right">0.2208427</td>
+<td style="text-align:right">0.0463215</td>
+<td style="text-align:right">0.2214204</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.94,-2.65]</td>
+<td style="text-align:left">(-2.9,-2.64]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">12</td>
-<td style="text-align:right">288</td>
-<td style="text-align:left">4.0%</td>
+<td style="text-align:right">14</td>
+<td style="text-align:right">286</td>
+<td style="text-align:left">4.7%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:right">0.0730994</td>
-<td style="text-align:right">0.3291949</td>
+<td style="text-align:right">0.0844687</td>
+<td style="text-align:right">0.3300418</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.65,-2.44]</td>
+<td style="text-align:left">(-2.64,-2.44]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">22</td>
-<td style="text-align:right">278</td>
-<td style="text-align:left">7.3%</td>
+<td style="text-align:right">19</td>
+<td style="text-align:right">281</td>
+<td style="text-align:left">6.3%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:right">0.1374269</td>
-<td style="text-align:right">0.4337848</td>
+<td style="text-align:right">0.1362398</td>
+<td style="text-align:right">0.4367641</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.44,-2.25]</td>
+<td style="text-align:left">(-2.44,-2.26]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">25</td>
-<td style="text-align:right">275</td>
-<td style="text-align:left">8.3%</td>
+<td style="text-align:right">24</td>
+<td style="text-align:right">276</td>
+<td style="text-align:left">8.0%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:right">0.2105263</td>
-<td style="text-align:right">0.5372460</td>
+<td style="text-align:right">0.2016349</td>
+<td style="text-align:right">0.5415875</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.25,-2.06]</td>
+<td style="text-align:left">(-2.26,-2.1]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">40</td>
-<td style="text-align:right">260</td>
-<td style="text-align:left">13.3%</td>
+<td style="text-align:right">38</td>
+<td style="text-align:right">262</td>
+<td style="text-align:left">12.7%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:right">0.3274854</td>
-<td style="text-align:right">0.6350640</td>
+<td style="text-align:right">0.3051771</td>
+<td style="text-align:right">0.6410938</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.06,-1.84]</td>
+<td style="text-align:left">(-2.1,-1.9]</td>
+<td style="text-align:right">300</td>
+<td style="text-align:right">52</td>
+<td style="text-align:right">248</td>
+<td style="text-align:left">17.3%</td>
+<td style="text-align:left">10.0%</td>
+<td style="text-align:right">0.4468665</td>
+<td style="text-align:right">0.7352829</td>
+</tr>
+<tr>
+<td style="text-align:left">(-1.9,-1.65]</td>
 <td style="text-align:right">300</td>
 <td style="text-align:right">56</td>
 <td style="text-align:right">244</td>
 <td style="text-align:left">18.7%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:right">0.4912281</td>
-<td style="text-align:right">0.7268623</td>
+<td style="text-align:right">0.5994550</td>
+<td style="text-align:right">0.8279529</td>
 </tr>
 <tr>
-<td style="text-align:left">(-1.84,-1.59]</td>
+<td style="text-align:left">(-1.65,-1.28]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">46</td>
-<td style="text-align:right">254</td>
-<td style="text-align:left">15.3%</td>
+<td style="text-align:right">63</td>
+<td style="text-align:right">237</td>
+<td style="text-align:left">21.0%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:right">0.6257310</td>
-<td style="text-align:right">0.8224229</td>
+<td style="text-align:right">0.7711172</td>
+<td style="text-align:right">0.9179643</td>
 </tr>
 <tr>
-<td style="text-align:left">(-1.59,-1.22]</td>
+<td style="text-align:left">(-1.28,0.638]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">62</td>
-<td style="text-align:right">238</td>
-<td style="text-align:left">20.7%</td>
-<td style="text-align:left">10.0%</td>
-<td style="text-align:right">0.8070175</td>
-<td style="text-align:right">0.9119639</td>
-</tr>
-<tr>
-<td style="text-align:left">(-1.22,2.59]</td>
-<td style="text-align:right">300</td>
-<td style="text-align:right">66</td>
-<td style="text-align:right">234</td>
-<td style="text-align:left">22.0%</td>
+<td style="text-align:right">84</td>
+<td style="text-align:right">216</td>
+<td style="text-align:left">28.0%</td>
 <td style="text-align:left">10.0%</td>
 <td style="text-align:right">1.0000000</td>
 <td style="text-align:right">1.0000000</td>
@@ -586,134 +585,134 @@ gains_table <span style="color:#f92672">&lt;-</span> test <span style="color:#f9
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">[-6.47,-3.39]</td>
+<td style="text-align:left">[-5.97,-3.35]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">5</td>
-<td style="text-align:right">295</td>
-<td style="text-align:left">1.7%</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">298</td>
+<td style="text-align:left">0.7%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">1.5%</td>
-<td style="text-align:left">11.1%</td>
-<td style="text-align:right">0.10</td>
+<td style="text-align:left">0.5%</td>
+<td style="text-align:left">11.3%</td>
+<td style="text-align:right">0.11</td>
 <td style="text-align:left">1%</td>
-<td style="text-align:left">1.7%</td>
+<td style="text-align:left">0.7%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-3.39,-2.94]</td>
+<td style="text-align:left">(-3.35,-2.9]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">8</td>
-<td style="text-align:right">292</td>
-<td style="text-align:left">2.7%</td>
+<td style="text-align:right">15</td>
+<td style="text-align:right">285</td>
+<td style="text-align:left">5.0%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">3.8%</td>
+<td style="text-align:left">4.6%</td>
 <td style="text-align:left">22.1%</td>
 <td style="text-align:right">0.18</td>
-<td style="text-align:left">4%</td>
-<td style="text-align:left">2.2%</td>
-</tr>
-<tr>
-<td style="text-align:left">(-2.94,-2.65]</td>
-<td style="text-align:right">300</td>
-<td style="text-align:right">12</td>
-<td style="text-align:right">288</td>
-<td style="text-align:left">4.0%</td>
-<td style="text-align:left">10.0%</td>
-<td style="text-align:left">7.3%</td>
-<td style="text-align:left">32.9%</td>
-<td style="text-align:right">0.26</td>
-<td style="text-align:left">7%</td>
+<td style="text-align:left">5%</td>
 <td style="text-align:left">2.8%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.65,-2.44]</td>
+<td style="text-align:left">(-2.9,-2.64]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">22</td>
-<td style="text-align:right">278</td>
-<td style="text-align:left">7.3%</td>
+<td style="text-align:right">14</td>
+<td style="text-align:right">286</td>
+<td style="text-align:left">4.7%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">13.7%</td>
-<td style="text-align:left">43.4%</td>
+<td style="text-align:left">8.4%</td>
+<td style="text-align:left">33.0%</td>
+<td style="text-align:right">0.25</td>
+<td style="text-align:left">8%</td>
+<td style="text-align:left">3.4%</td>
+</tr>
+<tr>
+<td style="text-align:left">(-2.64,-2.44]</td>
+<td style="text-align:right">300</td>
+<td style="text-align:right">19</td>
+<td style="text-align:right">281</td>
+<td style="text-align:left">6.3%</td>
+<td style="text-align:left">10.0%</td>
+<td style="text-align:left">13.6%</td>
+<td style="text-align:left">43.7%</td>
 <td style="text-align:right">0.30</td>
 <td style="text-align:left">14%</td>
-<td style="text-align:left">3.9%</td>
+<td style="text-align:left">4.2%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.44,-2.25]</td>
+<td style="text-align:left">(-2.44,-2.26]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">25</td>
-<td style="text-align:right">275</td>
-<td style="text-align:left">8.3%</td>
+<td style="text-align:right">24</td>
+<td style="text-align:right">276</td>
+<td style="text-align:left">8.0%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">21.1%</td>
-<td style="text-align:left">53.7%</td>
-<td style="text-align:right">0.33</td>
-<td style="text-align:left">21%</td>
-<td style="text-align:left">4.8%</td>
+<td style="text-align:left">20.2%</td>
+<td style="text-align:left">54.2%</td>
+<td style="text-align:right">0.34</td>
+<td style="text-align:left">20%</td>
+<td style="text-align:left">4.9%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.25,-2.06]</td>
+<td style="text-align:left">(-2.26,-2.1]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">40</td>
-<td style="text-align:right">260</td>
-<td style="text-align:left">13.3%</td>
+<td style="text-align:right">38</td>
+<td style="text-align:right">262</td>
+<td style="text-align:left">12.7%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">32.7%</td>
-<td style="text-align:left">63.5%</td>
-<td style="text-align:right">0.31</td>
-<td style="text-align:left">33%</td>
+<td style="text-align:left">30.5%</td>
+<td style="text-align:left">64.1%</td>
+<td style="text-align:right">0.34</td>
+<td style="text-align:left">31%</td>
 <td style="text-align:left">6.2%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.06,-1.84]</td>
+<td style="text-align:left">(-2.1,-1.9]</td>
+<td style="text-align:right">300</td>
+<td style="text-align:right">52</td>
+<td style="text-align:right">248</td>
+<td style="text-align:left">17.3%</td>
+<td style="text-align:left">10.0%</td>
+<td style="text-align:left">44.7%</td>
+<td style="text-align:left">73.5%</td>
+<td style="text-align:right">0.29</td>
+<td style="text-align:left">45%</td>
+<td style="text-align:left">7.8%</td>
+</tr>
+<tr>
+<td style="text-align:left">(-1.9,-1.65]</td>
 <td style="text-align:right">300</td>
 <td style="text-align:right">56</td>
 <td style="text-align:right">244</td>
 <td style="text-align:left">18.7%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">49.1%</td>
-<td style="text-align:left">72.7%</td>
-<td style="text-align:right">0.24</td>
-<td style="text-align:left">49%</td>
-<td style="text-align:left">8.0%</td>
+<td style="text-align:left">59.9%</td>
+<td style="text-align:left">82.8%</td>
+<td style="text-align:right">0.23</td>
+<td style="text-align:left">60%</td>
+<td style="text-align:left">9.2%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-1.84,-1.59]</td>
+<td style="text-align:left">(-1.65,-1.28]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">46</td>
-<td style="text-align:right">254</td>
-<td style="text-align:left">15.3%</td>
+<td style="text-align:right">63</td>
+<td style="text-align:right">237</td>
+<td style="text-align:left">21.0%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">62.6%</td>
-<td style="text-align:left">82.2%</td>
-<td style="text-align:right">0.20</td>
-<td style="text-align:left">63%</td>
-<td style="text-align:left">8.9%</td>
+<td style="text-align:left">77.1%</td>
+<td style="text-align:left">91.8%</td>
+<td style="text-align:right">0.15</td>
+<td style="text-align:left">77%</td>
+<td style="text-align:left">10.5%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-1.59,-1.22]</td>
+<td style="text-align:left">(-1.28,0.638]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">62</td>
-<td style="text-align:right">238</td>
-<td style="text-align:left">20.7%</td>
-<td style="text-align:left">10.0%</td>
-<td style="text-align:left">80.7%</td>
-<td style="text-align:left">91.2%</td>
-<td style="text-align:right">0.10</td>
-<td style="text-align:left">81%</td>
-<td style="text-align:left">10.2%</td>
-</tr>
-<tr>
-<td style="text-align:left">(-1.22,2.59]</td>
-<td style="text-align:right">300</td>
-<td style="text-align:right">66</td>
-<td style="text-align:right">234</td>
-<td style="text-align:left">22.0%</td>
+<td style="text-align:right">84</td>
+<td style="text-align:right">216</td>
+<td style="text-align:left">28.0%</td>
 <td style="text-align:left">10.0%</td>
 <td style="text-align:left">100.0%</td>
 <td style="text-align:left">100.0%</td>
 <td style="text-align:right">0.00</td>
 <td style="text-align:left">100%</td>
-<td style="text-align:left">11.4%</td>
+<td style="text-align:left">12.2%</td>
 </tr>
 </tbody>
 </table>
@@ -774,134 +773,134 @@ tab <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">gains_t
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">(-1.22,2.59]</td>
+<td style="text-align:left">(-1.28,0.638]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">66</td>
-<td style="text-align:right">234</td>
-<td style="text-align:left">22.0%</td>
+<td style="text-align:right">84</td>
+<td style="text-align:right">216</td>
+<td style="text-align:left">28.0%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">19.3%</td>
-<td style="text-align:left">8.8%</td>
-<td style="text-align:right">0.10</td>
-<td style="text-align:left">19%</td>
-<td style="text-align:left">22.0%</td>
+<td style="text-align:left">22.9%</td>
+<td style="text-align:left">8.2%</td>
+<td style="text-align:right">0.15</td>
+<td style="text-align:left">23%</td>
+<td style="text-align:left">28.0%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-1.59,-1.22]</td>
+<td style="text-align:left">(-1.65,-1.28]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">62</td>
-<td style="text-align:right">238</td>
-<td style="text-align:left">20.7%</td>
+<td style="text-align:right">63</td>
+<td style="text-align:right">237</td>
+<td style="text-align:left">21.0%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">37.4%</td>
-<td style="text-align:left">17.8%</td>
-<td style="text-align:right">0.20</td>
-<td style="text-align:left">37%</td>
-<td style="text-align:left">21.3%</td>
+<td style="text-align:left">40.1%</td>
+<td style="text-align:left">17.2%</td>
+<td style="text-align:right">0.23</td>
+<td style="text-align:left">40%</td>
+<td style="text-align:left">24.5%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-1.84,-1.59]</td>
-<td style="text-align:right">300</td>
-<td style="text-align:right">46</td>
-<td style="text-align:right">254</td>
-<td style="text-align:left">15.3%</td>
-<td style="text-align:left">10.0%</td>
-<td style="text-align:left">50.9%</td>
-<td style="text-align:left">27.3%</td>
-<td style="text-align:right">0.24</td>
-<td style="text-align:left">51%</td>
-<td style="text-align:left">19.3%</td>
-</tr>
-<tr>
-<td style="text-align:left">(-2.06,-1.84]</td>
+<td style="text-align:left">(-1.9,-1.65]</td>
 <td style="text-align:right">300</td>
 <td style="text-align:right">56</td>
 <td style="text-align:right">244</td>
 <td style="text-align:left">18.7%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">67.3%</td>
-<td style="text-align:left">36.5%</td>
-<td style="text-align:right">0.31</td>
-<td style="text-align:left">67%</td>
-<td style="text-align:left">19.2%</td>
+<td style="text-align:left">55.3%</td>
+<td style="text-align:left">26.5%</td>
+<td style="text-align:right">0.29</td>
+<td style="text-align:left">55%</td>
+<td style="text-align:left">22.6%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.25,-2.06]</td>
+<td style="text-align:left">(-2.1,-1.9]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">40</td>
-<td style="text-align:right">260</td>
-<td style="text-align:left">13.3%</td>
+<td style="text-align:right">52</td>
+<td style="text-align:right">248</td>
+<td style="text-align:left">17.3%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">78.9%</td>
-<td style="text-align:left">46.3%</td>
-<td style="text-align:right">0.33</td>
-<td style="text-align:left">79%</td>
-<td style="text-align:left">18.0%</td>
+<td style="text-align:left">69.5%</td>
+<td style="text-align:left">35.9%</td>
+<td style="text-align:right">0.34</td>
+<td style="text-align:left">69%</td>
+<td style="text-align:left">21.2%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.44,-2.25]</td>
+<td style="text-align:left">(-2.26,-2.1]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">25</td>
-<td style="text-align:right">275</td>
-<td style="text-align:left">8.3%</td>
+<td style="text-align:right">38</td>
+<td style="text-align:right">262</td>
+<td style="text-align:left">12.7%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">86.3%</td>
-<td style="text-align:left">56.6%</td>
+<td style="text-align:left">79.8%</td>
+<td style="text-align:left">45.8%</td>
+<td style="text-align:right">0.34</td>
+<td style="text-align:left">80%</td>
+<td style="text-align:left">19.5%</td>
+</tr>
+<tr>
+<td style="text-align:left">(-2.44,-2.26]</td>
+<td style="text-align:right">300</td>
+<td style="text-align:right">24</td>
+<td style="text-align:right">276</td>
+<td style="text-align:left">8.0%</td>
+<td style="text-align:left">10.0%</td>
+<td style="text-align:left">86.4%</td>
+<td style="text-align:left">56.3%</td>
 <td style="text-align:right">0.30</td>
 <td style="text-align:left">86%</td>
-<td style="text-align:left">16.4%</td>
+<td style="text-align:left">17.6%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.65,-2.44]</td>
+<td style="text-align:left">(-2.64,-2.44]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">22</td>
-<td style="text-align:right">278</td>
-<td style="text-align:left">7.3%</td>
+<td style="text-align:right">19</td>
+<td style="text-align:right">281</td>
+<td style="text-align:left">6.3%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">92.7%</td>
-<td style="text-align:left">67.1%</td>
-<td style="text-align:right">0.26</td>
-<td style="text-align:left">93%</td>
-<td style="text-align:left">15.1%</td>
+<td style="text-align:left">91.6%</td>
+<td style="text-align:left">67.0%</td>
+<td style="text-align:right">0.25</td>
+<td style="text-align:left">92%</td>
+<td style="text-align:left">16.0%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-2.94,-2.65]</td>
+<td style="text-align:left">(-2.9,-2.64]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">12</td>
-<td style="text-align:right">288</td>
-<td style="text-align:left">4.0%</td>
+<td style="text-align:right">14</td>
+<td style="text-align:right">286</td>
+<td style="text-align:left">4.7%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">96.2%</td>
+<td style="text-align:left">95.4%</td>
 <td style="text-align:left">77.9%</td>
 <td style="text-align:right">0.18</td>
-<td style="text-align:left">96%</td>
-<td style="text-align:left">13.7%</td>
+<td style="text-align:left">95%</td>
+<td style="text-align:left">14.6%</td>
 </tr>
 <tr>
-<td style="text-align:left">(-3.39,-2.94]</td>
+<td style="text-align:left">(-3.35,-2.9]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">8</td>
-<td style="text-align:right">292</td>
-<td style="text-align:left">2.7%</td>
+<td style="text-align:right">15</td>
+<td style="text-align:right">285</td>
+<td style="text-align:left">5.0%</td>
 <td style="text-align:left">10.0%</td>
-<td style="text-align:left">98.5%</td>
-<td style="text-align:left">88.9%</td>
-<td style="text-align:right">0.10</td>
+<td style="text-align:left">99.5%</td>
+<td style="text-align:left">88.7%</td>
+<td style="text-align:right">0.11</td>
 <td style="text-align:left">99%</td>
-<td style="text-align:left">12.5%</td>
+<td style="text-align:left">13.5%</td>
 </tr>
 <tr>
-<td style="text-align:left">[-6.47,-3.39]</td>
+<td style="text-align:left">[-5.97,-3.35]</td>
 <td style="text-align:right">300</td>
-<td style="text-align:right">5</td>
-<td style="text-align:right">295</td>
-<td style="text-align:left">1.7%</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">298</td>
+<td style="text-align:left">0.7%</td>
 <td style="text-align:left">10.0%</td>
 <td style="text-align:left">100.0%</td>
 <td style="text-align:left">100.0%</td>
 <td style="text-align:right">0.00</td>
 <td style="text-align:left">100%</td>
-<td style="text-align:left">11.4%</td>
+<td style="text-align:left">12.2%</td>
 </tr>
 </tbody>
 </table>
@@ -955,7 +954,7 @@ var disqus_config = function () {
     </div>
 
     <div class="footer-copyright text-sm text-center text-gray-400 mt-4">
-      &#169; 2021-2021 R&#39;tichoke
+      &#169; 2021-2022 R&#39;tichoke
     </div>
     <div class="text-sm sm:text-xs text-center text-gray-400 mt-2">
       Powered by <a href="https://www.axiomtheme.com/?utm_source=theme-footer&utm_medium=website&utm_campaign=referral">Axiom</a>
@@ -963,7 +962,7 @@ var disqus_config = function () {
   </div>
 </footer>
 
-<script src="/bundle.js?v=1636045864"></script>
+<script src="/bundle.js?v=1641649589"></script>
 
 
 </body>

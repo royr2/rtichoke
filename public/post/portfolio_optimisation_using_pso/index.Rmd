@@ -1,9 +1,9 @@
---
+---
 title: "Find optimal portfolios using particle swarm optimisation in R"
 subtitle: ""
-summary: "How to perform portfolio optimisation using particle swarm optimisation in R"
+summary: "How to perform portfolio optimisation using a particle swarm optimiser in R"
 author: "royr2"
-date: 2021-11-02
+date: 2021-11-05
 categories: ["R", "optimisation", "data visualisation", "portfolio optimisation"]
 tags: ["R", "analytics", "optimisation", "ggplot", "pso"]  
 comments: true
@@ -14,13 +14,13 @@ knitr::opts_chunk$set(collapse = TRUE)
 ``` 
 
 In the [last post](/post/pso_optimisation) we explored how to build a particle swarm optimiser from scratch. In this post, let's explore how we can leverage such an optimiser to perform mean variance optimisation to find optimal portfolios that satisfy certain constraints. 
-
+ 
 Additional information on mean variance optimisation and the CAPM model is available in this [paper](http://www.columbia.edu/~mh2078/FoundationsFE/MeanVariance-CAPM.pdf).
 
 ## Libraries
 ```{r}
 # install.packages(pacman)
-pacman::p_load(pso, ggplot2, dplyr, quantmod, tidyr, plotly)
+pacman::p_load(pso, ggplot2, dplyr, quantmod, tidyr, plotly) 
 ```
 
 ## Pre-requisites 
@@ -186,6 +186,8 @@ obj_func <- function(wts,
   # Full investment penalisation 
   obj <- obj - lambda1 * (sum(wts) - 1)^2
   
+  # Returning negative since the optimiser does minimisation by default 
+  # We need maximisation
   return(-obj)
 }
 ```
@@ -272,7 +274,7 @@ pso_optim <- function(obj_func,
 out <- pso_optim(obj_func,
                  ret_vec = mean_returns_small, 
                  cov_mat = cov_mat_small,
-                 lambda1 = 10, risk_av = 1000,
+                 lambda1 = 10, risk_av = 100,
                  n_particles = 100,
                  n_dim = 2,
                  n_iter = 200,
@@ -283,30 +285,36 @@ out <- pso_optim(obj_func,
 sum(out$obj_loc)
 ```
 
-We can now visualise the function we were trying to optimise as well as the path each particle took to get to the optimal result. 
+We can now visualise the function we were trying to optimise as well as the path each particle took to get to the optimal result (its interactive so feel free to play around with the plot). 
 
 ```{r}
 grid <- expand.grid(x = seq(0, 1, by = 0.01), 
                     y = seq(0, 1, by = 0.01))
 
 grid$obj <- apply(grid, 1, obj_func, ret_vec = mean_returns_small, cov_mat = cov_mat_small, 
-                  lambda1 = 1, risk_av = 1000)
-
-plot_ly(grid, x = ~x, y = ~y, z = ~obj) %>% 
-  add_mesh()
+                  lambda1 = 10, risk_av = 100)
 ```
 
-
-```{r}
-# Output has a data frame that stores particle locations and objective
-# values at those locations
-p <- plot_ly(out$X, x = ~X1, y = ~X2, z = ~obj) %>% 
-  add_markers(color = ~iter, size = 1)
-
-htmltools::tagList(list(p))
+```{r eval = F}
+# Interactive 3D scatter plot with mesh
+p <- plot_ly() %>% 
+  add_mesh(data = grid, x = ~x, y = ~y, z = ~obj, inherit = F, color = "red") %>% 
+  add_markers(data = out$X, x = ~X1, y = ~X2, z = ~obj, color = ~ iter, inherit = F, 
+              marker = list(size = 2))
+  
+htmlwidgets::saveWidget(p, "plotly.html") 
 ```
 
-Looks a little odd but gets the point across (hopefully) :nervous:
+```{r eval = F}
+# Interactive 3D scatter plot
+plot_ly(out$X, x = ~X1, y = ~X2, z = ~obj) %>% 
+  add_markers(size = 1) %>% 
+  add_mesh(data = grid, x = ~x, y = ~y, z = ~obj, inherit = F)
+```
+
+<iframe src = "plotly.html" width="800" height="600"></iframe>
+
+Looks a little odd but gets the point across (hopefully) :sweat_smile:
 
 ## Optimiser (multi asset example)
 
@@ -333,14 +341,14 @@ And that's pretty much it. Additional constraints can be added very easily. Say 
 
 ```{r}
 # Benchmark portfolio 
-# For now let's use an equally weighted portfolio 
+# For now let's use an equally weighted portfolio  
 bench_wts <- rep(1/n_stocks, n_stocks)
 bench_returns <- as.matrix(returns_df) %*% t(t(bench_wts))
 ```
 
 ```{r}
 # Update the objective function 
-obj_func_TE <- function(wts, 
+obj_func_TE <- function(wts,  
                         risk_av = 10, 
                         lambda1 = 10,  
                         lambda2 = 50, 

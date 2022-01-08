@@ -298,7 +298,7 @@ out <- pso_optim(obj_func,
 ```r
 # Global minimum is at (1,1)
 out$obj_loc
-## [1] "0.999979582998843,1.00002588674428"
+## [1] "0.999970489653139,1.00001974997258"
 ```
 
 ## Animating results

@@ -299,7 +299,7 @@ out <- pso_optim(obj_func,
 
 # Check if weights add to one
 sum(out$obj_loc)
-## [1] 1.00063
+## [1] 0.9975584
 ```
 
 We can now visualise the function we were trying to optimise as well as the path each particle took to get to the optimal result (its interactive so feel free to play around with the plot). 
@@ -353,13 +353,13 @@ opt <- psoptim(par = rep(0, n_stocks),
                control = list(maxit = 200, s = 100, maxit.stagnate = 500))
 
 paste("Portfolio returns:", round(opt$par %*% mean_returns, 5))
-## [1] "Portfolio returns: 0.00075"
+## [1] "Portfolio returns: 0.00067"
 paste("Portfolio Std dev:", round(sqrt(opt$par %*% cov_mat %*% opt$par), 5))
-## [1] "Portfolio Std dev: 0.00986"
+## [1] "Portfolio Std dev: 0.0099"
 
 # Check if weights add up to one 
 sum(opt$par)
-## [1] 0.9902846
+## [1] 0.9935782
 ```
 And that's pretty much it. Additional constraints can be added very easily. Say for example we wanted to add `tracking error` so as to penalise deviations from a benchmark portfolio.
 
@@ -406,11 +406,11 @@ opt <- psoptim(par = rep(0, n_stocks),
 paste("Portfolio returns:", round(opt$par %*% mean_returns, 5))
 ## [1] "Portfolio returns: 0.00074"
 paste("Portfolio Std dev:", round(sqrt(opt$par %*% cov_mat %*% opt$par), 5))
-## [1] "Portfolio Std dev: 0.01212"
+## [1] "Portfolio Std dev: 0.01231"
 
 # Check if weights add up to one 
 sum(opt$par)
-## [1] 0.9876818
+## [1] 0.9960087
 ```
 # Parting notes 
 
