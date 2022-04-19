@@ -1,7 +1,7 @@
 ---
 title: "Getting started with Python using R and reticulate"
 subtitle: ""
-summary: "How to setup and use reticulate to in windows"
+summary: "How to setup and use reticulate in windows"
 author: "royr2"
 date: 2022-04-19
 categories: ["R", "Analytics", "Machine Learning", "Python"]
