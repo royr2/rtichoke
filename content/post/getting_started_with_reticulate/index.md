@@ -90,7 +90,7 @@ Yay! Python and R are now talking to each other :clap:
 
 Now, that everything is setup, there are multiple ways to use python along with R inside RStudio: 
 
-One can R-Studio as an IDE for python. Simply open up a new python script from `File -> New File -> Python Script` and start to write some python code. 
+One can use R-Studio as an IDE for python. Simply open up a new python script from `File -> New File -> Python Script` and start to write some python code. 
 
 ![](py_script.png)
 
