@@ -64,7 +64,6 @@ model_df <- bake(prep, new_data = BostonHousing2)
 # All levels have been one hot encoded and separate columns have been appended to the model matrix
 colnames(model_df)
 ```
-
 Next, we can use the `resample` package to create test/train splits.
 
 ```{r}
