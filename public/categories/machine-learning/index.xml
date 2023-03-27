@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>machine learning on R&#39;tichoke</title>
+    <link>https://rtichoke.netlify.app/categories/machine-learning/</link>
+    <description>Recent content in machine learning on R&#39;tichoke</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 19 Apr 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://rtichoke.netlify.app/categories/machine-learning/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Getting started with Python using R and reticulate</title>
+      <link>https://rtichoke.netlify.app/post/getting_started_with_reticulate/</link>
+      <pubDate>Tue, 19 Apr 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://rtichoke.netlify.app/post/getting_started_with_reticulate/</guid>
+      <description>How to setup and use reticulate in windows</description>
+    </item>
+    
+    <item>
+      <title>Using bayesian optimisation to tune a XGBOOST model in R</title>
+      <link>https://rtichoke.netlify.app/post/bayesian_optimisation_xgboost/</link>
+      <pubDate>Sat, 08 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://rtichoke.netlify.app/post/bayesian_optimisation_xgboost/</guid>
+      <description>How to use bayesian optimisation to tune hyperparameters in a XGBOOST model in R</description>
+    </item>
+    
+  </channel>
+</rss>

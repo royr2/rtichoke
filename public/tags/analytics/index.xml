@@ -6,7 +6,25 @@
     <description>Recent content in analytics on R&#39;tichoke</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 05 Nov 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://rtichoke.netlify.app/tags/analytics/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 15 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://rtichoke.netlify.app/tags/analytics/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Generating correlated random numbers in R from scratch</title>
+      <link>https://rtichoke.netlify.app/post/correlated_random_numbers/</link>
+      <pubDate>Sun, 15 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://rtichoke.netlify.app/post/correlated_random_numbers/</guid>
+      <description>How to generate correlated random numbers in R from scratch</description>
+    </item>
+    
+    <item>
+      <title>Using bayesian optimisation to tune a XGBOOST model in R</title>
+      <link>https://rtichoke.netlify.app/post/bayesian_optimisation_xgboost/</link>
+      <pubDate>Sat, 08 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://rtichoke.netlify.app/post/bayesian_optimisation_xgboost/</guid>
+      <description>How to use bayesian optimisation to tune hyperparameters in a XGBOOST model in R</description>
+    </item>
+    
     <item>
       <title>Find optimal portfolios using particle swarm optimisation in R</title>
       <link>https://rtichoke.netlify.app/post/portfolio_optimisation_using_pso/</link>

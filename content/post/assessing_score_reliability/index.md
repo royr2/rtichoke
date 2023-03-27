@@ -50,11 +50,11 @@ sample_99_quantile <- apply(samples, 1, quantile, p = 0.99)
 
 ```r
 sd(sample_means)/mean(sample_means)
-## [1] 0.01023223
+## [1] 0.01001566
 sd(sample_75_quantile)/mean(sample_75_quantile)
-## [1] 0.01258346
+## [1] 0.01272449
 sd(sample_95_quantile)/mean(sample_75_quantile)
-## [1] 0.01810062
+## [1] 0.01822555
 ```
 
 
@@ -136,19 +136,19 @@ boot_sample <- bootstraps(data = sample, times = 100)
 
 ```r
 head(boot_sample, 3)
-## # A tibble: 3 x 2
+## # A tibble: 3 × 2
 ##   splits               id          
 ##   <list>               <chr>       
-## 1 <split [10000/3692]> Bootstrap001
-## 2 <split [10000/3712]> Bootstrap002
-## 3 <split [10000/3696]> Bootstrap003
+## 1 <split [10000/3621]> Bootstrap001
+## 2 <split [10000/3617]> Bootstrap002
+## 3 <split [10000/3666]> Bootstrap003
 ```
 
 
 ```r
 boot_sample$splits[[1]]
 ## <Analysis/Assess/Total>
-## <10000/3692/10000>
+## <10000/3621/10000>
 ```
 
 Each row represents a separate bootstrapped sample whereas within each sample, there are two sub-samples namely an `analysis set` and an `assessment set`. To retrieve a bootstrapped sample as a `data.frame`, the package provides two helper functions -  `analysis()` and `assessment()`
@@ -158,11 +158,11 @@ Each row represents a separate bootstrapped sample whereas within each sample, t
 # Show the first 5 rows and 5 columns of the first sample
 analysis(boot_sample$splits[[1]]) %>% .[1:5, 1:5]
 ##         V1        id member_id loan_amnt funded_amnt
-## 5428 12946  94135798        -1     28000       28000
-## 4019 24972 110418022        -1     20400       20400
-## 5729   718 144715469        -1     40000       40000
-## 7927 66593 138895956        -1     10000       10000
-## 9668 62772 107983553        -1      6300        6300
+## 8823 39052  59271494        -1     15000       15000
+## 8907 82937  49197911        -1     12000       12000
+## 8384 38625 112870855        -1     10000       10000
+## 6579 97794 129904408        -1     29400       29400
+## 5579  6494   1368450        -1      1500        1500
 ```
 
 The [getting started](https://rsample.tidymodels.org/articles/rsample.html) page of the `rsample` package has additional information.
@@ -199,7 +199,7 @@ pred <- glm_model(train)
 
 # Check output
 range(pred)  # Output is on log odds scale
-## [1] -25.618826   1.699397
+## [1] -19.3723801   0.9013321
 ```
 ## Fitting the model repeatedly
 Now we need to fit the model repeatedly on each of the bootstrapped samples and store the fitted values. And since we are using `R`, for-loops are not allowed :laughing:
@@ -218,7 +218,7 @@ output <- lapply(boot_sample$splits, function(x){
 # Collate all predictions into a vector 
 boot_preds <- do.call(c, output)
 range(boot_preds)
-## [1] -145.993853    4.115973
+## [1] -133.837276    9.449129
 ```
 
 
@@ -236,7 +236,7 @@ boot_preds[boot_preds > q_high] <- q_high
 boot_preds[boot_preds < q_low] <- q_low
 
 range(boot_preds)
-## [1] -5.060861 -0.225235
+## [1] -5.0077892 -0.2118255
 ```
 
 ```r
@@ -245,12 +245,12 @@ boot_preds <- data.frame(pred = boot_preds,
                          id = rep(1:length(boot_sample$splits), each = nrow(sample)))
 head(boot_preds)
 ##         pred id
-## 1 -3.1242074  1
-## 2 -3.5973415  1
-## 3 -0.3822420  1
-## 4 -2.6574425  1
-## 5 -0.7789107  1
-## 6 -1.9527129  1
+## 1 -2.6577589  1
+## 2 -3.6382487  1
+## 3 -0.5991623  1
+## 4 -0.4766980  1
+## 5 -1.9934515  1
+## 6 -2.8314833  1
 ```
 
 ## Scaling model predictions

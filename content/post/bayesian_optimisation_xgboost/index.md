@@ -69,8 +69,8 @@ Table: Table 1: Data summary
 
 **Variable type: numeric**
 
-|skim_variable | n_missing| complete_rate|    mean|      sd|     p0|     p25|     p50|     p75|    p100|hist                                     |
-|:-------------|---------:|-------------:|-------:|-------:|------:|-------:|-------:|-------:|-------:|:----------------------------------------|
+|skim_variable | n_missing| complete_rate|    mean|      sd|     p0|     p25|     p50|     p75|    p100|hist  |
+|:-------------|---------:|-------------:|-------:|-------:|------:|-------:|-------:|-------:|-------:|:-----|
 |tract         |         0|             1| 2700.36| 1380.04|   1.00| 1303.25| 3393.50| 3739.75| 5082.00|▅▂▂▇▂ |
 |lon           |         0|             1|  -71.06|    0.08| -71.29|  -71.09|  -71.05|  -71.02|  -70.81|▁▂▇▂▁ |
 |lat           |         0|             1|   42.22|    0.06|  42.03|   42.18|   42.22|   42.25|   42.38|▁▃▇▃▁ |
@@ -122,7 +122,6 @@ colnames(model_df)
 ## [19] "town_Cambridge"         "town_Lynn"              "town_Newton"           
 ## [22] "town_Other"             "chas_X1"
 ```
-
 Next, we can use the `resample` package to create test/train splits.
 
 
@@ -314,7 +313,7 @@ predicted <- test_df %>%
 ```r
 # Compute MAPE
 mean(abs(actuals - predicted)/actuals)
-## [1] 0.008391282
+## [1] 0.009401109
 ```
 ## Compare with grid search 
 
@@ -395,7 +394,7 @@ pred <- test_df %>%
 
 ```r
 mean(abs(act - pred)/act)
-## [1] 0.009407723
+## [1] 0.01581713
 ```
 
 While both the methods offer similar final results, the bayesian optimiser completed its search in less than a minute where as the grid search took over seven minutes. Also, I find that I can use bayesian optimisation to search a larger parameter space more quickly than a traditional grid search. 

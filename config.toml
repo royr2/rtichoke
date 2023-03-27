@@ -17,7 +17,7 @@ math = true
 posts = "/:filename"
 
 [params]
-copyrightYear = 2021
+copyrightYear = 2023
 dateFormat = "Jan 2, 2006"
 maxWidthContent = "max-w-4xl"
 maxWidthTitle = "max-w-4xl"
@@ -62,3 +62,4 @@ disqusShortname = "rtichoke"
   [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true
+

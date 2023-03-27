@@ -7,6 +7,7 @@ date: 2021-09-30
 categories: ["R", "Credit risk analytics"]
 tags: ["R", "risk", "analytics", "credit risk", "bootstrapping"]  
 comments: true
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
