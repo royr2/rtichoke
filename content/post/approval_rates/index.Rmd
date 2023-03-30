@@ -3,7 +3,7 @@ title: "Optimising approval rates by creating segmented models"
 subtitle: "Credit risk series (Post #5)"
 summary: "Why segment your population base to optimise your approval rates"
 author: "royr2"
-date: 2023-03-28
+date: 2023-03-29
 categories: ["R", "Credit risk analytics"]
 tags: ["R", "risk", "analytics", "credit risk", "approval rate"]  
 comments: true
