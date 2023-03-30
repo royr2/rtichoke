@@ -11,8 +11,8 @@
   <link rel="icon" type="image/x-icon" href="/">
   <link rel="apple-touch-icon" href="/">
   <link rel="canonical" href="https://rtichoke.netlify.app/post/bayesian_optimisation_xgboost/">
-<link rel="preload" as="style" href="/bundle.css?v=1679930341" media="all">
-<link rel="stylesheet" href="/bundle.css?v=1679930341" media="all">
+<link rel="preload" as="style" href="/bundle.css?v=1680150811" media="all">
+<link rel="stylesheet" href="/bundle.css?v=1680150811" media="all">
 <style>.cdata pre{background-color:#1f2937;color:#e5e7eb}.cdata :not(pre)>code{background-color:#f3f4f6;color:#7c3aed}.chroma .err{background-color:#991b1b;color:#fecaca}.chroma .hl{background-color:#374151}.chroma .ln{color:#9ca3af}.chroma .k,.chroma .kc,.chroma .kd,.chroma .kn,.chroma .kp,.chroma .kr{color:#60a5fa}.chroma .kt{color:#a78bfa}.chroma .na,.chroma .nb{color:#fbbf24}.chroma .nc{color:#f87171}.chroma .no{color:#34d399}.chroma .nd{color:#f87171}.chroma .ne{color:#f87171}.chroma .nf{color:#fbbf24}.chroma .nt{color:#f87171}.chroma .l{color:#a78bfa}.chroma .dl,.chroma .ld,.chroma .s,.chroma .s2,.chroma .sa,.chroma .sb,.chroma .sc,.chroma .sd{color:#34d399}.chroma .se{color:#9ca3af}.chroma .s1,.chroma .sh,.chroma .si,.chroma .sr,.chroma .ss,.chroma .sx{color:#34d399}.chroma .il,.chroma .m,.chroma .mb,.chroma .mf,.chroma .mh,.chroma .mi,.chroma .mo{color:#a78bfa}.chroma .o,.chroma .ow{color:#93c5fd}.chroma .c,.chroma .c1,.chroma .ch,.chroma .cm,.chroma .cp,.chroma .cpf,.chroma .cs,.chroma .p{color:#9ca3af}.chroma .ge{font-style:italic}.chroma .gs{font-weight:700}
 </style>
 
@@ -64,11 +64,11 @@
   },
   "datePublished": "2022-01-08T00:00:00Z",
   "dateModified": "2022-01-08T00:00:00Z",
-  "articleBody": "\r\n\r\n\r\n\u003cp\u003eMy first post in 2022! A very happy new year to anyone reading this. 😄\u003c/p\u003e\r\n\u003cp\u003eI was looking for a simple and effective way to tune \u003ccode\u003exgboost\u003c/code\u003e models in \u003ccode\u003eR\u003c/code\u003e and came across this package called \u003ca href=\"https://github.com/AnotherSamWilson/ParBayesianOptimization\"\u003eParBayesianOptimization\u003c/a\u003e. Here’s a quick tutorial on how to use it to tune a \u003ccode\u003exgboost\u003c/code\u003e model.\u003c/p\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# Pacman is a package management tool \r\ninstall.packages(\u0026quot;pacman\u0026quot;)\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003elibrary(pacman)\r\n\r\n# p_load automatically installs packages if needed\r\np_load(xgboost, ParBayesianOptimization, mlbench, dplyr, skimr, recipes, resample)\r\n## package \u0026#39;xgboost\u0026#39; successfully unpacked and MD5 sums checked\r\n## \r\n## The downloaded binary packages are in\r\n## \tC:\\Users\\riddh\\AppData\\Local\\Temp\\RtmpCy7FXq\\downloaded_packages\r\n## package \u0026#39;rprojroot\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;diffobj\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;rematch2\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;brio\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;callr\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;desc\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;pkgload\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;praise\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;processx\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;ps\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;waldo\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;testthat\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;numDeriv\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;SparseM\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;MatrixModels\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;minqa\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;nloptr\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;RcppEigen\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;backports\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;carData\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;abind\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;pbkrtest\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;quantreg\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;lme4\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;broom\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;corrplot\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;car\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;iterators\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;ggrepel\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;ggsci\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;cowplot\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;ggsignif\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;gridExtra\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;polynom\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;rstatix\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;DiceKriging\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;foreach\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;dbscan\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;lhs\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;ggpubr\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;ParBayesianOptimization\u0026#39; successfully unpacked and MD5 sums checked\r\n## \r\n## The downloaded binary packages are in\r\n## \tC:\\Users\\riddh\\AppData\\Local\\Temp\\RtmpCy7FXq\\downloaded_packages\r\n## package \u0026#39;mlbench\u0026#39; successfully unpacked and MD5 sums checked\r\n## \r\n## The downloaded binary packages are in\r\n## \tC:\\Users\\riddh\\AppData\\Local\\Temp\\RtmpCy7FXq\\downloaded_packages\r\n## package \u0026#39;repr\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;skimr\u0026#39; successfully unpacked and MD5 sums checked\r\n## \r\n## The downloaded binary packages are in\r\n## \tC:\\Users\\riddh\\AppData\\Local\\Temp\\RtmpCy7FXq\\downloaded_packages\r\n## package \u0026#39;future.apply\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;progressr\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;SQUAREM\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;lava\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;tzdb\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;prodlim\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;timechange\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;clock\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;gower\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;hardhat\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;ipred\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;lubridate\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;timeDate\u0026#39; successfully unpacked and MD5 sums checked\r\n## package \u0026#39;recipes\u0026#39; successfully unpacked and MD5 sums checked\r\n## \r\n## The downloaded binary packages are in\r\n## \tC:\\Users\\riddh\\AppData\\Local\\Temp\\RtmpCy7FXq\\downloaded_packages\r\n## package \u0026#39;resample\u0026#39; successfully unpacked and MD5 sums checked\r\n## \r\n## The downloaded binary packages are in\r\n## \tC:\\Users\\riddh\\AppData\\Local\\Temp\\RtmpCy7FXq\\downloaded_packages\u003c/code\u003e\u003c/pre\u003e\r\n\u003cdiv id=\"data-prep\" class=\"section level2\"\u003e\r\n\u003ch2\u003eData prep\u003c/h2\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# Load up some data\r\ndata(\u0026quot;BostonHousing2\u0026quot;)\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# Data summary\r\nskim(BostonHousing2)\u003c/code\u003e\u003c/pre\u003e\r\n\u003ctable\u003e\r\n\u003ccaption\u003e\u003cspan id=\"tab:unnamed-chunk-4\"\u003eTable 1: \u003c/span\u003eData summary\u003c/caption\u003e\r\n\u003ctbody\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003eName\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003eBostonHousing2\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"even\"\u003e\r\n\u003ctd align=\"left\"\u003eNumber of rows\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e506\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003eNumber of columns\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e19\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"even\"\u003e\r\n\u003ctd align=\"left\"\u003e_______________________\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003eColumn type frequency:\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"even\"\u003e\r\n\u003ctd align=\"left\"\u003efactor\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e2\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003enumeric\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e17\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"even\"\u003e\r\n\u003ctd align=\"left\"\u003e________________________\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003eGroup variables\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003eNone\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003c/tbody\u003e\r\n\u003c/table\u003e\r\n\u003cp\u003e\u003cstrong\u003eVariable type: factor\u003c/strong\u003e\u003c/p\u003e\r\n\u003ctable\u003e\r\n\u003ccolgroup\u003e\r\n\u003ccol width=\"15%\" /\u003e\r\n\u003ccol width=\"11%\" /\u003e\r\n\u003ccol width=\"15%\" /\u003e\r\n\u003ccol width=\"8%\" /\u003e\r\n\u003ccol width=\"10%\" /\u003e\r\n\u003ccol width=\"38%\" /\u003e\r\n\u003c/colgroup\u003e\r\n\u003cthead\u003e\r\n\u003ctr class=\"header\"\u003e\r\n\u003cth align=\"left\"\u003eskim_variable\u003c/th\u003e\r\n\u003cth align=\"right\"\u003en_missing\u003c/th\u003e\r\n\u003cth align=\"right\"\u003ecomplete_rate\u003c/th\u003e\r\n\u003cth align=\"left\"\u003eordered\u003c/th\u003e\r\n\u003cth align=\"right\"\u003en_unique\u003c/th\u003e\r\n\u003cth align=\"left\"\u003etop_counts\u003c/th\u003e\r\n\u003c/tr\u003e\r\n\u003c/thead\u003e\r\n\u003ctbody\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003etown\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003eFALSE\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e92\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003eCam: 30, Bos: 23, Lyn: 22, Bos: 19\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"even\"\u003e\r\n\u003ctd align=\"left\"\u003echas\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003eFALSE\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e2\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e0: 471, 1: 35\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003c/tbody\u003e\r\n\u003c/table\u003e\r\n\u003cp\u003e\u003cstrong\u003eVariable type: numeric\u003c/strong\u003e\u003c/p\u003e\r\n\u003ctable\u003e\r\n\u003ccolgroup\u003e\r\n\u003ccol width=\"14%\" /\u003e\r\n\u003ccol width=\"10%\" /\u003e\r\n\u003ccol width=\"14%\" /\u003e\r\n\u003ccol width=\"8%\" /\u003e\r\n\u003ccol width=\"8%\" /\u003e\r\n\u003ccol width=\"7%\" /\u003e\r\n\u003ccol width=\"8%\" /\u003e\r\n\u003ccol width=\"8%\" /\u003e\r\n\u003ccol width=\"8%\" /\u003e\r\n\u003ccol width=\"8%\" /\u003e\r\n\u003ccol width=\"6%\" /\u003e\r\n\u003c/colgroup\u003e\r\n\u003cthead\u003e\r\n\u003ctr class=\"header\"\u003e\r\n\u003cth align=\"left\"\u003eskim_variable\u003c/th\u003e\r\n\u003cth align=\"right\"\u003en_missing\u003c/th\u003e\r\n\u003cth align=\"right\"\u003ecomplete_rate\u003c/th\u003e\r\n\u003cth align=\"right\"\u003emean\u003c/th\u003e\r\n\u003cth align=\"right\"\u003esd\u003c/th\u003e\r\n\u003cth align=\"right\"\u003ep0\u003c/th\u003e\r\n\u003cth align=\"right\"\u003ep25\u003c/th\u003e\r\n\u003cth align=\"right\"\u003ep50\u003c/th\u003e\r\n\u003cth align=\"right\"\u003ep75\u003c/th\u003e\r\n\u003cth align=\"right\"\u003ep100\u003c/th\u003e\r\n\u003cth align=\"left\"\u003ehist\u003c/th\u003e\r\n\u003c/tr\u003e\r\n\u003c/thead\u003e\r\n\u003ctbody\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003etract\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e2700.36\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1380.04\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1303.25\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e3393.50\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e3739.75\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e5082.00\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▅▂▂▇▂\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"even\"\u003e\r\n\u003ctd align=\"left\"\u003elon\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e-71.06\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.08\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e-71.29\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e-71.09\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e-71.05\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e-71.02\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e-70.81\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▁▂▇▂▁\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003elat\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e42.22\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.06\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e42.03\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e42.18\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e42.22\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e42.25\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e42.38\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▁▃▇▃▁\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"even\"\u003e\r\n\u003ctd align=\"left\"\u003emedv\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e22.53\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e9.20\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e5.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e17.02\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e21.20\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e25.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e50.00\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▂▇▅▁▁\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003ecmedv\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e22.53\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e9.18\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e5.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e17.02\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e21.20\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e25.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e50.00\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▂▇▅▁▁\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"even\"\u003e\r\n\u003ctd align=\"left\"\u003ecrim\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e3.61\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e8.60\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.01\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.08\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.26\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e3.68\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e88.98\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▇▁▁▁▁\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003ezn\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e11.36\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e23.32\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e12.50\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e100.00\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▇▁▁▁▁\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"even\"\u003e\r\n\u003ctd align=\"left\"\u003eindus\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e11.14\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e6.86\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.46\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e5.19\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e9.69\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e18.10\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e27.74\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▇▆▁▇▁\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003enox\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.55\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.12\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.38\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.45\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.54\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.62\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.87\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▇▇▆▅▁\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"even\"\u003e\r\n\u003ctd align=\"left\"\u003erm\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e6.28\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.70\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e3.56\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e5.89\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e6.21\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e6.62\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e8.78\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▁▂▇▂▁\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003eage\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e68.57\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e28.15\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e2.90\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e45.02\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e77.50\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e94.07\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e100.00\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▂▂▂▃▇\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"even\"\u003e\r\n\u003ctd align=\"left\"\u003edis\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e3.80\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e2.11\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1.13\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e2.10\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e3.21\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e5.19\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e12.13\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▇▅▂▁▁\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003erad\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e9.55\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e8.71\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e4.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e5.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e24.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e24.00\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▇▂▁▁▃\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"even\"\u003e\r\n\u003ctd align=\"left\"\u003etax\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e408.24\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e168.54\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e187.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e279.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e330.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e666.00\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e711.00\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▇▇▃▁▇\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003eptratio\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e18.46\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e2.16\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e12.60\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e17.40\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e19.05\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e20.20\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e22.00\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▁▃▅▅▇\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"even\"\u003e\r\n\u003ctd align=\"left\"\u003eb\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e356.67\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e91.29\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0.32\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e375.38\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e391.44\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e396.22\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e396.90\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▁▁▁▁▇\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003ctr class=\"odd\"\u003e\r\n\u003ctd align=\"left\"\u003elstat\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e0\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e12.65\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e7.14\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e1.73\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e6.95\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e11.36\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e16.96\u003c/td\u003e\r\n\u003ctd align=\"right\"\u003e37.97\u003c/td\u003e\r\n\u003ctd align=\"left\"\u003e▇▇▅▂▁\u003c/td\u003e\r\n\u003c/tr\u003e\r\n\u003c/tbody\u003e\r\n\u003c/table\u003e\r\n\u003cp\u003eLooks like there is are two factor variables. We’ll need to convert them into numeric variables before we proceed. I’ll use the \u003ccode\u003erecipes\u003c/code\u003e package to one-hot encode them.\u003c/p\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# Predicting median house prices\r\nrec \u0026lt;- recipe(cmedv ~ ., data = BostonHousing2) %\u0026gt;%\r\n  \r\n  # Collapse categories where population is \u0026lt; 3%\r\n  step_other(town, chas, threshold = .03, other = \u0026quot;Other\u0026quot;) %\u0026gt;% \r\n  \r\n  # Create dummy variables for all factor variables \r\n  step_dummy(all_nominal_predictors())\r\n\r\n# Train the recipe on the data set\r\nprep \u0026lt;- prep(rec, training = BostonHousing2)\r\n\r\n# Create the final model matrix\r\nmodel_df \u0026lt;- bake(prep, new_data = BostonHousing2)\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# All levels have been one hot encoded and separate columns have been appended to the model matrix\r\ncolnames(model_df)\r\n##  [1] \u0026quot;tract\u0026quot;                  \u0026quot;lon\u0026quot;                    \u0026quot;lat\u0026quot;                   \r\n##  [4] \u0026quot;medv\u0026quot;                   \u0026quot;crim\u0026quot;                   \u0026quot;zn\u0026quot;                    \r\n##  [7] \u0026quot;indus\u0026quot;                  \u0026quot;nox\u0026quot;                    \u0026quot;rm\u0026quot;                    \r\n## [10] \u0026quot;age\u0026quot;                    \u0026quot;dis\u0026quot;                    \u0026quot;rad\u0026quot;                   \r\n## [13] \u0026quot;tax\u0026quot;                    \u0026quot;ptratio\u0026quot;                \u0026quot;b\u0026quot;                     \r\n## [16] \u0026quot;lstat\u0026quot;                  \u0026quot;cmedv\u0026quot;                  \u0026quot;town_Boston.Savin.Hill\u0026quot;\r\n## [19] \u0026quot;town_Cambridge\u0026quot;         \u0026quot;town_Lynn\u0026quot;              \u0026quot;town_Newton\u0026quot;           \r\n## [22] \u0026quot;town_Other\u0026quot;             \u0026quot;chas_X1\u0026quot;\u003c/code\u003e\u003c/pre\u003e\r\n\u003cp\u003eNext, we can use the \u003ccode\u003eresample\u003c/code\u003e package to create test/train splits.\u003c/p\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003esplits \u0026lt;- rsample::initial_split(model_df, prop = 0.7)\r\n\r\n# Training set\r\ntrain_df \u0026lt;- rsample::training(splits)\r\n\r\n# Test set\r\ntest_df \u0026lt;- rsample::testing(splits)\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003edim(train_df)\r\n## [1] 354  23\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003edim(test_df)\r\n## [1] 152  23\u003c/code\u003e\u003c/pre\u003e\r\n\u003c/div\u003e\r\n\u003cdiv id=\"finding-optimal-parameters\" class=\"section level2\"\u003e\r\n\u003ch2\u003eFinding optimal parameters\u003c/h2\u003e\r\n\u003cp\u003eNow we can start to run some optimisations using the \u003ccode\u003eParBayesianOptimization\u003c/code\u003e package.\u003c/p\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# The xgboost interface accepts matrices \r\nX \u0026lt;- train_df %\u0026gt;%\r\n  # Remove the target variable\r\n  select(!medv, !cmedv) %\u0026gt;%\r\n  as.matrix()\r\n\r\n# Get the target variable\r\ny \u0026lt;- train_df %\u0026gt;%\r\n  pull(cmedv)\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# Cross validation folds\r\nfolds \u0026lt;- list(fold1 = as.integer(seq(1, nrow(X), by = 5)),\r\n              fold2 = as.integer(seq(2, nrow(X), by = 5)))\u003c/code\u003e\u003c/pre\u003e\r\n\u003cp\u003eWe’ll need an objective function which can be fed to the optimiser. We’ll use the value of the evaluation metric from \u003ccode\u003exgb.cv()\u003c/code\u003e as the value that needs to be optimised.\u003c/p\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# Function must take the hyper-parameters as inputs\r\nobj_func \u0026lt;- function(eta, max_depth, min_child_weight, subsample, lambda, alpha) {\r\n  \r\n  param \u0026lt;- list(\r\n    \r\n    # Hyter parameters \r\n    eta = eta,\r\n    max_depth = max_depth,\r\n    min_child_weight = min_child_weight,\r\n    subsample = subsample,\r\n    lambda = lambda,\r\n    alpha = alpha,\r\n    \r\n    # Tree model \r\n    booster = \u0026quot;gbtree\u0026quot;,\r\n    \r\n    # Regression problem \r\n    objective = \u0026quot;reg:squarederror\u0026quot;,\r\n    \r\n    # Use the Mean Absolute Percentage Error\r\n    eval_metric = \u0026quot;mape\u0026quot;)\r\n  \r\n  xgbcv \u0026lt;- xgb.cv(params = param,\r\n                  data = X,\r\n                  label = y,\r\n                  nround = 50,\r\n                  folds = folds,\r\n                  prediction = TRUE,\r\n                  early_stopping_rounds = 5,\r\n                  verbose = 0,\r\n                  maximize = F)\r\n  \r\n  lst \u0026lt;- list(\r\n    \r\n    # First argument must be named as \u0026quot;Score\u0026quot;\r\n    # Function finds maxima so inverting the output\r\n    Score = -min(xgbcv$evaluation_log$test_mape_mean),\r\n    \r\n    # Get number of trees for the best performing model\r\n    nrounds = xgbcv$best_iteration\r\n  )\r\n  \r\n  return(lst)\r\n}\u003c/code\u003e\u003c/pre\u003e\r\n\u003cp\u003eOnce we have the objective function, we’ll need to define some bounds for the optimiser to search within.\u003c/p\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003ebounds \u0026lt;- list(eta = c(0.001, 0.2),\r\n               max_depth = c(1L, 10L),\r\n               min_child_weight = c(1, 50),\r\n               subsample = c(0.1, 1),\r\n               lambda = c(1, 10),\r\n               alpha = c(1, 10))\u003c/code\u003e\u003c/pre\u003e\r\n\u003cp\u003eWe can now run the optimiser to find a set of optimal hyper-parameters.\u003c/p\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003eset.seed(1234)\r\nbayes_out \u0026lt;- bayesOpt(FUN = obj_func, bounds = bounds, initPoints = length(bounds) + 2, iters.n = 3)\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# Show relevant columns from the summary object \r\nbayes_out$scoreSummary[1:5, c(3:8, 13)]\r\n##           eta max_depth min_child_weight subsample   lambda    alpha      Score\r\n## 1: 0.13392137         8         4.913332 0.2105925 4.721124 3.887629 -0.0902970\r\n## 2: 0.19400811         2        25.454160 0.9594105 9.329695 3.173695 -0.1402720\r\n## 3: 0.16079775         2        14.035652 0.5118349 1.229953 5.093530 -0.1475580\r\n## 4: 0.08957707         4        12.534842 0.3844404 4.358837 1.788342 -0.1410245\r\n## 5: 0.02876388         4        36.586761 0.8107181 6.137100 6.039125 -0.3061535\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# Get best parameters\r\ndata.frame(getBestPars(bayes_out))\r\n##         eta max_depth min_child_weight subsample lambda alpha\r\n## 1 0.1905414         8         1.541476 0.8729207      1     1\u003c/code\u003e\u003c/pre\u003e\r\n\u003c/div\u003e\r\n\u003cdiv id=\"fitting-the-model\" class=\"section level2\"\u003e\r\n\u003ch2\u003eFitting the model\u003c/h2\u003e\r\n\u003cp\u003eWe can now fit a model and check how well these parameters work.\u003c/p\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# Combine best params with base params\r\nopt_params \u0026lt;- append(list(booster = \u0026quot;gbtree\u0026quot;, \r\n                          objective = \u0026quot;reg:squarederror\u0026quot;, \r\n                          eval_metric = \u0026quot;mae\u0026quot;), \r\n                     getBestPars(bayes_out))\r\n\r\n# Run cross validation \r\nxgbcv \u0026lt;- xgb.cv(params = opt_params,\r\n                data = X,\r\n                label = y,\r\n                nround = 100,\r\n                folds = folds,\r\n                prediction = TRUE,\r\n                early_stopping_rounds = 5,\r\n                verbose = 0,\r\n                maximize = F)\r\n\r\n# Get optimal number of rounds\r\nnrounds = xgbcv$best_iteration\r\n\r\n# Fit a xgb model\r\nmdl \u0026lt;- xgboost(data = X, label = y, \r\n               params = opt_params, \r\n               maximize = F, \r\n               early_stopping_rounds = 5, \r\n               nrounds = nrounds, \r\n               verbose = 0)\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# Evaluate performance \r\nactuals \u0026lt;- test_df$cmedv\r\npredicted \u0026lt;- test_df %\u0026gt;%\r\n  select_at(mdl$feature_names) %\u0026gt;%\r\n  as.matrix %\u0026gt;%\r\n  predict(mdl, newdata = .)\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# Compute MAPE\r\nmean(abs(actuals - predicted)/actuals)\r\n## [1] 0.01648831\u003c/code\u003e\u003c/pre\u003e\r\n\u003c/div\u003e\r\n\u003cdiv id=\"compare-with-grid-search\" class=\"section level2\"\u003e\r\n\u003ch2\u003eCompare with grid search\u003c/h2\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003egrd \u0026lt;- expand.grid(\r\n  eta = seq(0.001, 0.2, length.out = 5),\r\n  max_depth = seq(2L, 10L, by = 1),\r\n  min_child_weight = seq(1, 25, length.out = 3),\r\n  subsample = c(0.25, 0.5, 0.75, 1),\r\n  lambda = c(1, 5, 10),\r\n  alpha = c(1, 5, 10))\r\n\r\ndim(grd)\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003egrd_out \u0026lt;- apply(grd, 1, function(par){\r\n  \r\n    par \u0026lt;- append(par, list(booster = \u0026quot;gbtree\u0026quot;,objective = \u0026quot;reg:squarederror\u0026quot;,eval_metric = \u0026quot;mae\u0026quot;))\r\n    mdl \u0026lt;- xgboost(data = X, label = y, params = par, nrounds = 50, early_stopping_rounds = 5, maximize = F, verbose = 0)\r\n    lst \u0026lt;- data.frame(par, score = mdl$best_score)\r\n\r\n    return(lst)\r\n  })\r\n\r\ngrd_out \u0026lt;- do.call(rbind, grd_out)\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003ebest_par \u0026lt;- grd_out %\u0026gt;%\r\n  data.frame() %\u0026gt;%\r\n  arrange(score) %\u0026gt;%\r\n  .[1,]\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# Fit final model\r\nparams \u0026lt;- as.list(best_par[-length(best_par)])\r\nxgbcv \u0026lt;- xgb.cv(params = params,\r\n                data = X,\r\n                label = y,\r\n                nround = 100,\r\n                folds = folds,\r\n                prediction = TRUE,\r\n                early_stopping_rounds = 5,\r\n                verbose = 0,\r\n                maximize = F)\r\n\r\nnrounds = xgbcv$best_iteration\r\n\r\nmdl \u0026lt;- xgboost(data = X, \r\n               label = y, \r\n               params = params, \r\n               maximize = F, \r\n               early_stopping_rounds = 5, \r\n               nrounds = nrounds, \r\n               verbose = 0)\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003e# Evaluate on test set\r\nact \u0026lt;- test_df$medv\r\npred \u0026lt;- test_df %\u0026gt;%\r\n  select_at(mdl$feature_names) %\u0026gt;%\r\n  as.matrix %\u0026gt;%\r\n  predict(mdl, newdata = .)\u003c/code\u003e\u003c/pre\u003e\r\n\u003cpre class=\"r\"\u003e\u003ccode\u003emean(abs(act - pred)/act)\r\n## [1] 0.01951497\u003c/code\u003e\u003c/pre\u003e\r\n\u003cp\u003eWhile both the methods offer similar final results, the bayesian optimiser completed its search in less than a minute where as the grid search took over seven minutes. Also, I find that I can use bayesian optimisation to search a larger parameter space more quickly than a traditional grid search.\u003c/p\u003e\r\n\u003cp\u003e\u003cem\u003eThoughts? Comments? Helpful? Not helpful? Like to see anything else added in here? Let me know!\u003c/em\u003e\u003c/p\u003e\r\n\u003c/div\u003e"
+  "articleBody": "\u003cp\u003eMy first post in 2022! A very happy new year to anyone reading this. 😄\u003c/p\u003e\n\u003cp\u003eI was looking for a simple and effective way to tune \u003ccode\u003exgboost\u003c/code\u003e models in \u003ccode\u003eR\u003c/code\u003e and came across this package called \u003ca href=\"https://github.com/AnotherSamWilson/ParBayesianOptimization\"\u003eParBayesianOptimization\u003c/a\u003e. Here\u0026rsquo;s a quick tutorial on how to use it to tune a \u003ccode\u003exgboost\u003c/code\u003e model.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Pacman is a package management tool \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#a6e22e\"\u003einstall.packages\u003c/span\u003e(\u003cspan style=\"color:#e6db74\"\u003e\u0026#34;pacman\u0026#34;\u003c/span\u003e)\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#a6e22e\"\u003elibrary\u003c/span\u003e(pacman)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# p_load automatically installs packages if needed\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#a6e22e\"\u003ep_load\u003c/span\u003e(xgboost, ParBayesianOptimization, mlbench, dplyr, skimr, recipes, resample)\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ch2 id=\"data-prep\"\u003eData prep\u003c/h2\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Load up some data\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#a6e22e\"\u003edata\u003c/span\u003e(\u003cspan style=\"color:#e6db74\"\u003e\u0026#34;BostonHousing2\u0026#34;\u003c/span\u003e)\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Data summary\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#a6e22e\"\u003eskim\u003c/span\u003e(BostonHousing2)\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eTable: Table 1: Data summary\u003c/p\u003e\n\u003ctable\u003e\n\u003cthead\u003e\n\u003ctr\u003e\n\u003cth style=\"text-align:left\"\u003e\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003e\u003c/th\u003e\n\u003c/tr\u003e\n\u003c/thead\u003e\n\u003ctbody\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003eName\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003eBostonHousing2\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003eNumber of rows\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e506\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003eNumber of columns\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e19\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e_______________________\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003eColumn type frequency:\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003efactor\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e2\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003enumeric\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e17\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003e________________________\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003eGroup variables\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003eNone\u003c/td\u003e\n\u003c/tr\u003e\n\u003c/tbody\u003e\n\u003c/table\u003e\n\u003cp\u003e\u003cstrong\u003eVariable type: factor\u003c/strong\u003e\u003c/p\u003e\n\u003ctable\u003e\n\u003cthead\u003e\n\u003ctr\u003e\n\u003cth style=\"text-align:left\"\u003eskim_variable\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003en_missing\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003ecomplete_rate\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003eordered\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003en_unique\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003etop_counts\u003c/th\u003e\n\u003c/tr\u003e\n\u003c/thead\u003e\n\u003ctbody\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003etown\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003eFALSE\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e92\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003eCam: 30, Bos: 23, Lyn: 22, Bos: 19\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003echas\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003eFALSE\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e2\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e0: 471, 1: 35\u003c/td\u003e\n\u003c/tr\u003e\n\u003c/tbody\u003e\n\u003c/table\u003e\n\u003cp\u003e\u003cstrong\u003eVariable type: numeric\u003c/strong\u003e\u003c/p\u003e\n\u003ctable\u003e\n\u003cthead\u003e\n\u003ctr\u003e\n\u003cth style=\"text-align:left\"\u003eskim_variable\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003en_missing\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003ecomplete_rate\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003emean\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003esd\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003ep0\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003ep25\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003ep50\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003ep75\u003c/th\u003e\n\u003cth style=\"text-align:right\"\u003ep100\u003c/th\u003e\n\u003cth style=\"text-align:left\"\u003ehist\u003c/th\u003e\n\u003c/tr\u003e\n\u003c/thead\u003e\n\u003ctbody\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003etract\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e2700.36\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1380.04\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1303.25\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e3393.50\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e3739.75\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e5082.00\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▅▂▂▇▂\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003elon\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e-71.06\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.08\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e-71.29\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e-71.09\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e-71.05\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e-71.02\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e-70.81\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▁▂▇▂▁\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003elat\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e42.22\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.06\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e42.03\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e42.18\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e42.22\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e42.25\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e42.38\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▁▃▇▃▁\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003emedv\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e22.53\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e9.20\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e5.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e17.02\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e21.20\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e25.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e50.00\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▂▇▅▁▁\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003ecmedv\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e22.53\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e9.18\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e5.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e17.02\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e21.20\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e25.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e50.00\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▂▇▅▁▁\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003ecrim\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e3.61\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e8.60\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.01\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.08\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.26\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e3.68\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e88.98\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▇▁▁▁▁\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003ezn\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e11.36\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e23.32\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e12.50\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e100.00\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▇▁▁▁▁\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003eindus\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e11.14\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e6.86\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.46\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e5.19\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e9.69\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e18.10\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e27.74\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▇▆▁▇▁\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003enox\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.55\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.12\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.38\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.45\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.54\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.62\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.87\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▇▇▆▅▁\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003erm\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e6.28\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.70\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e3.56\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e5.89\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e6.21\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e6.62\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e8.78\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▁▂▇▂▁\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003eage\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e68.57\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e28.15\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e2.90\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e45.02\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e77.50\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e94.07\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e100.00\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▂▂▂▃▇\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003edis\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e3.80\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e2.11\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1.13\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e2.10\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e3.21\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e5.19\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e12.13\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▇▅▂▁▁\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003erad\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e9.55\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e8.71\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e4.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e5.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e24.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e24.00\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▇▂▁▁▃\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003etax\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e408.24\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e168.54\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e187.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e279.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e330.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e666.00\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e711.00\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▇▇▃▁▇\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003eptratio\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e18.46\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e2.16\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e12.60\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e17.40\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e19.05\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e20.20\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e22.00\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▁▃▅▅▇\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003eb\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e356.67\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e91.29\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0.32\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e375.38\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e391.44\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e396.22\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e396.90\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▁▁▁▁▇\u003c/td\u003e\n\u003c/tr\u003e\n\u003ctr\u003e\n\u003ctd style=\"text-align:left\"\u003elstat\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e0\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e12.65\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e7.14\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e1.73\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e6.95\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e11.36\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e16.96\u003c/td\u003e\n\u003ctd style=\"text-align:right\"\u003e37.97\u003c/td\u003e\n\u003ctd style=\"text-align:left\"\u003e▇▇▅▂▁\u003c/td\u003e\n\u003c/tr\u003e\n\u003c/tbody\u003e\n\u003c/table\u003e\n\u003cp\u003eLooks like there is are two factor variables. We\u0026rsquo;ll need to convert them into numeric variables before we proceed. I\u0026rsquo;ll use the \u003ccode\u003erecipes\u003c/code\u003e package to one-hot encode them.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Predicting median house prices\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003erec \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003erecipe\u003c/span\u003e(cmedv \u003cspan style=\"color:#f92672\"\u003e~\u003c/span\u003e ., data \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e BostonHousing2) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#75715e\"\u003e# Collapse categories where population is \u0026lt; 3%\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#a6e22e\"\u003estep_other\u003c/span\u003e(town, chas, threshold \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e.03\u003c/span\u003e, other \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;Other\u0026#34;\u003c/span\u003e) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#75715e\"\u003e# Create dummy variables for all factor variables \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#a6e22e\"\u003estep_dummy\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003eall_nominal_predictors\u003c/span\u003e())\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Train the recipe on the data set\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003eprep \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eprep\u003c/span\u003e(rec, training \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e BostonHousing2)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Create the final model matrix\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003emodel_df \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ebake\u003c/span\u003e(prep, new_data \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e BostonHousing2)\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# All levels have been one hot encoded and separate columns have been appended to the model matrix\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#a6e22e\"\u003ecolnames\u003c/span\u003e(model_df)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e##  [1] \u0026#34;tract\u0026#34;                  \u0026#34;lon\u0026#34;                    \u0026#34;lat\u0026#34;                   \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e##  [4] \u0026#34;medv\u0026#34;                   \u0026#34;crim\u0026#34;                   \u0026#34;zn\u0026#34;                    \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e##  [7] \u0026#34;indus\u0026#34;                  \u0026#34;nox\u0026#34;                    \u0026#34;rm\u0026#34;                    \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## [10] \u0026#34;age\u0026#34;                    \u0026#34;dis\u0026#34;                    \u0026#34;rad\u0026#34;                   \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## [13] \u0026#34;tax\u0026#34;                    \u0026#34;ptratio\u0026#34;                \u0026#34;b\u0026#34;                     \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## [16] \u0026#34;lstat\u0026#34;                  \u0026#34;cmedv\u0026#34;                  \u0026#34;town_Boston.Savin.Hill\u0026#34;\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## [19] \u0026#34;town_Cambridge\u0026#34;         \u0026#34;town_Lynn\u0026#34;              \u0026#34;town_Newton\u0026#34;           \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## [22] \u0026#34;town_Other\u0026#34;             \u0026#34;chas_X1\u0026#34;\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eNext, we can use the \u003ccode\u003eresample\u003c/code\u003e package to create test/train splits.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003esplits \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e rsample\u003cspan style=\"color:#f92672\"\u003e::\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003einitial_split\u003c/span\u003e(model_df, prop \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0.7\u003c/span\u003e)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Training set\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003etrain_df \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e rsample\u003cspan style=\"color:#f92672\"\u003e::\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003etraining\u003c/span\u003e(splits)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Test set\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003etest_df \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e rsample\u003cspan style=\"color:#f92672\"\u003e::\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003etesting\u003c/span\u003e(splits)\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#a6e22e\"\u003edim\u003c/span\u003e(train_df)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## [1] 354  23\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#a6e22e\"\u003edim\u003c/span\u003e(test_df)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## [1] 152  23\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ch2 id=\"finding-optimal-parameters\"\u003eFinding optimal parameters\u003c/h2\u003e\n\u003cp\u003eNow we can start to run some optimisations using the \u003ccode\u003eParBayesianOptimization\u003c/code\u003e package.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# The xgboost interface accepts matrices \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003eX \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e train_df \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#75715e\"\u003e# Remove the target variable\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#a6e22e\"\u003eselect\u003c/span\u003e(\u003cspan style=\"color:#f92672\"\u003e!\u003c/span\u003emedv, \u003cspan style=\"color:#f92672\"\u003e!\u003c/span\u003ecmedv) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#a6e22e\"\u003eas.matrix\u003c/span\u003e()\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Get the target variable\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003ey \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e train_df \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#a6e22e\"\u003epull\u003c/span\u003e(cmedv)\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Cross validation folds\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003efolds \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003elist\u003c/span\u003e(fold1 \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eas.integer\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003eseq\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, \u003cspan style=\"color:#a6e22e\"\u003enrow\u003c/span\u003e(X), by \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e5\u003c/span\u003e)),\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e              fold2 \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eas.integer\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003eseq\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e2\u003c/span\u003e, \u003cspan style=\"color:#a6e22e\"\u003enrow\u003c/span\u003e(X), by \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e5\u003c/span\u003e)))\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eWe\u0026rsquo;ll need an objective function which can be fed to the optimiser. We\u0026rsquo;ll use the value of the evaluation metric from \u003ccode\u003exgb.cv()\u003c/code\u003e as the value that needs to be optimised.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Function must take the hyper-parameters as inputs\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003eobj_func \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003efunction\u003c/span\u003e(eta, max_depth, min_child_weight, subsample, lambda, alpha) {\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  param \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003elist\u003c/span\u003e(\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    \u003cspan style=\"color:#75715e\"\u003e# Hyter parameters \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    eta \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e eta,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    max_depth \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e max_depth,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    min_child_weight \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e min_child_weight,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    subsample \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e subsample,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    lambda \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e lambda,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    alpha \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e alpha,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    \u003cspan style=\"color:#75715e\"\u003e# Tree model \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    booster \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;gbtree\u0026#34;\u003c/span\u003e,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    \u003cspan style=\"color:#75715e\"\u003e# Regression problem \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    objective \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;reg:squarederror\u0026#34;\u003c/span\u003e,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    \u003cspan style=\"color:#75715e\"\u003e# Use the Mean Absolute Percentage Error\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    eval_metric \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;mape\u0026#34;\u003c/span\u003e)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  xgbcv \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003exgb.cv\u003c/span\u003e(params \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e param,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                  data \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e X,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                  label \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e y,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                  nround \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e50\u003c/span\u003e,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                  folds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e folds,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                  prediction \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#66d9ef\"\u003eTRUE\u003c/span\u003e,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                  early_stopping_rounds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e5\u003c/span\u003e,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                  verbose \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                  maximize \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e F)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  lst \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003elist\u003c/span\u003e(\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    \u003cspan style=\"color:#75715e\"\u003e# First argument must be named as \u0026#34;Score\u0026#34;\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    \u003cspan style=\"color:#75715e\"\u003e# Function finds maxima so inverting the output\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    Score \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#f92672\"\u003e-\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003emin\u003c/span\u003e(xgbcv\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003eevaluation_log\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003etest_mape_mean),\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    \u003cspan style=\"color:#75715e\"\u003e# Get number of trees for the best performing model\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    nrounds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e xgbcv\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003ebest_iteration\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  )\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#a6e22e\"\u003ereturn\u003c/span\u003e(lst)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e}\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eOnce we have the objective function, we\u0026rsquo;ll need to define some bounds for the optimiser to search within.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003ebounds \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003elist\u003c/span\u003e(eta \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ec\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e0.001\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e0.2\u003c/span\u003e),\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               max_depth \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ec\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e1L\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e10L\u003c/span\u003e),\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               min_child_weight \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ec\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e50\u003c/span\u003e),\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               subsample \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ec\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e0.1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e),\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               lambda \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ec\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e10\u003c/span\u003e),\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               alpha \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ec\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e10\u003c/span\u003e))\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eWe can now run the optimiser to find a set of optimal hyper-parameters.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#a6e22e\"\u003eset.seed\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e1234\u003c/span\u003e)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003ebayes_out \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ebayesOpt\u003c/span\u003e(FUN \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e obj_func, bounds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e bounds, initPoints \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003elength\u003c/span\u003e(bounds) \u003cspan style=\"color:#f92672\"\u003e+\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e2\u003c/span\u003e, iters.n \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e3\u003c/span\u003e)\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Show relevant columns from the summary object \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003ebayes_out\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003escoreSummary[1\u003cspan style=\"color:#f92672\"\u003e:\u003c/span\u003e\u003cspan style=\"color:#ae81ff\"\u003e5\u003c/span\u003e, \u003cspan style=\"color:#a6e22e\"\u003ec\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e3\u003c/span\u003e\u003cspan style=\"color:#f92672\"\u003e:\u003c/span\u003e\u003cspan style=\"color:#ae81ff\"\u003e8\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e13\u003c/span\u003e)]\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e##           eta max_depth min_child_weight subsample   lambda    alpha      Score\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## 1: 0.13392137         8         4.913332 0.2105925 4.721124 3.887629 -0.0902970\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## 2: 0.19400811         2        25.454160 0.9594105 9.329695 3.173695 -0.1402720\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## 3: 0.16079775         2        14.035652 0.5118349 1.229953 5.093530 -0.1475580\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## 4: 0.08957707         4        12.534842 0.3844404 4.358837 1.788342 -0.1410245\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## 5: 0.02876388         4        36.586761 0.8107181 6.137100 6.039125 -0.3061535\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Get best parameters\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#a6e22e\"\u003edata.frame\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003egetBestPars\u003c/span\u003e(bayes_out))\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e##         eta max_depth min_child_weight subsample lambda alpha\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## 1 0.1905414         8         1.541476 0.8729207      1     1\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ch2 id=\"fitting-the-model\"\u003eFitting the model\u003c/h2\u003e\n\u003cp\u003eWe can now fit a model and check how well these parameters work.\u003c/p\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Combine best params with base params\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003eopt_params \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eappend\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003elist\u003c/span\u003e(booster \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;gbtree\u0026#34;\u003c/span\u003e, \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                          objective \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;reg:squarederror\u0026#34;\u003c/span\u003e, \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                          eval_metric \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;mae\u0026#34;\u003c/span\u003e), \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                     \u003cspan style=\"color:#a6e22e\"\u003egetBestPars\u003c/span\u003e(bayes_out))\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Run cross validation \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003exgbcv \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003exgb.cv\u003c/span\u003e(params \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e opt_params,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                data \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e X,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                label \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e y,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                nround \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                folds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e folds,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                prediction \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#66d9ef\"\u003eTRUE\u003c/span\u003e,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                early_stopping_rounds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e5\u003c/span\u003e,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                verbose \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                maximize \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e F)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Get optimal number of rounds\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003enrounds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e xgbcv\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003ebest_iteration\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Fit a xgb model\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003emdl \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003exgboost\u003c/span\u003e(data \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e X, label \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e y, \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               params \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e opt_params, \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               maximize \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e F, \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               early_stopping_rounds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e5\u003c/span\u003e, \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               nrounds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e nrounds, \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               verbose \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e)\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Evaluate performance \u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003eactuals \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e test_df\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003ecmedv\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003epredicted \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e test_df \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#a6e22e\"\u003eselect_at\u003c/span\u003e(mdl\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003efeature_names) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  as.matrix \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#a6e22e\"\u003epredict\u003c/span\u003e(mdl, newdata \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e .)\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Compute MAPE\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#a6e22e\"\u003emean\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003eabs\u003c/span\u003e(actuals \u003cspan style=\"color:#f92672\"\u003e-\u003c/span\u003e predicted)\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003eactuals)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## [1] 0.009401109\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003ch2 id=\"compare-with-grid-search\"\u003eCompare with grid search\u003c/h2\u003e\n\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003egrd \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eexpand.grid\u003c/span\u003e(\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  eta \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eseq\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e0.001\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e0.2\u003c/span\u003e, length.out \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e5\u003c/span\u003e),\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  max_depth \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eseq\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e2L\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e10L\u003c/span\u003e, by \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e),\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  min_child_weight \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eseq\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e25\u003c/span\u003e, length.out \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e3\u003c/span\u003e),\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  subsample \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ec\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e0.25\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e0.5\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e0.75\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e),\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  lambda \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ec\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e5\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e10\u003c/span\u003e),\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  alpha \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003ec\u003c/span\u003e(\u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e5\u003c/span\u003e, \u003cspan style=\"color:#ae81ff\"\u003e10\u003c/span\u003e))\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#a6e22e\"\u003edim\u003c/span\u003e(grd)\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003egrd_out \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eapply\u003c/span\u003e(grd, \u003cspan style=\"color:#ae81ff\"\u003e1\u003c/span\u003e, \u003cspan style=\"color:#a6e22e\"\u003efunction\u003c/span\u003e(par){\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    par \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eappend\u003c/span\u003e(par, \u003cspan style=\"color:#a6e22e\"\u003elist\u003c/span\u003e(booster \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;gbtree\u0026#34;\u003c/span\u003e,objective \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;reg:squarederror\u0026#34;\u003c/span\u003e,eval_metric \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#e6db74\"\u003e\u0026#34;mae\u0026#34;\u003c/span\u003e))\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    mdl \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003exgboost\u003c/span\u003e(data \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e X, label \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e y, params \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e par, nrounds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e50\u003c/span\u003e, early_stopping_rounds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e5\u003c/span\u003e, maximize \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e F, verbose \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    lst \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003edata.frame\u003c/span\u003e(par, score \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e mdl\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003ebest_score)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e    \u003cspan style=\"color:#a6e22e\"\u003ereturn\u003c/span\u003e(lst)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  })\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003egrd_out \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003edo.call\u003c/span\u003e(rbind, grd_out)\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003ebest_par \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e grd_out \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#a6e22e\"\u003edata.frame\u003c/span\u003e() \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#a6e22e\"\u003earrange\u003c/span\u003e(score) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  .[1,]\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Fit final model\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003eparams \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003eas.list\u003c/span\u003e(best_par[\u003cspan style=\"color:#f92672\"\u003e-\u003c/span\u003e\u003cspan style=\"color:#a6e22e\"\u003elength\u003c/span\u003e(best_par)])\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003exgbcv \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003exgb.cv\u003c/span\u003e(params \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e params,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                data \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e X,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                label \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e y,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                nround \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e100\u003c/span\u003e,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                folds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e folds,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                prediction \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#66d9ef\"\u003eTRUE\u003c/span\u003e,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                early_stopping_rounds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e5\u003c/span\u003e,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                verbose \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e,\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e                maximize \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e F)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003enrounds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e xgbcv\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003ebest_iteration\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003emdl \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e \u003cspan style=\"color:#a6e22e\"\u003exgboost\u003c/span\u003e(data \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e X, \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               label \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e y, \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               params \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e params, \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               maximize \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e F, \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               early_stopping_rounds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e5\u003c/span\u003e, \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               nrounds \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e nrounds, \n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e               verbose \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e \u003cspan style=\"color:#ae81ff\"\u003e0\u003c/span\u003e)\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e# Evaluate on test set\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003eact \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e test_df\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003emedv\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003epred \u003cspan style=\"color:#f92672\"\u003e\u0026lt;-\u003c/span\u003e test_df \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#a6e22e\"\u003eselect_at\u003c/span\u003e(mdl\u003cspan style=\"color:#f92672\"\u003e$\u003c/span\u003efeature_names) \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  as.matrix \u003cspan style=\"color:#f92672\"\u003e%\u0026gt;%\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e  \u003cspan style=\"color:#a6e22e\"\u003epredict\u003c/span\u003e(mdl, newdata \u003cspan style=\"color:#f92672\"\u003e=\u003c/span\u003e .)\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cdiv class=\"highlight\"\u003e\u003cpre tabindex=\"0\" style=\"color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\"\u003e\u003ccode class=\"language-r\" data-lang=\"r\"\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#a6e22e\"\u003emean\u003c/span\u003e(\u003cspan style=\"color:#a6e22e\"\u003eabs\u003c/span\u003e(act \u003cspan style=\"color:#f92672\"\u003e-\u003c/span\u003e pred)\u003cspan style=\"color:#f92672\"\u003e/\u003c/span\u003eact)\n\u003c/span\u003e\u003c/span\u003e\u003cspan style=\"display:flex;\"\u003e\u003cspan\u003e\u003cspan style=\"color:#75715e\"\u003e## [1] 0.01581713\u003c/span\u003e\n\u003c/span\u003e\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\u003c/div\u003e\u003cp\u003eWhile both the methods offer similar final results, the bayesian optimiser completed its search in less than a minute where as the grid search took over seven minutes. Also, I find that I can use bayesian optimisation to search a larger parameter space more quickly than a traditional grid search.\u003c/p\u003e\n\u003cp\u003e\u003cem\u003eThoughts? Comments? Helpful? Not helpful? Like to see anything else added in here? Let me know!\u003c/em\u003e\u003c/p\u003e"
 }
 </script>
 
-<link rel="preload" as="script" href="/bundle.js?v=1679930341">
+<link rel="preload" as="script" href="/bundle.js?v=1680150811">
 
 <link rel="preconnect" href="https://www.google-analytics.com">
 <link rel="preconnect" href="https://stats.g.doubleclick.net">
@@ -96,7 +96,7 @@
 
       </a>
       <a class="p-2 block text-base leading-none text-raven-500 hover:text-gray-800 focus:text-gray-800 focus:outline-none" href="/post/">
-        Posts
+        All Posts
       </a>
       <a class="p-2 block text-base leading-none text-raven-500 hover:text-gray-800 focus:text-gray-800 focus:outline-none" href="/about/">
         About
@@ -153,653 +153,549 @@
   </div><div class="ax-content ax-l-o">
     <div class="ax-l-i max-w-4xl">
       <article class="cdata">
-
-
-
 <p>My first post in 2022! A very happy new year to anyone reading this. 😄</p>
-<p>I was looking for a simple and effective way to tune <code>xgboost</code> models in <code>R</code> and came across this package called <a href="https://github.com/AnotherSamWilson/ParBayesianOptimization">ParBayesianOptimization</a>. Here’s a quick tutorial on how to use it to tune a <code>xgboost</code> model.</p>
-<pre class="r"><code># Pacman is a package management tool 
-install.packages(&quot;pacman&quot;)</code></pre>
-<pre class="r"><code>library(pacman)
-
-# p_load automatically installs packages if needed
-p_load(xgboost, ParBayesianOptimization, mlbench, dplyr, skimr, recipes, resample)
-## package &#39;xgboost&#39; successfully unpacked and MD5 sums checked
-## 
-## The downloaded binary packages are in
-## 	C:\Users\riddh\AppData\Local\Temp\RtmpCy7FXq\downloaded_packages
-## package &#39;rprojroot&#39; successfully unpacked and MD5 sums checked
-## package &#39;diffobj&#39; successfully unpacked and MD5 sums checked
-## package &#39;rematch2&#39; successfully unpacked and MD5 sums checked
-## package &#39;brio&#39; successfully unpacked and MD5 sums checked
-## package &#39;callr&#39; successfully unpacked and MD5 sums checked
-## package &#39;desc&#39; successfully unpacked and MD5 sums checked
-## package &#39;pkgload&#39; successfully unpacked and MD5 sums checked
-## package &#39;praise&#39; successfully unpacked and MD5 sums checked
-## package &#39;processx&#39; successfully unpacked and MD5 sums checked
-## package &#39;ps&#39; successfully unpacked and MD5 sums checked
-## package &#39;waldo&#39; successfully unpacked and MD5 sums checked
-## package &#39;testthat&#39; successfully unpacked and MD5 sums checked
-## package &#39;numDeriv&#39; successfully unpacked and MD5 sums checked
-## package &#39;SparseM&#39; successfully unpacked and MD5 sums checked
-## package &#39;MatrixModels&#39; successfully unpacked and MD5 sums checked
-## package &#39;minqa&#39; successfully unpacked and MD5 sums checked
-## package &#39;nloptr&#39; successfully unpacked and MD5 sums checked
-## package &#39;RcppEigen&#39; successfully unpacked and MD5 sums checked
-## package &#39;backports&#39; successfully unpacked and MD5 sums checked
-## package &#39;carData&#39; successfully unpacked and MD5 sums checked
-## package &#39;abind&#39; successfully unpacked and MD5 sums checked
-## package &#39;pbkrtest&#39; successfully unpacked and MD5 sums checked
-## package &#39;quantreg&#39; successfully unpacked and MD5 sums checked
-## package &#39;lme4&#39; successfully unpacked and MD5 sums checked
-## package &#39;broom&#39; successfully unpacked and MD5 sums checked
-## package &#39;corrplot&#39; successfully unpacked and MD5 sums checked
-## package &#39;car&#39; successfully unpacked and MD5 sums checked
-## package &#39;iterators&#39; successfully unpacked and MD5 sums checked
-## package &#39;ggrepel&#39; successfully unpacked and MD5 sums checked
-## package &#39;ggsci&#39; successfully unpacked and MD5 sums checked
-## package &#39;cowplot&#39; successfully unpacked and MD5 sums checked
-## package &#39;ggsignif&#39; successfully unpacked and MD5 sums checked
-## package &#39;gridExtra&#39; successfully unpacked and MD5 sums checked
-## package &#39;polynom&#39; successfully unpacked and MD5 sums checked
-## package &#39;rstatix&#39; successfully unpacked and MD5 sums checked
-## package &#39;DiceKriging&#39; successfully unpacked and MD5 sums checked
-## package &#39;foreach&#39; successfully unpacked and MD5 sums checked
-## package &#39;dbscan&#39; successfully unpacked and MD5 sums checked
-## package &#39;lhs&#39; successfully unpacked and MD5 sums checked
-## package &#39;ggpubr&#39; successfully unpacked and MD5 sums checked
-## package &#39;ParBayesianOptimization&#39; successfully unpacked and MD5 sums checked
-## 
-## The downloaded binary packages are in
-## 	C:\Users\riddh\AppData\Local\Temp\RtmpCy7FXq\downloaded_packages
-## package &#39;mlbench&#39; successfully unpacked and MD5 sums checked
-## 
-## The downloaded binary packages are in
-## 	C:\Users\riddh\AppData\Local\Temp\RtmpCy7FXq\downloaded_packages
-## package &#39;repr&#39; successfully unpacked and MD5 sums checked
-## package &#39;skimr&#39; successfully unpacked and MD5 sums checked
-## 
-## The downloaded binary packages are in
-## 	C:\Users\riddh\AppData\Local\Temp\RtmpCy7FXq\downloaded_packages
-## package &#39;future.apply&#39; successfully unpacked and MD5 sums checked
-## package &#39;progressr&#39; successfully unpacked and MD5 sums checked
-## package &#39;SQUAREM&#39; successfully unpacked and MD5 sums checked
-## package &#39;lava&#39; successfully unpacked and MD5 sums checked
-## package &#39;tzdb&#39; successfully unpacked and MD5 sums checked
-## package &#39;prodlim&#39; successfully unpacked and MD5 sums checked
-## package &#39;timechange&#39; successfully unpacked and MD5 sums checked
-## package &#39;clock&#39; successfully unpacked and MD5 sums checked
-## package &#39;gower&#39; successfully unpacked and MD5 sums checked
-## package &#39;hardhat&#39; successfully unpacked and MD5 sums checked
-## package &#39;ipred&#39; successfully unpacked and MD5 sums checked
-## package &#39;lubridate&#39; successfully unpacked and MD5 sums checked
-## package &#39;timeDate&#39; successfully unpacked and MD5 sums checked
-## package &#39;recipes&#39; successfully unpacked and MD5 sums checked
-## 
-## The downloaded binary packages are in
-## 	C:\Users\riddh\AppData\Local\Temp\RtmpCy7FXq\downloaded_packages
-## package &#39;resample&#39; successfully unpacked and MD5 sums checked
-## 
-## The downloaded binary packages are in
-## 	C:\Users\riddh\AppData\Local\Temp\RtmpCy7FXq\downloaded_packages</code></pre>
-<div id="data-prep" class="section level2">
-<h2>Data prep</h2>
-<pre class="r"><code># Load up some data
-data(&quot;BostonHousing2&quot;)</code></pre>
-<pre class="r"><code># Data summary
-skim(BostonHousing2)</code></pre>
+<p>I was looking for a simple and effective way to tune <code>xgboost</code> models in <code>R</code> and came across this package called <a href="https://github.com/AnotherSamWilson/ParBayesianOptimization">ParBayesianOptimization</a>. Here&rsquo;s a quick tutorial on how to use it to tune a <code>xgboost</code> model.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Pacman is a package management tool </span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">install.packages</span>(<span style="color:#e6db74">&#34;pacman&#34;</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#a6e22e">library</span>(pacman)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># p_load automatically installs packages if needed</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">p_load</span>(xgboost, ParBayesianOptimization, mlbench, dplyr, skimr, recipes, resample)
+</span></span></code></pre></div><h2 id="data-prep">Data prep</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Load up some data</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">data</span>(<span style="color:#e6db74">&#34;BostonHousing2&#34;</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Data summary</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">skim</span>(BostonHousing2)
+</span></span></code></pre></div><p>Table: Table 1: Data summary</p>
 <table>
-<caption><span id="tab:unnamed-chunk-4">Table 1: </span>Data summary</caption>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
 <tbody>
-<tr class="odd">
-<td align="left">Name</td>
-<td align="left">BostonHousing2</td>
+<tr>
+<td style="text-align:left">Name</td>
+<td style="text-align:left">BostonHousing2</td>
 </tr>
-<tr class="even">
-<td align="left">Number of rows</td>
-<td align="left">506</td>
+<tr>
+<td style="text-align:left">Number of rows</td>
+<td style="text-align:left">506</td>
 </tr>
-<tr class="odd">
-<td align="left">Number of columns</td>
-<td align="left">19</td>
+<tr>
+<td style="text-align:left">Number of columns</td>
+<td style="text-align:left">19</td>
 </tr>
-<tr class="even">
-<td align="left">_______________________</td>
-<td align="left"></td>
+<tr>
+<td style="text-align:left">_______________________</td>
+<td style="text-align:left"></td>
 </tr>
-<tr class="odd">
-<td align="left">Column type frequency:</td>
-<td align="left"></td>
+<tr>
+<td style="text-align:left">Column type frequency:</td>
+<td style="text-align:left"></td>
 </tr>
-<tr class="even">
-<td align="left">factor</td>
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">factor</td>
+<td style="text-align:left">2</td>
 </tr>
-<tr class="odd">
-<td align="left">numeric</td>
-<td align="left">17</td>
+<tr>
+<td style="text-align:left">numeric</td>
+<td style="text-align:left">17</td>
 </tr>
-<tr class="even">
-<td align="left">________________________</td>
-<td align="left"></td>
+<tr>
+<td style="text-align:left">________________________</td>
+<td style="text-align:left"></td>
 </tr>
-<tr class="odd">
-<td align="left">Group variables</td>
-<td align="left">None</td>
+<tr>
+<td style="text-align:left">Group variables</td>
+<td style="text-align:left">None</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Variable type: factor</strong></p>
 <table>
-<colgroup>
-<col width="15%" />
-<col width="11%" />
-<col width="15%" />
-<col width="8%" />
-<col width="10%" />
-<col width="38%" />
-</colgroup>
 <thead>
-<tr class="header">
-<th align="left">skim_variable</th>
-<th align="right">n_missing</th>
-<th align="right">complete_rate</th>
-<th align="left">ordered</th>
-<th align="right">n_unique</th>
-<th align="left">top_counts</th>
+<tr>
+<th style="text-align:left">skim_variable</th>
+<th style="text-align:right">n_missing</th>
+<th style="text-align:right">complete_rate</th>
+<th style="text-align:left">ordered</th>
+<th style="text-align:right">n_unique</th>
+<th style="text-align:left">top_counts</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">town</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="left">FALSE</td>
-<td align="right">92</td>
-<td align="left">Cam: 30, Bos: 23, Lyn: 22, Bos: 19</td>
+<tr>
+<td style="text-align:left">town</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:left">FALSE</td>
+<td style="text-align:right">92</td>
+<td style="text-align:left">Cam: 30, Bos: 23, Lyn: 22, Bos: 19</td>
 </tr>
-<tr class="even">
-<td align="left">chas</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="left">FALSE</td>
-<td align="right">2</td>
-<td align="left">0: 471, 1: 35</td>
+<tr>
+<td style="text-align:left">chas</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:left">FALSE</td>
+<td style="text-align:right">2</td>
+<td style="text-align:left">0: 471, 1: 35</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Variable type: numeric</strong></p>
 <table>
-<colgroup>
-<col width="14%" />
-<col width="10%" />
-<col width="14%" />
-<col width="8%" />
-<col width="8%" />
-<col width="7%" />
-<col width="8%" />
-<col width="8%" />
-<col width="8%" />
-<col width="8%" />
-<col width="6%" />
-</colgroup>
 <thead>
-<tr class="header">
-<th align="left">skim_variable</th>
-<th align="right">n_missing</th>
-<th align="right">complete_rate</th>
-<th align="right">mean</th>
-<th align="right">sd</th>
-<th align="right">p0</th>
-<th align="right">p25</th>
-<th align="right">p50</th>
-<th align="right">p75</th>
-<th align="right">p100</th>
-<th align="left">hist</th>
+<tr>
+<th style="text-align:left">skim_variable</th>
+<th style="text-align:right">n_missing</th>
+<th style="text-align:right">complete_rate</th>
+<th style="text-align:right">mean</th>
+<th style="text-align:right">sd</th>
+<th style="text-align:right">p0</th>
+<th style="text-align:right">p25</th>
+<th style="text-align:right">p50</th>
+<th style="text-align:right">p75</th>
+<th style="text-align:right">p100</th>
+<th style="text-align:left">hist</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">tract</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">2700.36</td>
-<td align="right">1380.04</td>
-<td align="right">1.00</td>
-<td align="right">1303.25</td>
-<td align="right">3393.50</td>
-<td align="right">3739.75</td>
-<td align="right">5082.00</td>
-<td align="left">▅▂▂▇▂</td>
+<tr>
+<td style="text-align:left">tract</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">2700.36</td>
+<td style="text-align:right">1380.04</td>
+<td style="text-align:right">1.00</td>
+<td style="text-align:right">1303.25</td>
+<td style="text-align:right">3393.50</td>
+<td style="text-align:right">3739.75</td>
+<td style="text-align:right">5082.00</td>
+<td style="text-align:left">▅▂▂▇▂</td>
 </tr>
-<tr class="even">
-<td align="left">lon</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">-71.06</td>
-<td align="right">0.08</td>
-<td align="right">-71.29</td>
-<td align="right">-71.09</td>
-<td align="right">-71.05</td>
-<td align="right">-71.02</td>
-<td align="right">-70.81</td>
-<td align="left">▁▂▇▂▁</td>
+<tr>
+<td style="text-align:left">lon</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">-71.06</td>
+<td style="text-align:right">0.08</td>
+<td style="text-align:right">-71.29</td>
+<td style="text-align:right">-71.09</td>
+<td style="text-align:right">-71.05</td>
+<td style="text-align:right">-71.02</td>
+<td style="text-align:right">-70.81</td>
+<td style="text-align:left">▁▂▇▂▁</td>
 </tr>
-<tr class="odd">
-<td align="left">lat</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">42.22</td>
-<td align="right">0.06</td>
-<td align="right">42.03</td>
-<td align="right">42.18</td>
-<td align="right">42.22</td>
-<td align="right">42.25</td>
-<td align="right">42.38</td>
-<td align="left">▁▃▇▃▁</td>
+<tr>
+<td style="text-align:left">lat</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">42.22</td>
+<td style="text-align:right">0.06</td>
+<td style="text-align:right">42.03</td>
+<td style="text-align:right">42.18</td>
+<td style="text-align:right">42.22</td>
+<td style="text-align:right">42.25</td>
+<td style="text-align:right">42.38</td>
+<td style="text-align:left">▁▃▇▃▁</td>
 </tr>
-<tr class="even">
-<td align="left">medv</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">22.53</td>
-<td align="right">9.20</td>
-<td align="right">5.00</td>
-<td align="right">17.02</td>
-<td align="right">21.20</td>
-<td align="right">25.00</td>
-<td align="right">50.00</td>
-<td align="left">▂▇▅▁▁</td>
+<tr>
+<td style="text-align:left">medv</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">22.53</td>
+<td style="text-align:right">9.20</td>
+<td style="text-align:right">5.00</td>
+<td style="text-align:right">17.02</td>
+<td style="text-align:right">21.20</td>
+<td style="text-align:right">25.00</td>
+<td style="text-align:right">50.00</td>
+<td style="text-align:left">▂▇▅▁▁</td>
 </tr>
-<tr class="odd">
-<td align="left">cmedv</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">22.53</td>
-<td align="right">9.18</td>
-<td align="right">5.00</td>
-<td align="right">17.02</td>
-<td align="right">21.20</td>
-<td align="right">25.00</td>
-<td align="right">50.00</td>
-<td align="left">▂▇▅▁▁</td>
+<tr>
+<td style="text-align:left">cmedv</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">22.53</td>
+<td style="text-align:right">9.18</td>
+<td style="text-align:right">5.00</td>
+<td style="text-align:right">17.02</td>
+<td style="text-align:right">21.20</td>
+<td style="text-align:right">25.00</td>
+<td style="text-align:right">50.00</td>
+<td style="text-align:left">▂▇▅▁▁</td>
 </tr>
-<tr class="even">
-<td align="left">crim</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">3.61</td>
-<td align="right">8.60</td>
-<td align="right">0.01</td>
-<td align="right">0.08</td>
-<td align="right">0.26</td>
-<td align="right">3.68</td>
-<td align="right">88.98</td>
-<td align="left">▇▁▁▁▁</td>
+<tr>
+<td style="text-align:left">crim</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">3.61</td>
+<td style="text-align:right">8.60</td>
+<td style="text-align:right">0.01</td>
+<td style="text-align:right">0.08</td>
+<td style="text-align:right">0.26</td>
+<td style="text-align:right">3.68</td>
+<td style="text-align:right">88.98</td>
+<td style="text-align:left">▇▁▁▁▁</td>
 </tr>
-<tr class="odd">
-<td align="left">zn</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">11.36</td>
-<td align="right">23.32</td>
-<td align="right">0.00</td>
-<td align="right">0.00</td>
-<td align="right">0.00</td>
-<td align="right">12.50</td>
-<td align="right">100.00</td>
-<td align="left">▇▁▁▁▁</td>
+<tr>
+<td style="text-align:left">zn</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">11.36</td>
+<td style="text-align:right">23.32</td>
+<td style="text-align:right">0.00</td>
+<td style="text-align:right">0.00</td>
+<td style="text-align:right">0.00</td>
+<td style="text-align:right">12.50</td>
+<td style="text-align:right">100.00</td>
+<td style="text-align:left">▇▁▁▁▁</td>
 </tr>
-<tr class="even">
-<td align="left">indus</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">11.14</td>
-<td align="right">6.86</td>
-<td align="right">0.46</td>
-<td align="right">5.19</td>
-<td align="right">9.69</td>
-<td align="right">18.10</td>
-<td align="right">27.74</td>
-<td align="left">▇▆▁▇▁</td>
+<tr>
+<td style="text-align:left">indus</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">11.14</td>
+<td style="text-align:right">6.86</td>
+<td style="text-align:right">0.46</td>
+<td style="text-align:right">5.19</td>
+<td style="text-align:right">9.69</td>
+<td style="text-align:right">18.10</td>
+<td style="text-align:right">27.74</td>
+<td style="text-align:left">▇▆▁▇▁</td>
 </tr>
-<tr class="odd">
-<td align="left">nox</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">0.55</td>
-<td align="right">0.12</td>
-<td align="right">0.38</td>
-<td align="right">0.45</td>
-<td align="right">0.54</td>
-<td align="right">0.62</td>
-<td align="right">0.87</td>
-<td align="left">▇▇▆▅▁</td>
+<tr>
+<td style="text-align:left">nox</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">0.55</td>
+<td style="text-align:right">0.12</td>
+<td style="text-align:right">0.38</td>
+<td style="text-align:right">0.45</td>
+<td style="text-align:right">0.54</td>
+<td style="text-align:right">0.62</td>
+<td style="text-align:right">0.87</td>
+<td style="text-align:left">▇▇▆▅▁</td>
 </tr>
-<tr class="even">
-<td align="left">rm</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">6.28</td>
-<td align="right">0.70</td>
-<td align="right">3.56</td>
-<td align="right">5.89</td>
-<td align="right">6.21</td>
-<td align="right">6.62</td>
-<td align="right">8.78</td>
-<td align="left">▁▂▇▂▁</td>
+<tr>
+<td style="text-align:left">rm</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">6.28</td>
+<td style="text-align:right">0.70</td>
+<td style="text-align:right">3.56</td>
+<td style="text-align:right">5.89</td>
+<td style="text-align:right">6.21</td>
+<td style="text-align:right">6.62</td>
+<td style="text-align:right">8.78</td>
+<td style="text-align:left">▁▂▇▂▁</td>
 </tr>
-<tr class="odd">
-<td align="left">age</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">68.57</td>
-<td align="right">28.15</td>
-<td align="right">2.90</td>
-<td align="right">45.02</td>
-<td align="right">77.50</td>
-<td align="right">94.07</td>
-<td align="right">100.00</td>
-<td align="left">▂▂▂▃▇</td>
+<tr>
+<td style="text-align:left">age</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">68.57</td>
+<td style="text-align:right">28.15</td>
+<td style="text-align:right">2.90</td>
+<td style="text-align:right">45.02</td>
+<td style="text-align:right">77.50</td>
+<td style="text-align:right">94.07</td>
+<td style="text-align:right">100.00</td>
+<td style="text-align:left">▂▂▂▃▇</td>
 </tr>
-<tr class="even">
-<td align="left">dis</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">3.80</td>
-<td align="right">2.11</td>
-<td align="right">1.13</td>
-<td align="right">2.10</td>
-<td align="right">3.21</td>
-<td align="right">5.19</td>
-<td align="right">12.13</td>
-<td align="left">▇▅▂▁▁</td>
+<tr>
+<td style="text-align:left">dis</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">3.80</td>
+<td style="text-align:right">2.11</td>
+<td style="text-align:right">1.13</td>
+<td style="text-align:right">2.10</td>
+<td style="text-align:right">3.21</td>
+<td style="text-align:right">5.19</td>
+<td style="text-align:right">12.13</td>
+<td style="text-align:left">▇▅▂▁▁</td>
 </tr>
-<tr class="odd">
-<td align="left">rad</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">9.55</td>
-<td align="right">8.71</td>
-<td align="right">1.00</td>
-<td align="right">4.00</td>
-<td align="right">5.00</td>
-<td align="right">24.00</td>
-<td align="right">24.00</td>
-<td align="left">▇▂▁▁▃</td>
+<tr>
+<td style="text-align:left">rad</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">9.55</td>
+<td style="text-align:right">8.71</td>
+<td style="text-align:right">1.00</td>
+<td style="text-align:right">4.00</td>
+<td style="text-align:right">5.00</td>
+<td style="text-align:right">24.00</td>
+<td style="text-align:right">24.00</td>
+<td style="text-align:left">▇▂▁▁▃</td>
 </tr>
-<tr class="even">
-<td align="left">tax</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">408.24</td>
-<td align="right">168.54</td>
-<td align="right">187.00</td>
-<td align="right">279.00</td>
-<td align="right">330.00</td>
-<td align="right">666.00</td>
-<td align="right">711.00</td>
-<td align="left">▇▇▃▁▇</td>
+<tr>
+<td style="text-align:left">tax</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">408.24</td>
+<td style="text-align:right">168.54</td>
+<td style="text-align:right">187.00</td>
+<td style="text-align:right">279.00</td>
+<td style="text-align:right">330.00</td>
+<td style="text-align:right">666.00</td>
+<td style="text-align:right">711.00</td>
+<td style="text-align:left">▇▇▃▁▇</td>
 </tr>
-<tr class="odd">
-<td align="left">ptratio</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">18.46</td>
-<td align="right">2.16</td>
-<td align="right">12.60</td>
-<td align="right">17.40</td>
-<td align="right">19.05</td>
-<td align="right">20.20</td>
-<td align="right">22.00</td>
-<td align="left">▁▃▅▅▇</td>
+<tr>
+<td style="text-align:left">ptratio</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">18.46</td>
+<td style="text-align:right">2.16</td>
+<td style="text-align:right">12.60</td>
+<td style="text-align:right">17.40</td>
+<td style="text-align:right">19.05</td>
+<td style="text-align:right">20.20</td>
+<td style="text-align:right">22.00</td>
+<td style="text-align:left">▁▃▅▅▇</td>
 </tr>
-<tr class="even">
-<td align="left">b</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">356.67</td>
-<td align="right">91.29</td>
-<td align="right">0.32</td>
-<td align="right">375.38</td>
-<td align="right">391.44</td>
-<td align="right">396.22</td>
-<td align="right">396.90</td>
-<td align="left">▁▁▁▁▇</td>
+<tr>
+<td style="text-align:left">b</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">356.67</td>
+<td style="text-align:right">91.29</td>
+<td style="text-align:right">0.32</td>
+<td style="text-align:right">375.38</td>
+<td style="text-align:right">391.44</td>
+<td style="text-align:right">396.22</td>
+<td style="text-align:right">396.90</td>
+<td style="text-align:left">▁▁▁▁▇</td>
 </tr>
-<tr class="odd">
-<td align="left">lstat</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">12.65</td>
-<td align="right">7.14</td>
-<td align="right">1.73</td>
-<td align="right">6.95</td>
-<td align="right">11.36</td>
-<td align="right">16.96</td>
-<td align="right">37.97</td>
-<td align="left">▇▇▅▂▁</td>
+<tr>
+<td style="text-align:left">lstat</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">12.65</td>
+<td style="text-align:right">7.14</td>
+<td style="text-align:right">1.73</td>
+<td style="text-align:right">6.95</td>
+<td style="text-align:right">11.36</td>
+<td style="text-align:right">16.96</td>
+<td style="text-align:right">37.97</td>
+<td style="text-align:left">▇▇▅▂▁</td>
 </tr>
 </tbody>
 </table>
-<p>Looks like there is are two factor variables. We’ll need to convert them into numeric variables before we proceed. I’ll use the <code>recipes</code> package to one-hot encode them.</p>
-<pre class="r"><code># Predicting median house prices
-rec &lt;- recipe(cmedv ~ ., data = BostonHousing2) %&gt;%
-  
-  # Collapse categories where population is &lt; 3%
-  step_other(town, chas, threshold = .03, other = &quot;Other&quot;) %&gt;% 
-  
-  # Create dummy variables for all factor variables 
-  step_dummy(all_nominal_predictors())
-
-# Train the recipe on the data set
-prep &lt;- prep(rec, training = BostonHousing2)
-
-# Create the final model matrix
-model_df &lt;- bake(prep, new_data = BostonHousing2)</code></pre>
-<pre class="r"><code># All levels have been one hot encoded and separate columns have been appended to the model matrix
-colnames(model_df)
-##  [1] &quot;tract&quot;                  &quot;lon&quot;                    &quot;lat&quot;                   
-##  [4] &quot;medv&quot;                   &quot;crim&quot;                   &quot;zn&quot;                    
-##  [7] &quot;indus&quot;                  &quot;nox&quot;                    &quot;rm&quot;                    
-## [10] &quot;age&quot;                    &quot;dis&quot;                    &quot;rad&quot;                   
-## [13] &quot;tax&quot;                    &quot;ptratio&quot;                &quot;b&quot;                     
-## [16] &quot;lstat&quot;                  &quot;cmedv&quot;                  &quot;town_Boston.Savin.Hill&quot;
-## [19] &quot;town_Cambridge&quot;         &quot;town_Lynn&quot;              &quot;town_Newton&quot;           
-## [22] &quot;town_Other&quot;             &quot;chas_X1&quot;</code></pre>
-<p>Next, we can use the <code>resample</code> package to create test/train splits.</p>
-<pre class="r"><code>splits &lt;- rsample::initial_split(model_df, prop = 0.7)
-
-# Training set
-train_df &lt;- rsample::training(splits)
-
-# Test set
-test_df &lt;- rsample::testing(splits)</code></pre>
-<pre class="r"><code>dim(train_df)
-## [1] 354  23</code></pre>
-<pre class="r"><code>dim(test_df)
-## [1] 152  23</code></pre>
-</div>
-<div id="finding-optimal-parameters" class="section level2">
-<h2>Finding optimal parameters</h2>
+<p>Looks like there is are two factor variables. We&rsquo;ll need to convert them into numeric variables before we proceed. I&rsquo;ll use the <code>recipes</code> package to one-hot encode them.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Predicting median house prices</span>
+</span></span><span style="display:flex;"><span>rec <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">recipe</span>(cmedv <span style="color:#f92672">~</span> ., data <span style="color:#f92672">=</span> BostonHousing2) <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Collapse categories where population is &lt; 3%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">step_other</span>(town, chas, threshold <span style="color:#f92672">=</span> <span style="color:#ae81ff">.03</span>, other <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Other&#34;</span>) <span style="color:#f92672">%&gt;%</span> 
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Create dummy variables for all factor variables </span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">step_dummy</span>(<span style="color:#a6e22e">all_nominal_predictors</span>())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Train the recipe on the data set</span>
+</span></span><span style="display:flex;"><span>prep <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">prep</span>(rec, training <span style="color:#f92672">=</span> BostonHousing2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create the final model matrix</span>
+</span></span><span style="display:flex;"><span>model_df <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">bake</span>(prep, new_data <span style="color:#f92672">=</span> BostonHousing2)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># All levels have been one hot encoded and separate columns have been appended to the model matrix</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">colnames</span>(model_df)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##  [1] &#34;tract&#34;                  &#34;lon&#34;                    &#34;lat&#34;                   </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##  [4] &#34;medv&#34;                   &#34;crim&#34;                   &#34;zn&#34;                    </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##  [7] &#34;indus&#34;                  &#34;nox&#34;                    &#34;rm&#34;                    </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## [10] &#34;age&#34;                    &#34;dis&#34;                    &#34;rad&#34;                   </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## [13] &#34;tax&#34;                    &#34;ptratio&#34;                &#34;b&#34;                     </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## [16] &#34;lstat&#34;                  &#34;cmedv&#34;                  &#34;town_Boston.Savin.Hill&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## [19] &#34;town_Cambridge&#34;         &#34;town_Lynn&#34;              &#34;town_Newton&#34;           </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## [22] &#34;town_Other&#34;             &#34;chas_X1&#34;</span>
+</span></span></code></pre></div><p>Next, we can use the <code>resample</code> package to create test/train splits.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>splits <span style="color:#f92672">&lt;-</span> rsample<span style="color:#f92672">::</span><span style="color:#a6e22e">initial_split</span>(model_df, prop <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.7</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Training set</span>
+</span></span><span style="display:flex;"><span>train_df <span style="color:#f92672">&lt;-</span> rsample<span style="color:#f92672">::</span><span style="color:#a6e22e">training</span>(splits)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Test set</span>
+</span></span><span style="display:flex;"><span>test_df <span style="color:#f92672">&lt;-</span> rsample<span style="color:#f92672">::</span><span style="color:#a6e22e">testing</span>(splits)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#a6e22e">dim</span>(train_df)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## [1] 354  23</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#a6e22e">dim</span>(test_df)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## [1] 152  23</span>
+</span></span></code></pre></div><h2 id="finding-optimal-parameters">Finding optimal parameters</h2>
 <p>Now we can start to run some optimisations using the <code>ParBayesianOptimization</code> package.</p>
-<pre class="r"><code># The xgboost interface accepts matrices 
-X &lt;- train_df %&gt;%
-  # Remove the target variable
-  select(!medv, !cmedv) %&gt;%
-  as.matrix()
-
-# Get the target variable
-y &lt;- train_df %&gt;%
-  pull(cmedv)</code></pre>
-<pre class="r"><code># Cross validation folds
-folds &lt;- list(fold1 = as.integer(seq(1, nrow(X), by = 5)),
-              fold2 = as.integer(seq(2, nrow(X), by = 5)))</code></pre>
-<p>We’ll need an objective function which can be fed to the optimiser. We’ll use the value of the evaluation metric from <code>xgb.cv()</code> as the value that needs to be optimised.</p>
-<pre class="r"><code># Function must take the hyper-parameters as inputs
-obj_func &lt;- function(eta, max_depth, min_child_weight, subsample, lambda, alpha) {
-  
-  param &lt;- list(
-    
-    # Hyter parameters 
-    eta = eta,
-    max_depth = max_depth,
-    min_child_weight = min_child_weight,
-    subsample = subsample,
-    lambda = lambda,
-    alpha = alpha,
-    
-    # Tree model 
-    booster = &quot;gbtree&quot;,
-    
-    # Regression problem 
-    objective = &quot;reg:squarederror&quot;,
-    
-    # Use the Mean Absolute Percentage Error
-    eval_metric = &quot;mape&quot;)
-  
-  xgbcv &lt;- xgb.cv(params = param,
-                  data = X,
-                  label = y,
-                  nround = 50,
-                  folds = folds,
-                  prediction = TRUE,
-                  early_stopping_rounds = 5,
-                  verbose = 0,
-                  maximize = F)
-  
-  lst &lt;- list(
-    
-    # First argument must be named as &quot;Score&quot;
-    # Function finds maxima so inverting the output
-    Score = -min(xgbcv$evaluation_log$test_mape_mean),
-    
-    # Get number of trees for the best performing model
-    nrounds = xgbcv$best_iteration
-  )
-  
-  return(lst)
-}</code></pre>
-<p>Once we have the objective function, we’ll need to define some bounds for the optimiser to search within.</p>
-<pre class="r"><code>bounds &lt;- list(eta = c(0.001, 0.2),
-               max_depth = c(1L, 10L),
-               min_child_weight = c(1, 50),
-               subsample = c(0.1, 1),
-               lambda = c(1, 10),
-               alpha = c(1, 10))</code></pre>
-<p>We can now run the optimiser to find a set of optimal hyper-parameters.</p>
-<pre class="r"><code>set.seed(1234)
-bayes_out &lt;- bayesOpt(FUN = obj_func, bounds = bounds, initPoints = length(bounds) + 2, iters.n = 3)</code></pre>
-<pre class="r"><code># Show relevant columns from the summary object 
-bayes_out$scoreSummary[1:5, c(3:8, 13)]
-##           eta max_depth min_child_weight subsample   lambda    alpha      Score
-## 1: 0.13392137         8         4.913332 0.2105925 4.721124 3.887629 -0.0902970
-## 2: 0.19400811         2        25.454160 0.9594105 9.329695 3.173695 -0.1402720
-## 3: 0.16079775         2        14.035652 0.5118349 1.229953 5.093530 -0.1475580
-## 4: 0.08957707         4        12.534842 0.3844404 4.358837 1.788342 -0.1410245
-## 5: 0.02876388         4        36.586761 0.8107181 6.137100 6.039125 -0.3061535</code></pre>
-<pre class="r"><code># Get best parameters
-data.frame(getBestPars(bayes_out))
-##         eta max_depth min_child_weight subsample lambda alpha
-## 1 0.1905414         8         1.541476 0.8729207      1     1</code></pre>
-</div>
-<div id="fitting-the-model" class="section level2">
-<h2>Fitting the model</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># The xgboost interface accepts matrices </span>
+</span></span><span style="display:flex;"><span>X <span style="color:#f92672">&lt;-</span> train_df <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Remove the target variable</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">select</span>(<span style="color:#f92672">!</span>medv, <span style="color:#f92672">!</span>cmedv) <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">as.matrix</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get the target variable</span>
+</span></span><span style="display:flex;"><span>y <span style="color:#f92672">&lt;-</span> train_df <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">pull</span>(cmedv)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Cross validation folds</span>
+</span></span><span style="display:flex;"><span>folds <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">list</span>(fold1 <span style="color:#f92672">=</span> <span style="color:#a6e22e">as.integer</span>(<span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">nrow</span>(X), by <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>)),
+</span></span><span style="display:flex;"><span>              fold2 <span style="color:#f92672">=</span> <span style="color:#a6e22e">as.integer</span>(<span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">2</span>, <span style="color:#a6e22e">nrow</span>(X), by <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>)))
+</span></span></code></pre></div><p>We&rsquo;ll need an objective function which can be fed to the optimiser. We&rsquo;ll use the value of the evaluation metric from <code>xgb.cv()</code> as the value that needs to be optimised.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Function must take the hyper-parameters as inputs</span>
+</span></span><span style="display:flex;"><span>obj_func <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(eta, max_depth, min_child_weight, subsample, lambda, alpha) {
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  param <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">list</span>(
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Hyter parameters </span>
+</span></span><span style="display:flex;"><span>    eta <span style="color:#f92672">=</span> eta,
+</span></span><span style="display:flex;"><span>    max_depth <span style="color:#f92672">=</span> max_depth,
+</span></span><span style="display:flex;"><span>    min_child_weight <span style="color:#f92672">=</span> min_child_weight,
+</span></span><span style="display:flex;"><span>    subsample <span style="color:#f92672">=</span> subsample,
+</span></span><span style="display:flex;"><span>    lambda <span style="color:#f92672">=</span> lambda,
+</span></span><span style="display:flex;"><span>    alpha <span style="color:#f92672">=</span> alpha,
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Tree model </span>
+</span></span><span style="display:flex;"><span>    booster <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;gbtree&#34;</span>,
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Regression problem </span>
+</span></span><span style="display:flex;"><span>    objective <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;reg:squarederror&#34;</span>,
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Use the Mean Absolute Percentage Error</span>
+</span></span><span style="display:flex;"><span>    eval_metric <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;mape&#34;</span>)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  xgbcv <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">xgb.cv</span>(params <span style="color:#f92672">=</span> param,
+</span></span><span style="display:flex;"><span>                  data <span style="color:#f92672">=</span> X,
+</span></span><span style="display:flex;"><span>                  label <span style="color:#f92672">=</span> y,
+</span></span><span style="display:flex;"><span>                  nround <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>,
+</span></span><span style="display:flex;"><span>                  folds <span style="color:#f92672">=</span> folds,
+</span></span><span style="display:flex;"><span>                  prediction <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>,
+</span></span><span style="display:flex;"><span>                  early_stopping_rounds <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>,
+</span></span><span style="display:flex;"><span>                  verbose <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>                  maximize <span style="color:#f92672">=</span> F)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  lst <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">list</span>(
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># First argument must be named as &#34;Score&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Function finds maxima so inverting the output</span>
+</span></span><span style="display:flex;"><span>    Score <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">min</span>(xgbcv<span style="color:#f92672">$</span>evaluation_log<span style="color:#f92672">$</span>test_mape_mean),
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Get number of trees for the best performing model</span>
+</span></span><span style="display:flex;"><span>    nrounds <span style="color:#f92672">=</span> xgbcv<span style="color:#f92672">$</span>best_iteration
+</span></span><span style="display:flex;"><span>  )
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">return</span>(lst)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Once we have the objective function, we&rsquo;ll need to define some bounds for the optimiser to search within.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>bounds <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">list</span>(eta <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.001</span>, <span style="color:#ae81ff">0.2</span>),
+</span></span><span style="display:flex;"><span>               max_depth <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">1L</span>, <span style="color:#ae81ff">10L</span>),
+</span></span><span style="display:flex;"><span>               min_child_weight <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">50</span>),
+</span></span><span style="display:flex;"><span>               subsample <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.1</span>, <span style="color:#ae81ff">1</span>),
+</span></span><span style="display:flex;"><span>               lambda <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">10</span>),
+</span></span><span style="display:flex;"><span>               alpha <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">10</span>))
+</span></span></code></pre></div><p>We can now run the optimiser to find a set of optimal hyper-parameters.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#a6e22e">set.seed</span>(<span style="color:#ae81ff">1234</span>)
+</span></span><span style="display:flex;"><span>bayes_out <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">bayesOpt</span>(FUN <span style="color:#f92672">=</span> obj_func, bounds <span style="color:#f92672">=</span> bounds, initPoints <span style="color:#f92672">=</span> <span style="color:#a6e22e">length</span>(bounds) <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>, iters.n <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Show relevant columns from the summary object </span>
+</span></span><span style="display:flex;"><span>bayes_out<span style="color:#f92672">$</span>scoreSummary[1<span style="color:#f92672">:</span><span style="color:#ae81ff">5</span>, <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">3</span><span style="color:#f92672">:</span><span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">13</span>)]
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##           eta max_depth min_child_weight subsample   lambda    alpha      Score</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 1: 0.13392137         8         4.913332 0.2105925 4.721124 3.887629 -0.0902970</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 2: 0.19400811         2        25.454160 0.9594105 9.329695 3.173695 -0.1402720</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 3: 0.16079775         2        14.035652 0.5118349 1.229953 5.093530 -0.1475580</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 4: 0.08957707         4        12.534842 0.3844404 4.358837 1.788342 -0.1410245</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 5: 0.02876388         4        36.586761 0.8107181 6.137100 6.039125 -0.3061535</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Get best parameters</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">data.frame</span>(<span style="color:#a6e22e">getBestPars</span>(bayes_out))
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##         eta max_depth min_child_weight subsample lambda alpha</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 1 0.1905414         8         1.541476 0.8729207      1     1</span>
+</span></span></code></pre></div><h2 id="fitting-the-model">Fitting the model</h2>
 <p>We can now fit a model and check how well these parameters work.</p>
-<pre class="r"><code># Combine best params with base params
-opt_params &lt;- append(list(booster = &quot;gbtree&quot;, 
-                          objective = &quot;reg:squarederror&quot;, 
-                          eval_metric = &quot;mae&quot;), 
-                     getBestPars(bayes_out))
-
-# Run cross validation 
-xgbcv &lt;- xgb.cv(params = opt_params,
-                data = X,
-                label = y,
-                nround = 100,
-                folds = folds,
-                prediction = TRUE,
-                early_stopping_rounds = 5,
-                verbose = 0,
-                maximize = F)
-
-# Get optimal number of rounds
-nrounds = xgbcv$best_iteration
-
-# Fit a xgb model
-mdl &lt;- xgboost(data = X, label = y, 
-               params = opt_params, 
-               maximize = F, 
-               early_stopping_rounds = 5, 
-               nrounds = nrounds, 
-               verbose = 0)</code></pre>
-<pre class="r"><code># Evaluate performance 
-actuals &lt;- test_df$cmedv
-predicted &lt;- test_df %&gt;%
-  select_at(mdl$feature_names) %&gt;%
-  as.matrix %&gt;%
-  predict(mdl, newdata = .)</code></pre>
-<pre class="r"><code># Compute MAPE
-mean(abs(actuals - predicted)/actuals)
-## [1] 0.01648831</code></pre>
-</div>
-<div id="compare-with-grid-search" class="section level2">
-<h2>Compare with grid search</h2>
-<pre class="r"><code>grd &lt;- expand.grid(
-  eta = seq(0.001, 0.2, length.out = 5),
-  max_depth = seq(2L, 10L, by = 1),
-  min_child_weight = seq(1, 25, length.out = 3),
-  subsample = c(0.25, 0.5, 0.75, 1),
-  lambda = c(1, 5, 10),
-  alpha = c(1, 5, 10))
-
-dim(grd)</code></pre>
-<pre class="r"><code>grd_out &lt;- apply(grd, 1, function(par){
-  
-    par &lt;- append(par, list(booster = &quot;gbtree&quot;,objective = &quot;reg:squarederror&quot;,eval_metric = &quot;mae&quot;))
-    mdl &lt;- xgboost(data = X, label = y, params = par, nrounds = 50, early_stopping_rounds = 5, maximize = F, verbose = 0)
-    lst &lt;- data.frame(par, score = mdl$best_score)
-
-    return(lst)
-  })
-
-grd_out &lt;- do.call(rbind, grd_out)</code></pre>
-<pre class="r"><code>best_par &lt;- grd_out %&gt;%
-  data.frame() %&gt;%
-  arrange(score) %&gt;%
-  .[1,]</code></pre>
-<pre class="r"><code># Fit final model
-params &lt;- as.list(best_par[-length(best_par)])
-xgbcv &lt;- xgb.cv(params = params,
-                data = X,
-                label = y,
-                nround = 100,
-                folds = folds,
-                prediction = TRUE,
-                early_stopping_rounds = 5,
-                verbose = 0,
-                maximize = F)
-
-nrounds = xgbcv$best_iteration
-
-mdl &lt;- xgboost(data = X, 
-               label = y, 
-               params = params, 
-               maximize = F, 
-               early_stopping_rounds = 5, 
-               nrounds = nrounds, 
-               verbose = 0)</code></pre>
-<pre class="r"><code># Evaluate on test set
-act &lt;- test_df$medv
-pred &lt;- test_df %&gt;%
-  select_at(mdl$feature_names) %&gt;%
-  as.matrix %&gt;%
-  predict(mdl, newdata = .)</code></pre>
-<pre class="r"><code>mean(abs(act - pred)/act)
-## [1] 0.01951497</code></pre>
-<p>While both the methods offer similar final results, the bayesian optimiser completed its search in less than a minute where as the grid search took over seven minutes. Also, I find that I can use bayesian optimisation to search a larger parameter space more quickly than a traditional grid search.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Combine best params with base params</span>
+</span></span><span style="display:flex;"><span>opt_params <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">append</span>(<span style="color:#a6e22e">list</span>(booster <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;gbtree&#34;</span>, 
+</span></span><span style="display:flex;"><span>                          objective <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;reg:squarederror&#34;</span>, 
+</span></span><span style="display:flex;"><span>                          eval_metric <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;mae&#34;</span>), 
+</span></span><span style="display:flex;"><span>                     <span style="color:#a6e22e">getBestPars</span>(bayes_out))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Run cross validation </span>
+</span></span><span style="display:flex;"><span>xgbcv <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">xgb.cv</span>(params <span style="color:#f92672">=</span> opt_params,
+</span></span><span style="display:flex;"><span>                data <span style="color:#f92672">=</span> X,
+</span></span><span style="display:flex;"><span>                label <span style="color:#f92672">=</span> y,
+</span></span><span style="display:flex;"><span>                nround <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>,
+</span></span><span style="display:flex;"><span>                folds <span style="color:#f92672">=</span> folds,
+</span></span><span style="display:flex;"><span>                prediction <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>,
+</span></span><span style="display:flex;"><span>                early_stopping_rounds <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>,
+</span></span><span style="display:flex;"><span>                verbose <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>                maximize <span style="color:#f92672">=</span> F)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get optimal number of rounds</span>
+</span></span><span style="display:flex;"><span>nrounds <span style="color:#f92672">=</span> xgbcv<span style="color:#f92672">$</span>best_iteration
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Fit a xgb model</span>
+</span></span><span style="display:flex;"><span>mdl <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">xgboost</span>(data <span style="color:#f92672">=</span> X, label <span style="color:#f92672">=</span> y, 
+</span></span><span style="display:flex;"><span>               params <span style="color:#f92672">=</span> opt_params, 
+</span></span><span style="display:flex;"><span>               maximize <span style="color:#f92672">=</span> F, 
+</span></span><span style="display:flex;"><span>               early_stopping_rounds <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>, 
+</span></span><span style="display:flex;"><span>               nrounds <span style="color:#f92672">=</span> nrounds, 
+</span></span><span style="display:flex;"><span>               verbose <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Evaluate performance </span>
+</span></span><span style="display:flex;"><span>actuals <span style="color:#f92672">&lt;-</span> test_df<span style="color:#f92672">$</span>cmedv
+</span></span><span style="display:flex;"><span>predicted <span style="color:#f92672">&lt;-</span> test_df <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">select_at</span>(mdl<span style="color:#f92672">$</span>feature_names) <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  as.matrix <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">predict</span>(mdl, newdata <span style="color:#f92672">=</span> .)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Compute MAPE</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">mean</span>(<span style="color:#a6e22e">abs</span>(actuals <span style="color:#f92672">-</span> predicted)<span style="color:#f92672">/</span>actuals)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## [1] 0.009401109</span>
+</span></span></code></pre></div><h2 id="compare-with-grid-search">Compare with grid search</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>grd <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">expand.grid</span>(
+</span></span><span style="display:flex;"><span>  eta <span style="color:#f92672">=</span> <span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">0.001</span>, <span style="color:#ae81ff">0.2</span>, length.out <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>),
+</span></span><span style="display:flex;"><span>  max_depth <span style="color:#f92672">=</span> <span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">2L</span>, <span style="color:#ae81ff">10L</span>, by <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>),
+</span></span><span style="display:flex;"><span>  min_child_weight <span style="color:#f92672">=</span> <span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">25</span>, length.out <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>),
+</span></span><span style="display:flex;"><span>  subsample <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.25</span>, <span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">0.75</span>, <span style="color:#ae81ff">1</span>),
+</span></span><span style="display:flex;"><span>  lambda <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">10</span>),
+</span></span><span style="display:flex;"><span>  alpha <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">10</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">dim</span>(grd)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>grd_out <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">apply</span>(grd, <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">function</span>(par){
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>    par <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">append</span>(par, <span style="color:#a6e22e">list</span>(booster <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;gbtree&#34;</span>,objective <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;reg:squarederror&#34;</span>,eval_metric <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;mae&#34;</span>))
+</span></span><span style="display:flex;"><span>    mdl <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">xgboost</span>(data <span style="color:#f92672">=</span> X, label <span style="color:#f92672">=</span> y, params <span style="color:#f92672">=</span> par, nrounds <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>, early_stopping_rounds <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>, maximize <span style="color:#f92672">=</span> F, verbose <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>    lst <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">data.frame</span>(par, score <span style="color:#f92672">=</span> mdl<span style="color:#f92672">$</span>best_score)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">return</span>(lst)
+</span></span><span style="display:flex;"><span>  })
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>grd_out <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">do.call</span>(rbind, grd_out)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span>best_par <span style="color:#f92672">&lt;-</span> grd_out <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">data.frame</span>() <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">arrange</span>(score) <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  .[1,]
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Fit final model</span>
+</span></span><span style="display:flex;"><span>params <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">as.list</span>(best_par[<span style="color:#f92672">-</span><span style="color:#a6e22e">length</span>(best_par)])
+</span></span><span style="display:flex;"><span>xgbcv <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">xgb.cv</span>(params <span style="color:#f92672">=</span> params,
+</span></span><span style="display:flex;"><span>                data <span style="color:#f92672">=</span> X,
+</span></span><span style="display:flex;"><span>                label <span style="color:#f92672">=</span> y,
+</span></span><span style="display:flex;"><span>                nround <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>,
+</span></span><span style="display:flex;"><span>                folds <span style="color:#f92672">=</span> folds,
+</span></span><span style="display:flex;"><span>                prediction <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>,
+</span></span><span style="display:flex;"><span>                early_stopping_rounds <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>,
+</span></span><span style="display:flex;"><span>                verbose <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>                maximize <span style="color:#f92672">=</span> F)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>nrounds <span style="color:#f92672">=</span> xgbcv<span style="color:#f92672">$</span>best_iteration
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>mdl <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">xgboost</span>(data <span style="color:#f92672">=</span> X, 
+</span></span><span style="display:flex;"><span>               label <span style="color:#f92672">=</span> y, 
+</span></span><span style="display:flex;"><span>               params <span style="color:#f92672">=</span> params, 
+</span></span><span style="display:flex;"><span>               maximize <span style="color:#f92672">=</span> F, 
+</span></span><span style="display:flex;"><span>               early_stopping_rounds <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>, 
+</span></span><span style="display:flex;"><span>               nrounds <span style="color:#f92672">=</span> nrounds, 
+</span></span><span style="display:flex;"><span>               verbose <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#75715e"># Evaluate on test set</span>
+</span></span><span style="display:flex;"><span>act <span style="color:#f92672">&lt;-</span> test_df<span style="color:#f92672">$</span>medv
+</span></span><span style="display:flex;"><span>pred <span style="color:#f92672">&lt;-</span> test_df <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">select_at</span>(mdl<span style="color:#f92672">$</span>feature_names) <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  as.matrix <span style="color:#f92672">%&gt;%</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">predict</span>(mdl, newdata <span style="color:#f92672">=</span> .)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-r" data-lang="r"><span style="display:flex;"><span><span style="color:#a6e22e">mean</span>(<span style="color:#a6e22e">abs</span>(act <span style="color:#f92672">-</span> pred)<span style="color:#f92672">/</span>act)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## [1] 0.01581713</span>
+</span></span></code></pre></div><p>While both the methods offer similar final results, the bayesian optimiser completed its search in less than a minute where as the grid search took over seven minutes. Also, I find that I can use bayesian optimisation to search a larger parameter space more quickly than a traditional grid search.</p>
 <p><em>Thoughts? Comments? Helpful? Not helpful? Like to see anything else added in here? Let me know!</em></p>
-</div>
 
       </article>
       
@@ -809,7 +705,7 @@ pred &lt;- test_df %&gt;%
 <script>
 var disqus_config = function () {
   this.page.url = "https://rtichoke.netlify.app/post/bayesian_optimisation_xgboost/";
-  this.page.identifier = "b8330eeb3c4ccc172570e3945338fe11";
+  this.page.identifier = "f288edfdaa799c0d7ca579d369ecc723";
   this.page.title = "Using bayesian optimisation to tune a XGBOOST model in R";
 };
 
@@ -849,7 +745,7 @@ var disqus_config = function () {
   </div>
 </footer>
 
-<script src="/bundle.js?v=1679930341"></script>
+<script src="/bundle.js?v=1680150811"></script>
 
 
 </body>

@@ -3,21 +3,22 @@ title: "Optimising approval rates by creating segmented models"
 subtitle: "Credit risk series (Post #5)"
 summary: "Why segment your population base to optimise your approval rates"
 author: "royr2"
-date: 2023-03-30
+date: 2023-03-29
 categories: ["R", "Credit risk analytics"]
 tags: ["R", "risk", "analytics", "credit risk", "approval rate"]  
 comments: true
 ---
 
-
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
 
 Here's a short post on why one should consider developing a segmented model when building credit risk scorecards to help optimize approval rates. While segmentation offers a variety of benefits, this post aims to offer a different perspective. 
 
 I will be reusing code from a previous post. Feel free to navigate to [this post](/post/gains_table) for additional information. Note that sample datasets are available for download from [(here)](https://github.com/royr2/blog/blob/main/download/credit_sample.csv)
 
 ## Packages
-
-```r
+```{r message = F}
 #install.packages("pacman") ## Install if needed 
 library(pacman)
 
@@ -26,8 +27,7 @@ p_load(dplyr, magrittr, scales, pROC)
 ```
 
 ## Sample data
-
-```r
+```{r}
 smple <- read.csv("../../../download/credit_sample.csv")
 
 # Define target
@@ -50,39 +50,22 @@ smple %<>%
 ## Segments
 Typically, credit risk scorecards would have segments like `known goods`, `known bads`, `ever chaged off` etc. For simplicity, I will use the available `FICO grade` variable in the dataset to segment `known goods` and `known bads`. For the purposes of this post, let's focus on the `known goods` customers    (mostly because policy filters would remove the known bad customers). 
 
-
-```r
+```{r}
 smple %>% 
   group_by(grade) %>% 
   summarise(total = n(), bads = sum(bad_flag == 1)) %>% 
   mutate(event_rate = percent(bads / total))
-## # A tibble: 7 × 4
-##   grade total  bads event_rate
-##   <chr> <int> <int> <chr>     
-## 1 A      1882    68 3.6%      
-## 2 B      3056   239 7.8%      
-## 3 C      2805   373 13.3%     
-## 4 D      1435   257 17.9%     
-## 5 E       590   144 24.4%     
-## 6 F       182    65 35.7%     
-## 7 G        49    16 32.7%
 ```
 
 Since the event rates are significantly higher, let's keep borrowers who have a `FICO grade` of `"E", "F" & "G"` in the `known bads` bucket and rest in the `known goods` bucket.
 
-
-```r
+```{r}
 smple %<>%
   mutate(segment = ifelse(grade %in% c("E", "F", "G"), "KB", "KG"))
 
 smple %>% 
   group_by(segment) %>% 
   tally()
-## # A tibble: 2 × 2
-##   segment     n
-##   <chr>   <int>
-## 1 KB        821
-## 2 KG       9178
 ```
 
 ## Model training 
@@ -91,8 +74,7 @@ Let's train two separate sets models like so:
 - One to the entire population
 - And one model to the `known goods`
 
-
-```r
+```{r}
 # Create a formula object to be used across models 
 form <- as.formula(
   "bad_flag ~
@@ -111,8 +93,7 @@ form <- as.formula(
 ```
 
 ### Model on the entire population
-
-```r
+```{r}
 set.seed(1234)
 
 # Train Test split
@@ -128,20 +109,15 @@ mdl_pop <- glm(
 )
 ```
 
-
-```r
+```{r}
 # Get performance on entire sample
 auc(test$bad_flag, predict(mdl_pop, test))
-## Setting levels: control = 0, case = 1
-## Setting direction: controls < cases
-## Area under the curve: 0.6602
 ```
 
 Now that we have a model, let's assume an `expected default propensity` target of `2%`. That is to say I can only approve those customers who I believe have an expected default propensity of `2%` or less. Given this, what would be my expected `approval rate`? Note that I need to maximise my approval rate (to better utilise my applicant funnel).
 
 
-
-```r
+```{r}
 # Output scaling function
 scaling_func <- function(vec, PDO = 30, OddsAtAnchor = 5, Anchor = 700){
   beta <- PDO / log(2)
@@ -155,8 +131,7 @@ scaling_func <- function(vec, PDO = 30, OddsAtAnchor = 5, Anchor = 700){
 }
 ```
 
-
-```r
+```{r}
 # Find the number of customers that can be approved such that 
 # the cumulative bad rate is <= target
 smple %>%
@@ -173,15 +148,12 @@ smple %>%
             score_cutoff = min(score), 
             bad_rate = sum(bad_flag)/n()) %>%
   mutate(approval_rate = approve_count / total)
-##   approve_count total score_cutoff   bad_rate approval_rate
-## 1           818  9178          689 0.01833741    0.08912617
 ```
 Based on the `unsegmented` model, if we choose a score cutoff of `>=689`, we should expect a bad rate of `~2%` at an approval rate of `~9%`. 
 
 ### Model on the known good population
 
-
-```r
+```{r}
 set.seed(1234)
 
 # Filter on KG
@@ -197,19 +169,14 @@ mdl_kg <- glm(
 )
 ```
 
-
-```r
+```{r}
 # Get performance on entire sample
 auc(test$bad_flag, predict(mdl_kg, test))
-## Setting levels: control = 0, case = 1
-## Setting direction: controls < cases
-## Area under the curve: 0.6496
 ```
 ## Simulations
 To evaluate the through the door population better, let's run some simulations. Let's assume that only `known good` customers will be assessed through the risk scorecard.
 
-
-```r
+```{r}
 # Function to generate simulations 
 generate_sim <- function(mdl, nSim = 500, sample_size = 5000, cutoff = 650){
   
@@ -249,18 +216,14 @@ generate_sim <- function(mdl, nSim = 500, sample_size = 5000, cutoff = 650){
 }
 ```
 
-
-```r
+```{r}
 # Simulate using the model built on the entire population
 generate_sim(mdl_pop, cutoff = 689)
 ```
 
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="672" />
-
 Based on the above simulations, when using the model trained on the entire population and using a threshold of `>=689` the average simulated event rates and approval rates are close to the expected rates from before. But what if we use the model developed only on the `known good population`?  
 
-
-```r
+```{r}
 smple %>%
   filter(segment == "KG") %>%  ## Filter on known goods only
   mutate(pred = predict(mdl_kg, newdata = .),   ## Generate predictions
@@ -275,17 +238,12 @@ smple %>%
             score_cutoff = min(score), 
             bad_rate = sum(bad_flag)/n()) %>%
   mutate(approval_rate = approve_count / total)
-##   approve_count total score_cutoff  bad_rate approval_rate
-## 1           904  9178          696 0.0199115     0.0984964
 ```
 
-
-```r
+```{r}
 # Simulate using the model built only on the known good population
 generate_sim(mdl_kg, cutoff = 696)
 ```
-
-<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="672" />
 
 When using the known-good model, we can achieve a slightly higher approval rate keeping the event rate more or less the same. While the difference is not significant, a ~1% higher approval rate on a large funnel could be significant (psst. monthly targets anyone?).  
 

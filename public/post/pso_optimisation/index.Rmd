@@ -340,6 +340,9 @@ g <- ggplot(out$X) +
   theme_minimal() + 
   transition_time(iter) +
   ease_aes("linear")
+
+animate(g, duration = 5, fps = 20, width = 200, height = 200, renderer = gifski_renderer())
+anim_save("anim.gif")
 ```
 
 ```{r echo = F} 

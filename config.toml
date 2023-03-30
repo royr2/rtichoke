@@ -25,23 +25,13 @@ maxWidthTitle = "max-w-4xl"
 [menu]
 [[menu.main]]
 url = "/post/"
-name = "Posts"
+name = "All Posts"
 weight = 1
 
 [[menu.main]]
 url = "/about/"
 name = "About"
 weight = 2
-
-[[menu.main]]
-url = "/rbloggers/"
-name = "R-Bloggers"
-weight = 3
-
-[[menu.main]]
-url = "/rbloggers/"
-name = "R-Bloggers"
-weight = 3
 
 [[menu.main]]
 url = "/rbloggers/"
