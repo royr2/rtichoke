@@ -1,0 +1,207 @@
+---
+title: "Monotonic Binning Using XGBoost"
+date: "2023-01-19"
+categories: [R, Credit Risk Analytics, XGBoost]
+image: "../images/monotonic.png"
+execute:
+  echo: true
+  warning: false
+  message: false
+  eval: true
+---
+
+# Creating Monotonic Bins for Credit Risk Modeling
+
+Monotonic binning is a technique where variable values are grouped into bins such that event rates increase or decrease consistently across these bins. This approach is particularly valuable in credit risk modeling for two key reasons:
+
+1. **Model Stability**: Monotonic relationships add robustness to models, making them less susceptible to overfitting and more reliable when deployed in production
+2. **Interpretability**: Monotonic relationships are easier to explain to stakeholders and regulators, as they ensure consistent and logical relationships between variables and outcomes
+
+## Required Libraries
+
+We'll use the following R packages for this demonstration:
+
+```{r}
+library(recipes)  # For data preprocessing
+library(dplyr)    # For data manipulation
+library(xgboost)  # For creating monotonic bins
+library(ggplot2)  # For visualization
+```
+
+## Sample Dataset
+
+For this demonstration, we'll use a sample from the Lending Club dataset, which contains loan information including whether loans defaulted:
+
+```{r}
+# Load sample data from Lending Club dataset
+sample <- read.csv("https://bit.ly/42ypcnJ")
+
+# Check dimensions of the dataset
+dim(sample)
+```
+
+## Creating a Target Variable
+
+First, we need to create a binary target variable that indicates whether a loan defaulted (1) or not (0):
+
+```{r}
+# Define loan statuses that represent defaults
+codes <- c("Charged Off", "Does not meet the credit policy. Status:Charged Off")
+
+# Create binary target variable
+model_data <- sample %>%
+  mutate(bad_flag = ifelse(loan_status %in% codes, 1, 0))
+```
+
+## Data Preparation
+
+Next, we'll preprocess the data using the `recipes` package to:
+1. Select only numeric variables
+2. Impute missing values with median values
+
+```{r}
+# Create a recipe for preprocessing
+rec <- recipe(bad_flag ~ ., data = model_data) %>%
+  step_select(where(is.numeric)) %>%  # Keep only numeric variables
+  step_impute_median(all_predictors())  # Fill missing values with medians
+
+# Apply the preprocessing steps
+rec <- prep(rec, training = model_data)
+train <- bake(rec, new_data = model_data)
+```
+
+## Analyzing Directional Trends
+
+Before creating monotonic bins, it's helpful to visualize the raw relationship between a predictor variable and the target. Let's examine how the number of credit inquiries in the past 6 months relates to default rates:
+
+```{r}
+# Create dataframe with inquiries and default flag
+data.frame(x = model_data$inq_last_6mths,
+           y = model_data$bad_flag) %>%
+  filter(x <= 5) %>%  # Focus on 0-5 inquiries for clarity
+  group_by(x) %>% 
+  summarise(count = n(),  # Count observations in each group
+            events = sum(y)) %>%  # Count defaults in each group
+  mutate(pct = events/count) %>%  # Calculate default rate
+  ggplot(aes(x = factor(x), y = pct)) + 
+  geom_col() + 
+  theme_minimal() + 
+  labs(x = "# of inquiries in past 6 months", 
+       y = "Default rate",
+       title = "Default rate vs number of inquiries")
+```
+
+Notice that while there's a general upward trend (more inquiries correlate with higher default rates), the relationship isn't perfectly monotonic. This is where our binning approach will help.
+
+## Creating Monotonic Bins with XGBoost
+
+Now we'll leverage XGBoost's monotonicity constraints to create bins that have a strictly increasing relationship with default rates. The key parameter is `monotone_constraints = 1`, which forces the model to create splits that maintain a positive relationship with the target:
+
+```{r}
+# Train XGBoost model with monotonicity constraint
+mdl <- xgboost(
+  data = train %>%
+    select(inq_last_6mths) %>%  # Use only the inquiries variable
+    as.matrix(),  
+  label = train[["bad_flag"]],  # Target variable
+  nrounds = 5,  # Number of boosting rounds
+  params = list(
+    booster = "gbtree",
+    objective = "binary:logistic",
+    monotone_constraints = 1,  # Force positive relationship
+    max_depth = 1  # Simple trees with single splits
+  ),
+  verbose = 0  # Suppress output
+)
+```
+
+## Retrieving Split Points and Creating Bins
+
+After training the model, we can extract the split points that XGBoost identified and use them to create our monotonic bins:
+
+```{r}
+# Extract split points from the model
+splits <- xgb.model.dt.tree(model = mdl)  
+
+# Create bin boundaries including -Inf and Inf for complete coverage
+cuts <- c(-Inf, unique(sort(splits$Split)), Inf)
+
+# Create and visualize the monotonic bins
+data.frame(target = train$bad_flag,
+           buckets = cut(train$inq_last_6mths, 
+                         breaks = cuts, 
+                         include.lowest = TRUE, 
+                         right = TRUE)) %>% 
+  group_by(buckets) %>%
+  summarise(total = n(),  # Count observations in each bin
+            events = sum(target == 1)) %>%  # Count defaults in each bin
+  mutate(pct = events/total) %>%  # Calculate default rate
+  ggplot(aes(x = buckets, y = pct)) + 
+  geom_col() + 
+  theme_minimal() + 
+  labs(x = "Bins", 
+       y = "Default rate",
+       title = "Monotonic Bins for Inquiries")
+```
+
+Notice how the default rates now increase monotonically across the bins, making the relationship clearer and more interpretable compared to the raw data we visualized earlier.
+
+## Creating a Reusable Function
+
+To make this process more efficient for multiple variables, let's create a reusable function that handles the entire binning workflow:
+
+```{r}
+create_bins <- function(var, outcome, max_depth = 10, plot = TRUE){
+  # Determine relationship direction automatically
+  corr <- cor(var, outcome, method = "spearman")
+  direction <- ifelse(corr > 0, 1, -1)  # 1 for positive, -1 for negative correlation
+  
+  # Build XGBoost model with appropriate monotonicity constraint
+  mdl <- xgboost(
+    verbose = 0,
+    data = as.matrix(var),
+    label = outcome,
+    nrounds = 100,  # Single round is sufficient for binning
+    params = list(objective = "binary:logistic",
+                  monotone_constraints = direction,  # Apply constraint based on correlation
+                  max_depth = max_depth))  # Control tree complexity
+  
+  # Extract and return split points
+  splits <- xgb.model.dt.tree(model = mdl)
+  cuts <- c(-Inf, sort(unique(splits$Split)), Inf)  # Include boundaries for complete coverage
+  
+  # Optionally visualize the bins
+  if(plot) {
+    data.frame(target = outcome,
+               buckets = cut(var, 
+                            breaks = cuts, 
+                            include.lowest = TRUE, 
+                            right = TRUE)) %>% 
+      group_by(buckets) %>%
+      summarise(total = n(),
+                events = sum(target == 1)) %>%
+      mutate(pct = events/total) %>%
+      ggplot(aes(x = buckets, y = pct)) + 
+      geom_col() + 
+      theme_minimal() + 
+      labs(x = "Bins", 
+           y = "Default rate",
+           title = "Monotonic Bins")
+  }
+  
+  return(cuts)  # Return the bin boundaries
+}
+```
+
+## Example Usage
+
+You can use this function to create monotonic bins for any numeric variable by passing the variable and outcome columns:
+
+```{r}
+# Example: Create monotonic bins for annual income
+income_bins <- create_bins(
+  var = train$annual_inc,
+  outcome = train$bad_flag,
+  max_depth = 5
+)
+```

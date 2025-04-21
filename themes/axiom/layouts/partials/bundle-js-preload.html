@@ -1,2 +1,0 @@
-{{- $bundleJS := printf "%s?v=%d" "bundle.js" now.Unix }}
-<link rel="preload" as="script" href="{{ $bundleJS | relURL | safeHTML }}">

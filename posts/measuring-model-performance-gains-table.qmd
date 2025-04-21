@@ -1,0 +1,275 @@
+---
+title: "Measuring Model Performance Using a Gains Table"
+date: "2024-01-28"
+categories: [R, Credit Risk Analytics, Model Evaluation]
+image: "../images/gains.png"
+execute:
+  echo: true
+  warning: false
+  message: false
+  eval: true
+---
+
+# Measuring Model Performance Using a Gains Table
+
+In credit risk modeling, analysts often use a tool called a **gains table** (or KS table) to measure and quantify the performance of classification models. This post explores how to build and interpret such a table using R.
+
+## What is a Gains Table?
+
+A gains table discretizes the population (typically a test or validation set) into groups based on the model's output (probability, log odds, or scores). Usually, each group represents 10% of the total population (deciles). The table then presents summary statistics for each group and analyzes the cumulative distributions of events (defaults) and non-events to quantify the model's performance.
+
+## Required Libraries
+
+```{r}
+#| label: setup
+
+# Load required packages
+library(dplyr)
+library(magrittr)
+library(knitr)
+library(scales)
+```
+
+## Sample Dataset
+
+We'll use a sample from the Lending Club dataset, which contains information about loans and their outcomes.
+
+```{r}
+#| label: data-load
+
+# Load the sample data
+sample <- read.csv("https://bit.ly/42ypcnJ")
+
+# Check dimensions
+dim(sample)
+```
+
+## Defining the Target Variable
+
+First, we need to create a target (outcome) variable to model. Since this is a credit risk use case, we'll identify borrowers who defaulted on their payments.
+
+```{r}
+#| label: target-definition
+
+# Check unique loan statuses
+unique(sample$loan_status)
+
+# Define "bad" loans as those that are charged off
+codes <- c("Charged Off", "Does not meet the credit policy. Status:Charged Off")
+
+# Create a binary flag for defaults
+sample %<>% mutate(bad_flag = ifelse(loan_status %in% codes, 1, 0))
+
+# Check overall event rates
+sample %>% 
+  summarise(events = sum(bad_flag == 1), 
+            non_events = sum(bad_flag == 0)) %>% 
+  mutate(event_rate = events/(events + non_events))
+```
+
+## Building a Simple Model
+
+Next, let's build a quick model, the output of which we'll use to create the gains table.
+
+```{r}
+#| label: data-prep
+
+# Replace NA values with a default value
+sample[is.na(sample)] <- -1
+
+# Clean the data
+sample %<>% 
+  # Remove cases where home ownership and payment plan are not reported
+  filter(!home_ownership %in% c("", "NONE"),
+         pymnt_plan != "") %>% 
+  # Convert categorical variables to factors
+  mutate(home_ownership = factor(home_ownership), 
+         pymnt_plan = factor(pymnt_plan))
+
+# Train-test split (70-30)
+idx <- sample(1:nrow(sample), size = 0.7 * nrow(sample), replace = FALSE)
+train <- sample[idx,]
+test <- sample[-idx,]
+```
+
+```{r}
+#| label: model-building
+
+# Build a logistic regression model
+mdl <- glm(
+  formula = bad_flag ~ 
+    loan_amnt + term + mths_since_last_delinq + total_pymnt + 
+    home_ownership + acc_now_delinq + 
+    inq_last_6mths + delinq_amnt + 
+    mths_since_last_record + mths_since_recent_revol_delinq + 
+    mths_since_last_major_derog + mths_since_recent_inq + 
+    mths_since_recent_bc + num_accts_ever_120_pd,
+  family = "binomial", 
+  data = train
+)
+
+# Generate predictions on the test set
+test$pred <- predict(mdl, newdata = test)
+```
+
+## Creating the Gains Table
+
+Now let's build the gains table step by step:
+
+### Step 1: Discretize Predictions into Bins
+
+```{r}
+#| label: binning
+
+# Create deciles based on model predictions
+q <- quantile(test$pred, probs = seq(0, 1, length.out = 11))
+
+# Add bins to test dataset
+test$bins <- cut(test$pred, breaks = q, include.lowest = TRUE, 
+                right = TRUE, ordered_result = TRUE)
+
+# Check the bin levels (note they're in increasing order)
+levels(test$bins)
+```
+
+### Step 2: Calculate Basic Statistics for Each Bin
+
+```{r}
+#| label: basic-stats
+
+# Create initial gains table with counts
+gains_table <- test %>% 
+  group_by(bins) %>% 
+  summarise(total = n(), 
+            events = sum(bad_flag == 1), 
+            non_events = sum(bad_flag == 0))
+
+# Add event rate column
+gains_table %<>%
+  mutate(event_rate = percent(events / total, 0.1, 100))
+
+# Display the table
+kable(gains_table)
+```
+
+### Step 3: Add Distribution Metrics
+
+```{r}
+#| label: distribution-metrics
+
+# Add population percentage and cumulative distributions
+gains_table %<>%
+  mutate(pop_pct = percent(total/sum(total), 0.1, 100), 
+         
+         # Calculate cumulative percentages
+         c.events_pct = cumsum(events) / sum(events),
+         c.non_events_pct = cumsum(non_events) / sum(non_events))
+
+# Display the updated table
+kable(gains_table)
+```
+
+### Step 4: Add Performance Metrics
+
+```{r}
+#| label: performance-metrics
+
+# Add KS statistic, capture rate, and cumulative event rate
+gains_table %<>%
+  mutate(
+    # KS statistic (difference between cumulative distributions)
+    ks = round(abs(c.events_pct - c.non_events_pct), 2), 
+    
+    # Capture rate (percentage of total events captured)
+    cap_rate = percent(cumsum(events)/sum(events), 1, 100), 
+    
+    # Cumulative event rate
+    c_event_rate = percent(cumsum(events)/cumsum(total), 0.1, 100), 
+    
+    # Format percentage columns
+    c.events_pct = percent(c.events_pct, 0.1, 100),
+    c.non_events_pct = percent(c.non_events_pct, 0.1, 100))
+
+# Display the final table
+kable(gains_table)
+```
+
+## Creating a Reusable Function
+
+Let's encapsulate all the above steps into a single function that can be reused for any binary classification model:
+
+```{r}
+#| label: gains-function
+
+gains_table <- function(act, pred, increasing = TRUE, nBins = 10) {
+  
+  # Create bins based on predictions
+  q <- quantile(pred, probs = seq(0, 1, length.out = nBins + 1))
+  bins <- cut(pred, breaks = q, include.lowest = TRUE, right = TRUE, ordered_result = TRUE)
+  
+  df <- data.frame(act, pred, bins)
+  
+  df %>% 
+    # Group by bins and calculate statistics
+    group_by(bins) %>% 
+    summarise(total = n(), 
+              events = sum(act == 1), 
+              non_events = sum(act == 0)) %>% 
+    mutate(event_rate = percent(events / total, 0.1, 100)) %>% 
+    
+    # Sort the table based on the 'increasing' parameter
+    {if(increasing == TRUE) {
+      arrange(., bins)
+    } else {
+      arrange(., desc(bins))
+    }} %>% 
+    
+    # Add all performance metrics
+    mutate(pop_pct = percent(total/sum(total), 0.1, 100), 
+           c.events_pct = cumsum(events) / sum(events),
+           c.non_events_pct = cumsum(non_events) / sum(non_events), 
+           ks = round(abs(c.events_pct - c.non_events_pct), 2), 
+           cap_rate = percent(cumsum(events)/sum(events), 1, 100), 
+           c_event_rate = percent(cumsum(events)/cumsum(total), 0.1, 100), 
+           c.events_pct = percent(c.events_pct, 0.1, 100),
+           c.non_events_pct = percent(c.non_events_pct, 0.1, 100))
+}
+```
+
+### Using the Function
+
+```{r}
+#| label: function-demo
+
+# Generate a gains table with bins in descending order
+tab <- gains_table(test$bad_flag, test$pred, FALSE, 10)
+kable(tab)
+```
+
+## Interpreting the Gains Table
+
+A gains table provides several key insights into model performance:
+
+1. **Monotonicity**: The event rates should consistently increase (or decrease) across bins. This confirms that the model effectively rank-orders risk.
+
+2. **Bin Consistency**: If bin sizes are not consistent (ideally ~10% each), it suggests the model is assigning the same output/score to many borrowers (clumping), which could pose issues when deciding cutoffs.
+
+3. **KS Statistic**: The maximum value of the KS column indicates the model's discriminatory power. A higher value (closer to 1) indicates better separation between good and bad borrowers.
+
+4. **Capture Rate**: Shows what percentage of all bad accounts are captured at each cutoff point.
+
+5. **Cumulative Event Rate**: Indicates the bad rate among all accounts up to that bin, useful for setting approval thresholds.
+
+## Practical Applications
+
+In credit risk management, the gains table helps with:
+
+1. **Setting Cutoffs**: Identifying appropriate score thresholds for approving or rejecting applications.
+
+2. **Strategy Development**: Creating tiered strategies (e.g., approve, review, decline) based on risk levels.
+
+3. **Performance Monitoring**: Tracking model performance over time by comparing actual vs. expected distributions.
+
+4. **Model Comparison**: Evaluating different models by comparing their KS statistics and capture rates.
+
+The gains table is a powerful tool for evaluating binary classification models, especially in credit risk applications. By providing a structured view of how well a model separates good and bad cases across the score distribution, it helps analysts make informed decisions about model quality and operational implementation.

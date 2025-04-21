@@ -1,0 +1,2 @@
+"0","hist(simulate_correlation(0.001), main = ""Starting with Random Data"","
+"0","     xlim = c(0, 1), col = ""lightblue"")"

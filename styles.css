@@ -1,0 +1,20 @@
+/* Custom styles for rtichoke site */
+
+/* TOC styling - gray text */
+#TOC a {
+  color: #666666;
+}
+
+#TOC .active a {
+  color: #444444;
+  font-weight: bold;
+}
+
+#TOC ul {
+  color: #666666;
+}
+
+/* Style for TOC navigation arrows */
+.sidebar nav[role=doc-toc] ul>li>ul {
+  margin-top: 0.25rem;
+}

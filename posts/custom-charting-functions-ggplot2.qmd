@@ -1,0 +1,289 @@
+---
+title: "Custom Charting Functions Using ggplot2"
+date: "2024-05-14"
+categories: [R, Data Visualization, ggplot2]
+image: "../images/custom_charts.png"
+execute:
+  echo: true
+  warning: false
+  message: false
+  eval: true
+---
+
+While R has a variety of options for 2D graphics and data visualization, it's hard to beat `ggplot2` in terms of features, functionality, and overall visual quality. This post demonstrates how to create customized charting functions for specific chart types using `ggplot2` as the underlying visualization engine.
+
+## Required Libraries
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+# Load required packages
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(stringr)
+```
+
+## Sample Dataset
+
+For this demonstration, we'll use a summarized version of the COVID-19 Data Repository hosted by [Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19).
+
+```{r}
+#| label: data-load
+
+# Load COVID-19 data
+df <- read.csv("https://bit.ly/3G8G63u")
+
+# Get top 5 countries by death count
+top_countries <- df %>% 
+  group_by(country) %>% 
+  summarise(count = sum(deaths_daily)) %>% 
+  top_n(5) %>% 
+  .$country
+
+print(top_countries)
+```
+
+Let's prepare our data for visualization by creating a 7-day moving average of daily confirmed cases for the top five countries:
+
+```{r}
+#| label: data-prep
+
+
+# Create a data frame with the required information
+# Note that a centered 7-day moving average is used
+plotdf <- df %>% 
+  mutate(date = as.Date(date, format = "%m/%d/%Y")) %>% 
+  filter(country %in% top_countries) %>% 
+  group_by(country, date) %>% 
+  summarise(count = sum(confirmed_daily)) %>%
+  arrange(country, date) %>% 
+  group_by(country) %>% 
+  mutate(MA = zoo::rollapply(count, FUN = mean, width = 7, by = 1, fill = NA, align = "center"))
+```
+
+## Building a Simple Line Chart Function
+
+Let's start by creating a basic line chart function. Note the use of `aes_string()` instead of just `aes()`. This allows us to supply arguments to `ggplot2` as strings, making our function more flexible.
+
+```{r}
+#| label: line-chart-basic
+
+# Function definition
+line_chart <- function(df, 
+                       x, 
+                       y, 
+                       group_color = NULL, 
+                       line_width = 1, 
+                       line_type = 1){
+  
+  ggplot(df, aes(x = !! sym(x), 
+                 y = !! sym(y), 
+                 color = !! sym(group_color))) + 
+    geom_line(linewidth = line_width, 
+              linetype = line_type)
+}
+
+# Test run
+line_chart(plotdf,
+           x = "date",
+           y = "MA",
+           group_color = "country", 
+           line_type = 1, 
+           line_width = 1.2)
+```
+
+## Creating a Custom Theme
+
+Now that we know how to encapsulate the call to `ggplot2` in a more intuitive manner, we can create a customized theme for our charts. This is useful since this theme can be applied to any chart.
+
+```{r}
+#| label: custom-theme-basic
+
+custom_theme <- function(plt, 
+                         base_size = 11, 
+                         base_line_size = 1, 
+                         palette = "Set1"){
+  
+  # Note the use of "+" and not "%>%"
+  plt + 
+    # Adjust overall font size
+    theme_minimal(base_size = base_size, 
+                  base_line_size = base_line_size) + 
+    
+    # Put legend at the bottom
+    theme(legend.position = "bottom") + 
+    
+    # Different colour scale
+    scale_color_brewer(palette = palette)
+}
+
+# Test run
+line_chart(plotdf, "date", "MA", "country") %>% custom_theme()
+```
+
+## Enhancing Our Functions
+
+Let's add more features to our `line_chart()` function to make it more versatile:
+
+```{r}
+#| label: line-chart-enhanced
+
+line_chart <- function(df, 
+                       x, y, 
+                       group_color = NULL, 
+                       line_width = 1, 
+                       line_type = 1, 
+                       xlab = NULL, 
+                       ylab = NULL, 
+                       title = NULL, 
+                       subtitle = NULL, 
+                       caption = NULL){
+  # Base plot
+  ggplot(df, aes(x = !! sym(x), 
+                 y = !! sym(y), 
+                 color = !! sym(group_color))) + 
+    
+    # Line chart 
+    geom_line(size = line_width, 
+              linetype = line_type) + 
+    
+    # Titles and subtitles
+    labs(x = xlab, 
+         y = ylab, 
+         title = title, 
+         subtitle = subtitle, 
+         caption = caption)
+}
+```
+
+We'll also enhance our `custom_theme()` function to handle different axis formatting options:
+
+```{r}
+#| label: custom-theme-enhanced
+
+custom_theme <- function(plt, 
+                         palette = "Set1", 
+                         format_x_axis_as = NULL, 
+                         format_y_axis_as = NULL, 
+                         x_axis_scale = 1, 
+                         y_axis_scale = 1, 
+                         x_axis_text_size = 10, 
+                         y_axis_text_size = 10, 
+                         base_size = 11, 
+                         base_line_size = 1, 
+                         x_angle = 45){
+  
+  mappings <- names(unlist(plt$mapping))
+  
+  p <- plt + 
+    
+    # Adjust overall font size
+    theme_minimal(base_size = base_size, 
+                  base_line_size = base_line_size) + 
+    
+    # Put legend at the bottom
+    theme(legend.position = "bottom", 
+          axis.text.x = element_text(angle = x_angle)) + 
+    
+    # Different colour palette
+    {if("colour" %in% mappings) scale_color_brewer(palette = palette)}+
+    
+    {if("fill" %in% mappings) scale_fill_brewer(palette = palette)}+
+    
+    # Change some theme options
+    theme(plot.background = element_rect(fill = "#f7f7f7"), 
+          plot.subtitle = element_text(face = "italic"), 
+          axis.title.x = element_text(face = "bold", 
+                                      size = x_axis_text_size), 
+          axis.title.y = element_text(face = "bold", 
+                                      size = y_axis_text_size)) + 
+    
+    # Change x-axis formatting
+    {if(!is.null(format_x_axis_as))
+      switch(format_x_axis_as, 
+             "date" = scale_x_date(breaks = pretty_breaks(n = 12)), 
+             "number" = scale_x_continuous(labels = number_format(accuracy = 0.1, 
+                                                                  decimal.mark = ",", 
+                                                                  scale = x_axis_scale)), 
+             "percent" = scale_x_continuous(labels = percent))} + 
+    
+    # Change y-axis formatting
+    {if(!is.null(format_y_axis_as))
+      
+      switch(format_y_axis_as, 
+             "date" = scale_y_date(breaks = pretty_breaks(n = 12)), 
+             "number" = scale_y_continuous(labels = number_format(accuracy = 0.1, 
+                                                                  decimal.mark = ",", 
+                                                                  scale = y_axis_scale)), 
+             "percent" = scale_y_continuous(labels = percent))}
+  
+  # Capitalise all names
+  vec <- lapply(p$labels, str_to_title)
+  names(vec) <- names(p$labels)
+  p$labels <- vec
+  
+  return(p)
+}
+```
+
+## Putting It All Together
+
+Now let's see how our enhanced functions work together to create a polished visualization:
+
+```{r}
+#| label: final-line-chart
+
+line_chart(plotdf,
+           x = "date", 
+           y = "MA", 
+           group_color = "country", 
+           xlab = "Date", 
+           ylab = "Moving Avg. (in '000)", 
+           title = "Daily COVID19 Case Load", 
+           subtitle = "Top 5 countries by volume") %>% 
+  
+  custom_theme(format_x_axis_as = "date", 
+               format_y_axis_as = "number", 
+               y_axis_scale = 0.001)
+```
+
+## Applying the Custom Theme to Other Chart Types
+
+The beauty of our `custom_theme()` function is that it can be applied to any `ggplot2` object. Let's create a bar chart to demonstrate this flexibility:
+
+```{r}
+#| label: bar-chart
+
+p <- plotdf %>%  
+  mutate(month = format(date, "%m-%b")) %>% 
+  ggplot(aes(x = month, y = MA, fill = country)) + 
+  geom_col(position = "dodge") + 
+  labs(title = "Monthly COVID19 Case load trend", 
+       subtitle = "Top 5 countries", 
+       x = "Month", 
+       y = "Moving Average ('000)")
+
+custom_theme(p, 
+             palette = "Set2", 
+             format_y_axis_as = "number", 
+             y_axis_scale = 0.001)
+```
+
+## Benefits of Custom Charting Functions
+
+Creating custom charting functions with ggplot2 offers several advantages:
+
+1. **Consistency**: Ensures all charts in your reports or dashboards have a consistent look and feel.
+
+2. **Efficiency**: Reduces the amount of code you need to write for commonly used chart types.
+
+3. **Maintainability**: Makes it easier to update the style of all charts by modifying a single function.
+
+4. **Simplicity**: Abstracts away the complexity of ggplot2 for team members who may not be as familiar with the package.
+
+## When to Use Custom Functions vs. Direct ggplot2
+
+It's worth noting that building customized charting functions using `ggplot2` is most useful when you need to create the same type of chart(s) repeatedly. When doing exploratory work, using `ggplot2` directly is often easier and more flexible since you can build all kinds of charts (or layer different chart types) within the same pipeline.

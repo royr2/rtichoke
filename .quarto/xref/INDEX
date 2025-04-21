@@ -1,0 +1,161 @@
+{
+  "about.qmd": {
+    "about.html": "31df85eb"
+  },
+  "index.qmd": {
+    "index.html": "1c4e53e8"
+  },
+  "posts/data-wrangling-with-dplyr.qmd": {
+    "data-wrangling-with-dplyr.html": "130258d0"
+  },
+  "posts/intro-to-r-analytics.qmd": {
+    "intro-to-r-analytics.html": "f26527ec"
+  },
+  "posts.qmd": {
+    "posts.html": "eef97518"
+  },
+  "learn/getting-started.qmd": {
+    "getting-started.html": "3214af26"
+  },
+  "resources.qmd": {
+    "resources.html": "371b6d7f"
+  },
+  "installation.qmd": {
+    "installation.html": "20ff7301"
+  },
+  "get-started/base-graphics.qmd": {
+    "base-graphics.html": "b3901d38"
+  },
+  "get-started/data-table.qmd": {
+    "data-table.html": "e9bbb569"
+  },
+  "get-started/dplyr.qmd": {
+    "dplyr.html": "dc4dbcf0"
+  },
+  "get-started/ggplot2.qmd": {
+    "ggplot2.html": "30cbe2eb"
+  },
+  "get-started/indexing.qmd": {
+    "indexing.html": "9495bea2"
+  },
+  "get-started/loops.qmd": {
+    "loops.html": "29ea53c3"
+  },
+  "get-started/reading-data.qmd": {
+    "reading-data.html": "c980862d"
+  },
+  "get-started/variables.qmd": {
+    "variables.html": "c46235b2"
+  },
+  "posts/particle-swarm-optimization.qmd": {
+    "particle-swarm-optimization.html": "c3da79a4"
+  },
+  "pso_optimisation/index.md": {
+    "index.html": "5946eb69"
+  },
+  "posts/approval_rates/index.md": {
+    "index.html": "ac0e8c4f"
+  },
+  "posts/assessing-score-reliability.qmd": {
+    "assessing-score-reliability.html": "699fe5e5"
+  },
+  "posts/assessing_score_reliability/index.md": {
+    "index.html": "d3e90343"
+  },
+  "posts/bayesian-optimization-xgboost.qmd": {
+    "bayesian-optimization-xgboost.html": "899aa2af"
+  },
+  "posts/bayesian_optimisation_xgboost/index.md": {
+    "index.html": "99940750"
+  },
+  "posts/building-particle-swarm-optimizer.qmd": {
+    "building-particle-swarm-optimizer.html": "0f56ec33"
+  },
+  "posts/charting_functions_with_ggplot/index.md": {
+    "index.html": "90826f26"
+  },
+  "posts/correlated_random_numbers/index.md": {
+    "index.html": "dddc0b01"
+  },
+  "posts/covid_visualisation_using_leaflet/index.md": {
+    "index.html": "c849aa2e"
+  },
+  "posts/custom-charting-functions-ggplot2.qmd": {
+    "custom-charting-functions-ggplot2.html": "157ab7ec"
+  },
+  "posts/gains_table/index.md": {
+    "index.html": "71b0ef69"
+  },
+  "posts/generating-correlated-random-numbers.qmd": {
+    "generating-correlated-random-numbers.html": "4dad260d"
+  },
+  "posts/getting-started-with-reticulate.qmd": {
+    "getting-started-with-reticulate.html": "56ef8842"
+  },
+  "posts/getting_started_with_reticulate/index.md": {
+    "index.html": "92a203e7"
+  },
+  "posts/getting_started_with_reticulate/py_notebook.md": {
+    "py_notebook.html": "2ca1c724"
+  },
+  "posts/measuring-model-performance-gains-table.qmd": {
+    "measuring-model-performance-gains-table.html": "2ce1775d"
+  },
+  "posts/monotonic-binning-using-xgboost.qmd": {
+    "monotonic-binning-using-xgboost.html": "b55f9053"
+  },
+  "posts/monotonic_binning_using_xgboost/index.md": {
+    "index.html": "3d76c573"
+  },
+  "posts/optimising-approval-rates.qmd": {
+    "optimising-approval-rates.html": "ae91870c"
+  },
+  "posts/portfolio_optimisation_using_pso/index.md": {
+    "index.html": "d4c1a01e"
+  },
+  "posts/pso_optimisation/index.md": {
+    "index.html": "dcb90982"
+  },
+  "posts/visualizing-covid-data-leaflet.qmd": {
+    "visualizing-covid-data-leaflet.html": "c9826765"
+  },
+  "posts/r-package-management.qmd": {
+    "r-package-management.html": "54d1c4eb"
+  },
+  "get-started/r-package-management.qmd": {
+    "r-package-management.html": "11e4f541"
+  },
+  "getting-started/base-graphics.qmd": {
+    "base-graphics.html": "b123ad25"
+  },
+  "getting-started/data-table.qmd": {
+    "data-table.html": "64c7fc56"
+  },
+  "getting-started/dplyr.qmd": {
+    "dplyr.html": "cb307fe4"
+  },
+  "getting-started/ggplot2.qmd": {
+    "ggplot2.html": "275bb806"
+  },
+  "getting-started/indexing.qmd": {
+    "indexing.html": "b49e6d49"
+  },
+  "getting-started/loops.qmd": {
+    "loops.html": "e45f4b63"
+  },
+  "getting-started/r-package-management.qmd": {
+    "r-package-management.html": "45e778e6"
+  },
+  "getting-started/reading-data.qmd": {
+    "reading-data.html": "d2393b9e"
+  },
+  "getting-started/variables.qmd": {
+    "variables.html": "3026e65c"
+  },
+  "getting-started.qmd": {
+    "getting-started.html": "95a40bcd"
+  },
+  "get-started/data-wrangling-with-dplyr.qmd": {
+    "data-wrangling-with-dplyr.html": "978bd9d4"
+  }
+}

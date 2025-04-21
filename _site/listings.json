@@ -1,0 +1,17 @@
+[
+  {
+    "listing": "/posts.html",
+    "items": [
+      "/posts/assessing-score-reliability.html",
+      "/posts/bayesian-optimization-xgboost.html",
+      "/posts/building-particle-swarm-optimizer.html",
+      "/posts/custom-charting-functions-ggplot2.html",
+      "/posts/generating-correlated-random-numbers.html",
+      "/posts/measuring-model-performance-gains-table.html",
+      "/posts/particle-swarm-optimization.html",
+      "/posts/intro-to-r-analytics.html",
+      "/posts/monotonic-binning-using-xgboost.html",
+      "/posts/getting-started-with-reticulate.html"
+    ]
+  }
+]

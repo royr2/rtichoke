@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2024-01-28">
+
+<title>Measuring Model Performance Using a Gains Table – R’tichoke</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-d4394cde7c380170a4469b96acf338b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-5770c8a6ee97a480cffe24099f10a61f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">R’tichoke</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Get Started</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-get-started">    
+        <li>
+    <a class="dropdown-item" href="../get-started/variables.html">
+ <span class="dropdown-text">Variables in R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/loops.html">
+ <span class="dropdown-text">Loops and Apply Functions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/indexing.html">
+ <span class="dropdown-text">Indexing Arrays</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/reading-data.html">
+ <span class="dropdown-text">Reading Data</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/dplyr.html">
+ <span class="dropdown-text">Introduction to dplyr</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/data-table.html">
+ <span class="dropdown-text">Introduction to data.table</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/base-graphics.html">
+ <span class="dropdown-text">Base Graphics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/ggplot2.html">
+ <span class="dropdown-text">ggplot2 Graphics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/r-package-management.html">
+ <span class="dropdown-text">Installing Packages</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">R Installation Guide</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#measuring-model-performance-using-a-gains-table" id="toc-measuring-model-performance-using-a-gains-table" class="nav-link active" data-scroll-target="#measuring-model-performance-using-a-gains-table">Measuring Model Performance Using a Gains Table</a>
+  <ul class="collapse">
+  <li><a href="#what-is-a-gains-table" id="toc-what-is-a-gains-table" class="nav-link" data-scroll-target="#what-is-a-gains-table">What is a Gains Table?</a></li>
+  <li><a href="#required-libraries" id="toc-required-libraries" class="nav-link" data-scroll-target="#required-libraries">Required Libraries</a></li>
+  <li><a href="#sample-dataset" id="toc-sample-dataset" class="nav-link" data-scroll-target="#sample-dataset">Sample Dataset</a></li>
+  <li><a href="#defining-the-target-variable" id="toc-defining-the-target-variable" class="nav-link" data-scroll-target="#defining-the-target-variable">Defining the Target Variable</a></li>
+  <li><a href="#building-a-simple-model" id="toc-building-a-simple-model" class="nav-link" data-scroll-target="#building-a-simple-model">Building a Simple Model</a></li>
+  <li><a href="#creating-the-gains-table" id="toc-creating-the-gains-table" class="nav-link" data-scroll-target="#creating-the-gains-table">Creating the Gains Table</a>
+  <ul class="collapse">
+  <li><a href="#step-1-discretize-predictions-into-bins" id="toc-step-1-discretize-predictions-into-bins" class="nav-link" data-scroll-target="#step-1-discretize-predictions-into-bins">Step 1: Discretize Predictions into Bins</a></li>
+  <li><a href="#step-2-calculate-basic-statistics-for-each-bin" id="toc-step-2-calculate-basic-statistics-for-each-bin" class="nav-link" data-scroll-target="#step-2-calculate-basic-statistics-for-each-bin">Step 2: Calculate Basic Statistics for Each Bin</a></li>
+  <li><a href="#step-3-add-distribution-metrics" id="toc-step-3-add-distribution-metrics" class="nav-link" data-scroll-target="#step-3-add-distribution-metrics">Step 3: Add Distribution Metrics</a></li>
+  <li><a href="#step-4-add-performance-metrics" id="toc-step-4-add-performance-metrics" class="nav-link" data-scroll-target="#step-4-add-performance-metrics">Step 4: Add Performance Metrics</a></li>
+  </ul></li>
+  <li><a href="#creating-a-reusable-function" id="toc-creating-a-reusable-function" class="nav-link" data-scroll-target="#creating-a-reusable-function">Creating a Reusable Function</a>
+  <ul class="collapse">
+  <li><a href="#using-the-function" id="toc-using-the-function" class="nav-link" data-scroll-target="#using-the-function">Using the Function</a></li>
+  </ul></li>
+  <li><a href="#interpreting-the-gains-table" id="toc-interpreting-the-gains-table" class="nav-link" data-scroll-target="#interpreting-the-gains-table">Interpreting the Gains Table</a></li>
+  <li><a href="#practical-applications" id="toc-practical-applications" class="nav-link" data-scroll-target="#practical-applications">Practical Applications</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Measuring Model Performance Using a Gains Table</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">R</div>
+    <div class="quarto-category">Credit Risk Analytics</div>
+    <div class="quarto-category">Model Evaluation</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 28, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="measuring-model-performance-using-a-gains-table" class="level1">
+<h1>Measuring Model Performance Using a Gains Table</h1>
+<p>In credit risk modeling, analysts often use a tool called a <strong>gains table</strong> (or KS table) to measure and quantify the performance of classification models. This post explores how to build and interpret such a table using R.</p>
+<section id="what-is-a-gains-table" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-a-gains-table">What is a Gains Table?</h2>
+<p>A gains table discretizes the population (typically a test or validation set) into groups based on the model’s output (probability, log odds, or scores). Usually, each group represents 10% of the total population (deciles). The table then presents summary statistics for each group and analyzes the cumulative distributions of events (defaults) and non-events to quantify the model’s performance.</p>
+</section>
+<section id="required-libraries" class="level2">
+<h2 class="anchored" data-anchor-id="required-libraries">Required Libraries</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(magrittr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="sample-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="sample-dataset">Sample Dataset</h2>
+<p>We’ll use a sample from the Lending Club dataset, which contains information about loans and their outcomes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the sample data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sample <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://bit.ly/42ypcnJ"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check dimensions</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(sample)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 10000   153</code></pre>
+</div>
+</div>
+</section>
+<section id="defining-the-target-variable" class="level2">
+<h2 class="anchored" data-anchor-id="defining-the-target-variable">Defining the Target Variable</h2>
+<p>First, we need to create a target (outcome) variable to model. Since this is a credit risk use case, we’ll identify borrowers who defaulted on their payments.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check unique loan statuses</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sample<span class="sc">$</span>loan_status)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Fully Paid"                                         
+[2] "Current"                                            
+[3] "Charged Off"                                        
+[4] "Late (31-120 days)"                                 
+[5] "Late (16-30 days)"                                  
+[6] "In Grace Period"                                    
+[7] "Does not meet the credit policy. Status:Fully Paid" 
+[8] "Does not meet the credit policy. Status:Charged Off"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define "bad" loans as those that are charged off</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>codes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Charged Off"</span>, <span class="st">"Does not meet the credit policy. Status:Charged Off"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a binary flag for defaults</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>sample <span class="sc">%&lt;&gt;%</span> <span class="fu">mutate</span>(<span class="at">bad_flag =</span> <span class="fu">ifelse</span>(loan_status <span class="sc">%in%</span> codes, <span class="dv">1</span>, <span class="dv">0</span>))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check overall event rates</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>sample <span class="sc">%&gt;%</span> </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">events =</span> <span class="fu">sum</span>(bad_flag <span class="sc">==</span> <span class="dv">1</span>), </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">non_events =</span> <span class="fu">sum</span>(bad_flag <span class="sc">==</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">event_rate =</span> events<span class="sc">/</span>(events <span class="sc">+</span> non_events))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  events non_events event_rate
+1   1162       8838     0.1162</code></pre>
+</div>
+</div>
+</section>
+<section id="building-a-simple-model" class="level2">
+<h2 class="anchored" data-anchor-id="building-a-simple-model">Building a Simple Model</h2>
+<p>Next, let’s build a quick model, the output of which we’ll use to create the gains table.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace NA values with a default value</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>sample[<span class="fu">is.na</span>(sample)] <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">1</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean the data</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>sample <span class="sc">%&lt;&gt;%</span> </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove cases where home ownership and payment plan are not reported</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>home_ownership <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"NONE"</span>),</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>         pymnt_plan <span class="sc">!=</span> <span class="st">""</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Convert categorical variables to factors</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">home_ownership =</span> <span class="fu">factor</span>(home_ownership), </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">pymnt_plan =</span> <span class="fu">factor</span>(pymnt_plan))</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Train-test split (70-30)</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(sample), <span class="at">size =</span> <span class="fl">0.7</span> <span class="sc">*</span> <span class="fu">nrow</span>(sample), <span class="at">replace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> sample[idx,]</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> sample[<span class="sc">-</span>idx,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build a logistic regression model</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>mdl <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> bad_flag <span class="sc">~</span> </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    loan_amnt <span class="sc">+</span> term <span class="sc">+</span> mths_since_last_delinq <span class="sc">+</span> total_pymnt <span class="sc">+</span> </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    home_ownership <span class="sc">+</span> acc_now_delinq <span class="sc">+</span> </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    inq_last_6mths <span class="sc">+</span> delinq_amnt <span class="sc">+</span> </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    mths_since_last_record <span class="sc">+</span> mths_since_recent_revol_delinq <span class="sc">+</span> </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    mths_since_last_major_derog <span class="sc">+</span> mths_since_recent_inq <span class="sc">+</span> </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    mths_since_recent_bc <span class="sc">+</span> num_accts_ever_120_pd,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="st">"binomial"</span>, </span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> train</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate predictions on the test set</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>test<span class="sc">$</span>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(mdl, <span class="at">newdata =</span> test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="creating-the-gains-table" class="level2">
+<h2 class="anchored" data-anchor-id="creating-the-gains-table">Creating the Gains Table</h2>
+<p>Now let’s build the gains table step by step:</p>
+<section id="step-1-discretize-predictions-into-bins" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-discretize-predictions-into-bins">Step 1: Discretize Predictions into Bins</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create deciles based on model predictions</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>q <span class="ot">&lt;-</span> <span class="fu">quantile</span>(test<span class="sc">$</span>pred, <span class="at">probs =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">11</span>))</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Add bins to test dataset</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>test<span class="sc">$</span>bins <span class="ot">&lt;-</span> <span class="fu">cut</span>(test<span class="sc">$</span>pred, <span class="at">breaks =</span> q, <span class="at">include.lowest =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">right =</span> <span class="cn">TRUE</span>, <span class="at">ordered_result =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the bin levels (note they're in increasing order)</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(test<span class="sc">$</span>bins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "[-5.37,-3.3]"  "(-3.3,-2.9]"   "(-2.9,-2.66]"  "(-2.66,-2.45]"
+ [5] "(-2.45,-2.25]" "(-2.25,-2.07]" "(-2.07,-1.86]" "(-1.86,-1.61]"
+ [9] "(-1.61,-1.23]" "(-1.23,1.6]"  </code></pre>
+</div>
+</div>
+</section>
+<section id="step-2-calculate-basic-statistics-for-each-bin" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-calculate-basic-statistics-for-each-bin">Step 2: Calculate Basic Statistics for Each Bin</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create initial gains table with counts</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>gains_table <span class="ot">&lt;-</span> test <span class="sc">%&gt;%</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(bins) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total =</span> <span class="fu">n</span>(), </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">events =</span> <span class="fu">sum</span>(bad_flag <span class="sc">==</span> <span class="dv">1</span>), </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">non_events =</span> <span class="fu">sum</span>(bad_flag <span class="sc">==</span> <span class="dv">0</span>))</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Add event rate column</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>gains_table <span class="sc">%&lt;&gt;%</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">event_rate =</span> <span class="fu">percent</span>(events <span class="sc">/</span> total, <span class="fl">0.1</span>, <span class="dv">100</span>))</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the table</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(gains_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">bins</th>
+<th style="text-align: right;">total</th>
+<th style="text-align: right;">events</th>
+<th style="text-align: right;">non_events</th>
+<th style="text-align: left;">event_rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">[-5.37,-3.3]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">295</td>
+<td style="text-align: left;">1.7%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-3.3,-2.9]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">292</td>
+<td style="text-align: left;">2.7%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-2.9,-2.66]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">292</td>
+<td style="text-align: left;">2.7%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-2.66,-2.45]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">289</td>
+<td style="text-align: left;">3.7%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-2.45,-2.25]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">278</td>
+<td style="text-align: left;">7.3%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-2.25,-2.07]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">266</td>
+<td style="text-align: left;">11.3%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-2.07,-1.86]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">244</td>
+<td style="text-align: left;">18.7%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-1.86,-1.61]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">65</td>
+<td style="text-align: right;">235</td>
+<td style="text-align: left;">21.7%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-1.61,-1.23]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">241</td>
+<td style="text-align: left;">19.7%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-1.23,1.6]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">225</td>
+<td style="text-align: left;">25.0%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="step-3-add-distribution-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-add-distribution-metrics">Step 3: Add Distribution Metrics</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add population percentage and cumulative distributions</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>gains_table <span class="sc">%&lt;&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pop_pct =</span> <span class="fu">percent</span>(total<span class="sc">/</span><span class="fu">sum</span>(total), <span class="fl">0.1</span>, <span class="dv">100</span>), </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>         </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>         <span class="co"># Calculate cumulative percentages</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">c.events_pct =</span> <span class="fu">cumsum</span>(events) <span class="sc">/</span> <span class="fu">sum</span>(events),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">c.non_events_pct =</span> <span class="fu">cumsum</span>(non_events) <span class="sc">/</span> <span class="fu">sum</span>(non_events))</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the updated table</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(gains_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 6%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 9%">
+<col style="width: 14%">
+<col style="width: 19%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">bins</th>
+<th style="text-align: right;">total</th>
+<th style="text-align: right;">events</th>
+<th style="text-align: right;">non_events</th>
+<th style="text-align: left;">event_rate</th>
+<th style="text-align: left;">pop_pct</th>
+<th style="text-align: right;">c.events_pct</th>
+<th style="text-align: right;">c.non_events_pct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">[-5.37,-3.3]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">295</td>
+<td style="text-align: left;">1.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: right;">0.0145773</td>
+<td style="text-align: right;">0.1110275</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-3.3,-2.9]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">292</td>
+<td style="text-align: left;">2.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: right;">0.0379009</td>
+<td style="text-align: right;">0.2209259</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-2.9,-2.66]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">292</td>
+<td style="text-align: left;">2.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: right;">0.0612245</td>
+<td style="text-align: right;">0.3308242</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-2.66,-2.45]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">289</td>
+<td style="text-align: left;">3.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: right;">0.0932945</td>
+<td style="text-align: right;">0.4395935</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-2.45,-2.25]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">278</td>
+<td style="text-align: left;">7.3%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: right;">0.1574344</td>
+<td style="text-align: right;">0.5442228</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-2.25,-2.07]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">266</td>
+<td style="text-align: left;">11.3%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: right;">0.2565598</td>
+<td style="text-align: right;">0.6443357</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-2.07,-1.86]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">244</td>
+<td style="text-align: left;">18.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: right;">0.4198251</td>
+<td style="text-align: right;">0.7361686</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-1.86,-1.61]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">65</td>
+<td style="text-align: right;">235</td>
+<td style="text-align: left;">21.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: right;">0.6093294</td>
+<td style="text-align: right;">0.8246142</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-1.61,-1.23]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">241</td>
+<td style="text-align: left;">19.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: right;">0.7813411</td>
+<td style="text-align: right;">0.9153180</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-1.23,1.6]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">225</td>
+<td style="text-align: left;">25.0%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">1.0000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="step-4-add-performance-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="step-4-add-performance-metrics">Step 4: Add Performance Metrics</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add KS statistic, capture rate, and cumulative event rate</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>gains_table <span class="sc">%&lt;&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># KS statistic (difference between cumulative distributions)</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">ks =</span> <span class="fu">round</span>(<span class="fu">abs</span>(c.events_pct <span class="sc">-</span> c.non_events_pct), <span class="dv">2</span>), </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Capture rate (percentage of total events captured)</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">cap_rate =</span> <span class="fu">percent</span>(<span class="fu">cumsum</span>(events)<span class="sc">/</span><span class="fu">sum</span>(events), <span class="dv">1</span>, <span class="dv">100</span>), </span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Cumulative event rate</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">c_event_rate =</span> <span class="fu">percent</span>(<span class="fu">cumsum</span>(events)<span class="sc">/</span><span class="fu">cumsum</span>(total), <span class="fl">0.1</span>, <span class="dv">100</span>), </span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Format percentage columns</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">c.events_pct =</span> <span class="fu">percent</span>(c.events_pct, <span class="fl">0.1</span>, <span class="dv">100</span>),</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">c.non_events_pct =</span> <span class="fu">percent</span>(c.non_events_pct, <span class="fl">0.1</span>, <span class="dv">100</span>))</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the final table</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(gains_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 5%">
+<col style="width: 6%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 7%">
+<col style="width: 11%">
+<col style="width: 14%">
+<col style="width: 4%">
+<col style="width: 7%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">bins</th>
+<th style="text-align: right;">total</th>
+<th style="text-align: right;">events</th>
+<th style="text-align: right;">non_events</th>
+<th style="text-align: left;">event_rate</th>
+<th style="text-align: left;">pop_pct</th>
+<th style="text-align: left;">c.events_pct</th>
+<th style="text-align: left;">c.non_events_pct</th>
+<th style="text-align: right;">ks</th>
+<th style="text-align: left;">cap_rate</th>
+<th style="text-align: left;">c_event_rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">[-5.37,-3.3]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">295</td>
+<td style="text-align: left;">1.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">1.5%</td>
+<td style="text-align: left;">11.1%</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: left;">1%</td>
+<td style="text-align: left;">1.7%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-3.3,-2.9]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">292</td>
+<td style="text-align: left;">2.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">3.8%</td>
+<td style="text-align: left;">22.1%</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: left;">4%</td>
+<td style="text-align: left;">2.2%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-2.9,-2.66]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">292</td>
+<td style="text-align: left;">2.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">6.1%</td>
+<td style="text-align: left;">33.1%</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: left;">6%</td>
+<td style="text-align: left;">2.3%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-2.66,-2.45]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">289</td>
+<td style="text-align: left;">3.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">9.3%</td>
+<td style="text-align: left;">44.0%</td>
+<td style="text-align: right;">0.35</td>
+<td style="text-align: left;">9%</td>
+<td style="text-align: left;">2.7%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-2.45,-2.25]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">278</td>
+<td style="text-align: left;">7.3%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">15.7%</td>
+<td style="text-align: left;">54.4%</td>
+<td style="text-align: right;">0.39</td>
+<td style="text-align: left;">16%</td>
+<td style="text-align: left;">3.6%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-2.25,-2.07]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">266</td>
+<td style="text-align: left;">11.3%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">25.7%</td>
+<td style="text-align: left;">64.4%</td>
+<td style="text-align: right;">0.39</td>
+<td style="text-align: left;">26%</td>
+<td style="text-align: left;">4.9%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-2.07,-1.86]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">244</td>
+<td style="text-align: left;">18.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">42.0%</td>
+<td style="text-align: left;">73.6%</td>
+<td style="text-align: right;">0.32</td>
+<td style="text-align: left;">42%</td>
+<td style="text-align: left;">6.9%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-1.86,-1.61]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">65</td>
+<td style="text-align: right;">235</td>
+<td style="text-align: left;">21.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">60.9%</td>
+<td style="text-align: left;">82.5%</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: left;">61%</td>
+<td style="text-align: left;">8.7%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-1.61,-1.23]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">241</td>
+<td style="text-align: left;">19.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">78.1%</td>
+<td style="text-align: left;">91.5%</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: left;">78%</td>
+<td style="text-align: left;">9.9%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-1.23,1.6]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">225</td>
+<td style="text-align: left;">25.0%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">100.0%</td>
+<td style="text-align: left;">100.0%</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: left;">100%</td>
+<td style="text-align: left;">11.4%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+<section id="creating-a-reusable-function" class="level2">
+<h2 class="anchored" data-anchor-id="creating-a-reusable-function">Creating a Reusable Function</h2>
+<p>Let’s encapsulate all the above steps into a single function that can be reused for any binary classification model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>gains_table <span class="ot">&lt;-</span> <span class="cf">function</span>(act, pred, <span class="at">increasing =</span> <span class="cn">TRUE</span>, <span class="at">nBins =</span> <span class="dv">10</span>) {</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create bins based on predictions</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  q <span class="ot">&lt;-</span> <span class="fu">quantile</span>(pred, <span class="at">probs =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> nBins <span class="sc">+</span> <span class="dv">1</span>))</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  bins <span class="ot">&lt;-</span> <span class="fu">cut</span>(pred, <span class="at">breaks =</span> q, <span class="at">include.lowest =</span> <span class="cn">TRUE</span>, <span class="at">right =</span> <span class="cn">TRUE</span>, <span class="at">ordered_result =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(act, pred, bins)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">%&gt;%</span> </span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Group by bins and calculate statistics</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(bins) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">total =</span> <span class="fu">n</span>(), </span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>              <span class="at">events =</span> <span class="fu">sum</span>(act <span class="sc">==</span> <span class="dv">1</span>), </span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>              <span class="at">non_events =</span> <span class="fu">sum</span>(act <span class="sc">==</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">event_rate =</span> <span class="fu">percent</span>(events <span class="sc">/</span> total, <span class="fl">0.1</span>, <span class="dv">100</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Sort the table based on the 'increasing' parameter</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    {<span class="cf">if</span>(increasing <span class="sc">==</span> <span class="cn">TRUE</span>) {</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">arrange</span>(., bins)</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">arrange</span>(., <span class="fu">desc</span>(bins))</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    }} <span class="sc">%&gt;%</span> </span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add all performance metrics</span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">pop_pct =</span> <span class="fu">percent</span>(total<span class="sc">/</span><span class="fu">sum</span>(total), <span class="fl">0.1</span>, <span class="dv">100</span>), </span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>           <span class="at">c.events_pct =</span> <span class="fu">cumsum</span>(events) <span class="sc">/</span> <span class="fu">sum</span>(events),</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>           <span class="at">c.non_events_pct =</span> <span class="fu">cumsum</span>(non_events) <span class="sc">/</span> <span class="fu">sum</span>(non_events), </span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>           <span class="at">ks =</span> <span class="fu">round</span>(<span class="fu">abs</span>(c.events_pct <span class="sc">-</span> c.non_events_pct), <span class="dv">2</span>), </span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>           <span class="at">cap_rate =</span> <span class="fu">percent</span>(<span class="fu">cumsum</span>(events)<span class="sc">/</span><span class="fu">sum</span>(events), <span class="dv">1</span>, <span class="dv">100</span>), </span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>           <span class="at">c_event_rate =</span> <span class="fu">percent</span>(<span class="fu">cumsum</span>(events)<span class="sc">/</span><span class="fu">cumsum</span>(total), <span class="fl">0.1</span>, <span class="dv">100</span>), </span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>           <span class="at">c.events_pct =</span> <span class="fu">percent</span>(c.events_pct, <span class="fl">0.1</span>, <span class="dv">100</span>),</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>           <span class="at">c.non_events_pct =</span> <span class="fu">percent</span>(c.non_events_pct, <span class="fl">0.1</span>, <span class="dv">100</span>))</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="using-the-function" class="level3">
+<h3 class="anchored" data-anchor-id="using-the-function">Using the Function</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate a gains table with bins in descending order</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">gains_table</span>(test<span class="sc">$</span>bad_flag, test<span class="sc">$</span>pred, <span class="cn">FALSE</span>, <span class="dv">10</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(tab)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 5%">
+<col style="width: 6%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 7%">
+<col style="width: 11%">
+<col style="width: 14%">
+<col style="width: 4%">
+<col style="width: 7%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">bins</th>
+<th style="text-align: right;">total</th>
+<th style="text-align: right;">events</th>
+<th style="text-align: right;">non_events</th>
+<th style="text-align: left;">event_rate</th>
+<th style="text-align: left;">pop_pct</th>
+<th style="text-align: left;">c.events_pct</th>
+<th style="text-align: left;">c.non_events_pct</th>
+<th style="text-align: right;">ks</th>
+<th style="text-align: left;">cap_rate</th>
+<th style="text-align: left;">c_event_rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(-1.23,1.6]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">225</td>
+<td style="text-align: left;">25.0%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">21.9%</td>
+<td style="text-align: left;">8.5%</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: left;">22%</td>
+<td style="text-align: left;">25.0%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-1.61,-1.23]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">241</td>
+<td style="text-align: left;">19.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">39.1%</td>
+<td style="text-align: left;">17.5%</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: left;">39%</td>
+<td style="text-align: left;">22.3%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-1.86,-1.61]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">65</td>
+<td style="text-align: right;">235</td>
+<td style="text-align: left;">21.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">58.0%</td>
+<td style="text-align: left;">26.4%</td>
+<td style="text-align: right;">0.32</td>
+<td style="text-align: left;">58%</td>
+<td style="text-align: left;">22.1%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-2.07,-1.86]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">244</td>
+<td style="text-align: left;">18.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">74.3%</td>
+<td style="text-align: left;">35.6%</td>
+<td style="text-align: right;">0.39</td>
+<td style="text-align: left;">74%</td>
+<td style="text-align: left;">21.2%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-2.25,-2.07]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">266</td>
+<td style="text-align: left;">11.3%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">84.3%</td>
+<td style="text-align: left;">45.6%</td>
+<td style="text-align: right;">0.39</td>
+<td style="text-align: left;">84%</td>
+<td style="text-align: left;">19.3%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-2.45,-2.25]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">278</td>
+<td style="text-align: left;">7.3%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">90.7%</td>
+<td style="text-align: left;">56.0%</td>
+<td style="text-align: right;">0.35</td>
+<td style="text-align: left;">91%</td>
+<td style="text-align: left;">17.3%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-2.66,-2.45]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">289</td>
+<td style="text-align: left;">3.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">93.9%</td>
+<td style="text-align: left;">66.9%</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: left;">94%</td>
+<td style="text-align: left;">15.3%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-2.9,-2.66]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">292</td>
+<td style="text-align: left;">2.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">96.2%</td>
+<td style="text-align: left;">77.9%</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: left;">96%</td>
+<td style="text-align: left;">13.8%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-3.3,-2.9]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">292</td>
+<td style="text-align: left;">2.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">98.5%</td>
+<td style="text-align: left;">88.9%</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: left;">99%</td>
+<td style="text-align: left;">12.5%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">[-5.37,-3.3]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">295</td>
+<td style="text-align: left;">1.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">100.0%</td>
+<td style="text-align: left;">100.0%</td>
+<td style="text-align: right;">0.00</td>
+<td style="text-align: left;">100%</td>
+<td style="text-align: left;">11.4%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</section>
+<section id="interpreting-the-gains-table" class="level2">
+<h2 class="anchored" data-anchor-id="interpreting-the-gains-table">Interpreting the Gains Table</h2>
+<p>A gains table provides several key insights into model performance:</p>
+<ol type="1">
+<li><p><strong>Monotonicity</strong>: The event rates should consistently increase (or decrease) across bins. This confirms that the model effectively rank-orders risk.</p></li>
+<li><p><strong>Bin Consistency</strong>: If bin sizes are not consistent (ideally ~10% each), it suggests the model is assigning the same output/score to many borrowers (clumping), which could pose issues when deciding cutoffs.</p></li>
+<li><p><strong>KS Statistic</strong>: The maximum value of the KS column indicates the model’s discriminatory power. A higher value (closer to 1) indicates better separation between good and bad borrowers.</p></li>
+<li><p><strong>Capture Rate</strong>: Shows what percentage of all bad accounts are captured at each cutoff point.</p></li>
+<li><p><strong>Cumulative Event Rate</strong>: Indicates the bad rate among all accounts up to that bin, useful for setting approval thresholds.</p></li>
+</ol>
+</section>
+<section id="practical-applications" class="level2">
+<h2 class="anchored" data-anchor-id="practical-applications">Practical Applications</h2>
+<p>In credit risk management, the gains table helps with:</p>
+<ol type="1">
+<li><p><strong>Setting Cutoffs</strong>: Identifying appropriate score thresholds for approving or rejecting applications.</p></li>
+<li><p><strong>Strategy Development</strong>: Creating tiered strategies (e.g., approve, review, decline) based on risk levels.</p></li>
+<li><p><strong>Performance Monitoring</strong>: Tracking model performance over time by comparing actual vs.&nbsp;expected distributions.</p></li>
+<li><p><strong>Model Comparison</strong>: Evaluating different models by comparing their KS statistics and capture rates.</p></li>
+</ol>
+<p>The gains table is a powerful tool for evaluating binary classification models, especially in credit risk applications. By providing a structured view of how well a model separates good and bad cases across the score distribution, it helps analysts make informed decisions about model quality and operational implementation.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>2025 R’tichoke</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com">
+      <i class="bi bi-twitter" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

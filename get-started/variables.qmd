@@ -1,0 +1,112 @@
+---
+title: "Variables in R"
+description: "Learn how to create and work with variables in R"
+date: "2025-03-30"
+categories: [basics, r-programming]
+image: "https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/RStudio.png"
+execute:
+  echo: true
+  warning: false
+  message: false
+  eval: true
+---
+
+## Creating Variables in R
+
+Variables in R are used to store data that can be referenced and manipulated throughout your code. Here's how to create and work with variables:
+
+### Basic Assignment
+
+```{r}
+# Using the assignment operator (<-)
+x <- 10
+y <- "Hello, R!"
+z <- TRUE
+
+# Print the variables
+x
+y
+z
+```
+
+### Alternative Assignment Methods
+
+```{r}
+# Using the equals sign (=)
+age = 25
+
+# Using the assignment operator in reverse (->)
+"Data Scientist" -> job_title
+
+# Print the variables
+age
+job_title
+```
+
+### Variable Naming Rules
+
+-   Names can contain letters, numbers, dots (.) and underscores (\_)
+-   Names must start with a letter or a dot
+-   If a name starts with a dot, it cannot be followed by a number
+-   Names are case-sensitive (`Value` and `value` are different variables)
+
+```{r}
+# Valid variable names
+valid_name <- 1
+validName <- 2
+valid.name <- 3
+.hidden <- 4
+
+# Print variables
+valid_name
+validName
+valid.name
+.hidden
+```
+
+### Data Types
+
+R has several basic data types:
+
+```{r}
+# Numeric
+num <- 42.5
+typeof(num)
+
+# Integer (note the L suffix)
+int <- 42L
+typeof(int)
+
+# Character
+text <- "R programming"
+typeof(text)
+
+# Logical
+flag <- TRUE
+typeof(flag)
+```
+
+### Checking and Converting Types
+
+```{r}
+# Check if a variable is of a specific type
+is.numeric(num)
+is.character(text)
+
+# Convert between types
+as.character(num)
+as.numeric("100")
+as.logical(1)
+```
+
+### Variable Information
+
+```{r}
+# Get information about a variable
+x <- c(1, 2, 3, 4, 5)
+class(x)
+length(x)
+str(x)
+```
+
+Remember that R is dynamically typed, so variables can change types during execution. This flexibility is one of R's strengths for data analysis.

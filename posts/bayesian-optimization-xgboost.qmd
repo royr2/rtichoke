@@ -1,0 +1,241 @@
+---
+title: "Using Bayesian Optimization to Tune XGBoost Models in R"
+date: "2024-09-18"
+categories: [R, Analytics, Machine Learning]
+image: "../images/bayesian_opt.png"
+execute:
+  echo: true
+  warning: false
+  message: false
+  eval: true
+  cache: true
+---
+
+Tuning machine learning models can be time-consuming and computationally expensive. This post shows how to use Bayesian optimization to efficiently find optimal XGBoost hyperparameters – saving time and improving model performance.
+
+## Required Packages
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+# Load required packages
+library(xgboost)
+library(ParBayesianOptimization)
+library(mlbench)
+library(dplyr)
+library(recipes)
+library(rsample)
+```
+
+## Data Preparation
+
+We'll use the Boston Housing dataset – a classic regression problem with both numeric and categorical variables.
+
+```{r}
+#| label: data-load
+
+# Load the Boston Housing dataset
+data("BostonHousing2")
+
+# Quick look at the data structure
+str(BostonHousing2)
+```
+
+XGBoost requires numeric inputs, so we'll use the `recipes` package to transform our categorical variables:
+
+```{r}
+#| label: data-prep
+
+# Create a recipe for preprocessing
+rec <- recipe(cmedv ~ ., data = BostonHousing2) %>%
+  # Collapse categories where population is < 3%
+  step_other(town, chas, threshold = .03, other = "Other") %>% 
+  # Create dummy variables for all factor variables 
+  step_dummy(all_nominal_predictors())
+
+# Train the recipe on the dataset
+prep <- prep(rec, training = BostonHousing2)
+
+# Create the final model matrix
+model_df <- bake(prep, new_data = BostonHousing2)
+
+# Check the column names after one-hot encoding
+colnames(model_df)
+```
+
+Next, we'll split our data into training and testing sets:
+
+```{r}
+#| label: train-test-split
+
+# Create a 70/30 train-test split
+splits <- rsample::initial_split(model_df, prop = 0.7)
+train_df <- rsample::training(splits)
+test_df <- rsample::testing(splits)
+
+# Prepare the training data for XGBoost
+X <- train_df %>%
+  select(!medv, !cmedv) %>%
+  as.matrix()
+
+# Get the target variable
+y <- train_df %>% pull(cmedv)
+
+# Create cross-validation folds
+folds <- list(
+  fold1 = as.integer(seq(1, nrow(X), by = 5)),
+  fold2 = as.integer(seq(2, nrow(X), by = 5))
+)
+```
+
+## Setting Up Bayesian Optimization
+
+Bayesian optimization requires two key components:
+
+1. An objective function that evaluates model performance
+2. The parameter bounds we want to explore
+
+```{r}
+#| label: objective-function
+
+# Our objective function takes hyperparameters as inputs
+obj_func <- function(eta, max_depth, min_child_weight, subsample, lambda, alpha) {
+  
+  param <- list(
+    # Learning parameters
+    eta = eta,                       # Learning rate
+    max_depth = max_depth,           # Tree depth
+    min_child_weight = min_child_weight, # Min observations per node
+    subsample = subsample,           # Data subsampling
+    lambda = lambda,                 # L2 regularization
+    alpha = alpha,                   # L1 regularization
+    
+    booster = "gbtree",             # Use tree model
+    objective = "reg:squarederror",  # Regression task
+    eval_metric = "mape"            # Mean Absolute Percentage Error
+  )
+  
+  xgbcv <- xgb.cv(params = param,
+                  data = X,
+                  label = y,
+                  nround = 50,
+                  folds = folds,
+                  prediction = TRUE,
+                  early_stopping_rounds = 5,
+                  verbose = 0,
+                  maximize = FALSE)
+  
+  lst <- list(
+    # First argument must be named as "Score"
+    # Function finds maxima so inverting the output
+    Score = -min(xgbcv$evaluation_log$test_mape_mean),
+    
+    # Get number of trees for the best performing model
+    nrounds = xgbcv$best_iteration
+  )
+  
+  return(lst)
+}
+
+# Define the search space for each parameter
+bounds <- list(
+  eta = c(0.001, 0.2),             # Learning rate range
+  max_depth = c(1L, 10L),           # Tree depth range
+  min_child_weight = c(1, 50),      # Min observations range
+  subsample = c(0.1, 1),            # Subsampling range
+  lambda = c(1, 10),                # L2 regularization range
+  alpha = c(1, 10)                  # L1 regularization range
+)
+```
+
+## Running Bayesian Optimization
+
+Now we'll run the optimization process to intelligently search for the best parameters:
+
+```{r}
+#| label: bayesian-opt
+
+set.seed(1234)
+bayes_out <- bayesOpt(
+  FUN = obj_func,                    # Our objective function
+  bounds = bounds,                   # Parameter bounds
+  initPoints = length(bounds) + 2,   # Initial random points
+  iters.n = 10,                      # Number of iterations
+  verbose = 0                        # Suppress output
+)
+
+# View top results
+bayes_out$scoreSummary[1:5, c(3:8, 13)]
+
+# Get the best parameters
+best_params <- getBestPars(bayes_out)
+data.frame(best_params)
+```
+
+## Training the Final Model
+
+With the optimal hyperparameters identified, we can now train our final XGBoost model.
+
+```{r}
+#| label: final-model
+
+# Combine best params with base params
+opt_params <- append(
+  list(booster = "gbtree", 
+       objective = "reg:squarederror", 
+       eval_metric = "mae"), 
+  best_params
+)
+
+# Run cross-validation to determine optimal number of rounds
+xgbcv <- xgb.cv(
+  params = opt_params,
+  data = X,
+  label = y,
+  nround = 100,
+  folds = folds,
+  prediction = TRUE,
+  early_stopping_rounds = 5,
+  verbose = 0,
+  maximize = FALSE
+)
+
+# Get optimal number of rounds
+nrounds = xgbcv$best_iteration
+
+# Fit the final XGBoost model
+mdl <- xgboost(
+  data = X, 
+  label = y, 
+  params = opt_params, 
+  maximize = FALSE, 
+  early_stopping_rounds = 5, 
+  nrounds = nrounds, 
+  verbose = 0
+)
+
+# Make predictions on the test set
+actuals <- test_df$cmedv
+predicted <- test_df %>%
+  select_at(mdl$feature_names) %>%
+  as.matrix() %>%
+  predict(mdl, newdata = .)
+
+# Evaluate performance using Mean Absolute Percentage Error (MAPE)
+mape <- mean(abs(actuals - predicted)/actuals)
+cat("MAPE on test set:", mape)
+```
+## Why Bayesian Optimization 
+
+Bayesian optimization offers several key advantages over traditional grid search:
+
+1. **Efficiency**: Finds optimal parameters in fewer iterations
+2. **Intelligence**: Learns from previous evaluations to focus on promising areas
+3. **Scalability**: Remains efficient even with many hyperparameters
+4. **Speed**: Completes in a fraction of the time while achieving comparable or better results
+
+This approach becomes increasingly valuable as model complexity grows. For production models, consider increasing the iterations (`iters.n`) to ensure thorough exploration of the parameter space.
+
+The `ParBayesianOptimization` package makes this powerful technique accessible to R users, allowing you to build better models with less computational overhead.

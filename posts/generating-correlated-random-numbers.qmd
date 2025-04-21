@@ -1,0 +1,162 @@
+---
+title: "Generating Correlated Random Numbers in R from Scratch"
+date: "2024-03-19"
+categories: [R, Statistics, Simulation]
+image: "../images/correlated.png"
+execute:
+  echo: true
+  warning: false
+  message: false
+  eval: true
+---
+
+Need random data with specific correlation patterns for your simulations? This post shows you how to generate correlated random numbers in R using a simple matrix approach – perfect for testing algorithms or creating realistic synthetic datasets.
+
+## The Cholesky Method in Four Steps
+
+```{r}
+#| label: setup
+
+# 1. Define your target correlation matrix
+cor_mat <- matrix(c(1, 0.3, 
+                   0.3, 1), nrow = 2, byrow = TRUE)
+
+# 2. Apply Cholesky decomposition
+chol_mat <- chol(cor_mat)
+
+# 3. Generate uncorrelated random numbers
+old_random <- matrix(rnorm(2000), ncol = 2)
+
+# 4. Transform to create correlation
+new_random <- old_random %*% chol_mat
+
+# Verify the correlation
+cor(new_random)
+```
+
+That's it! The `new_random` matrix now contains values with approximately your target correlation structure. This technique uses Cholesky decomposition to create a transformation matrix that induces the desired correlation when applied to uncorrelated data.
+
+## Watch Out for These Pitfalls
+
+### 1. Start with Truly Random Data
+
+Your input data must be uncorrelated for this method to work correctly:
+
+```{r}
+#| label: correlation-comparison
+
+# What happens with already correlated input?
+simulate_correlation <- function(input_correlation, target = 0.3) {
+  results <- replicate(1000, {
+    # Create input with specified correlation
+    x <- rnorm(1000)
+    y <- input_correlation * x + rnorm(1000, sd = sqrt(1 - input_correlation^2))
+    
+    # Apply our method
+    old_random <- cbind(x, y)
+    chol_mat <- chol(matrix(c(1, target, target, 1), ncol = 2))
+    new_random <- old_random %*% chol_mat
+    
+    # Return resulting correlation
+    cor(new_random)[1,2]
+  })
+  return(results)
+}
+
+# Compare results with different input correlations
+par(mfrow = c(1, 2))
+hist(simulate_correlation(0.8), main = "Starting with Correlated Data",
+     xlim = c(0, 1), col = "salmon")
+hist(simulate_correlation(0.001), main = "Starting with Random Data",
+     xlim = c(0, 1), col = "lightblue")
+```
+
+When your input data already has correlation patterns, the Cholesky method can't properly override them to create your target correlation.
+
+### 2. Use the Same Distribution for All Variables
+
+```{r}
+#| label: distribution-comparison
+
+# Different distributions cause problems
+set.seed(123)
+x1 <- rchisq(1000, df = 3)  # Chi-squared (skewed)
+y1 <- rnorm(1000)           # Normal (symmetric)
+old_mixed <- cbind(x1, y1)
+
+# Same distribution works better
+x2 <- rchisq(1000, df = 3)
+y2 <- rchisq(1000, df = 3)
+old_same <- cbind(x2, y2)
+
+# Apply the same transformation to both
+chol_mat <- chol(matrix(c(1, 0.7, 0.7, 1), ncol = 2))
+new_mixed <- old_mixed %*% chol_mat
+new_same <- old_same %*% chol_mat
+
+# Compare results
+cat("Target correlation: 0.7\n")
+cat("Mixed distributions result:", round(cor(new_mixed)[1,2], 3), "\n")
+cat("Same distribution result:", round(cor(new_same)[1,2], 3))
+```
+
+Mixing different distributions (like normal and chi-squared) can lead to unexpected correlation patterns after transformation.
+
+### 3. Distribution Properties Can Change
+
+```{r}
+#| label: property-changes
+
+# Original positive-only distribution
+x <- rchisq(1000, df = 3)  # Always positive
+y <- rchisq(1000, df = 3)  # Always positive
+old_random <- cbind(x, y)
+
+# Apply negative correlation
+chol_mat <- chol(matrix(c(1, -0.7, -0.7, 1), ncol = 2))
+new_random <- old_random %*% chol_mat
+
+# Check what happened
+cat("Original data range:", round(range(old_random), 2), "\n")
+cat("Transformed data range:", round(range(new_random), 2), "\n")
+cat("Negative values in result:", sum(new_random < 0), "out of", length(new_random))
+```
+
+The Cholesky transformation can fundamentally change your data's properties - like introducing negative values into a previously positive-only distribution.
+
+## The Easy Way: Using mvtnorm
+
+For most real applications, the `mvtnorm` package offers a simpler solution:
+
+```{r}
+#| label: mvtnorm
+
+# Load the package
+library(mvtnorm)
+
+# Define means and covariance matrix
+means <- c(10, 20)  # Mean for each variable
+sigma <- matrix(c(4, 2,   # Covariance matrix
+                  2, 3), ncol = 2)
+
+# See the implied correlation
+cov2cor(sigma)
+
+# Generate correlated normal data in one step
+x <- rmvnorm(n = 1000, mean = means, sigma = sigma)
+
+# Verify the result
+round(cor(x), 3)
+```
+
+## When to Use Each Method
+
+**Use the Cholesky method when:**
+- You need to understand the mathematical principles
+- You're working with non-normal distributions
+- You need to create custom correlation structures
+
+**Use mvtnorm when:**
+- You need multivariate normal data quickly
+- You want precise control over means and variances
+- You're working with many variables

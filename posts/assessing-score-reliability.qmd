@@ -1,0 +1,313 @@
+---
+title: "Understanding Variability in Credit Score Predictions"
+date: "2024-11-15"
+categories: [R, Credit Risk Analytics, Bootstrapping]
+image: "../images/score_reliability.png"
+execute:
+  echo: true
+  warning: false
+  message: false
+  eval: true
+---
+
+Credit scoring models work well in the middle of the score distribution but often become less reliable at the extremes where data is sparse. This post shows how to use bootstrapping to measure prediction variability across different score ranges – helping you identify where your model is most dependable.
+
+## Why Estimation Variance Matters
+
+Smaller sample sizes lead to higher variance in estimates, especially for extreme values. While statistics like means remain stable with limited data, tail percentiles (95th, 99th) show much more volatility. This matters for credit scoring, where very high and very low scores represent these unstable tail regions.
+
+```{r}
+# Number of samples to be drawn from a probability distribution
+n_samples <- 1000
+
+# Number of times, sampling should be repeated
+repeats <- 100
+
+# Mean and std-dev for a standard normal distribution
+mu <- 5
+std_dev <- 2
+
+# Sample
+samples <- rnorm(n_samples * repeats, mean = 10)
+
+# Fit into a matrix like object with `n_samples' number of rows 
+# and `repeats` number of columns
+samples <- matrix(samples, nrow = n_samples, ncol = repeats)
+
+# Compute mean across each column
+sample_means <- apply(samples, 1, mean)
+
+# Similarly, compute 75% and 95% quantile across each column
+sample_75_quantile <- apply(samples, 1, quantile, p = 0.75)
+sample_95_quantile <- apply(samples, 1, quantile, p = 0.95)
+sample_99_quantile <- apply(samples, 1, quantile, p = 0.99)
+
+# Compare coefficient of variation
+sd(sample_means)/mean(sample_means)
+sd(sample_75_quantile)/mean(sample_75_quantile)
+sd(sample_95_quantile)/mean(sample_75_quantile)
+
+# Plot the distributions
+combined_vec <- c(sample_means, sample_75_quantile, sample_95_quantile, sample_99_quantile)
+
+plot(density(sample_means), 
+     col = "#6F69AC", 
+     lwd = 3, 
+     main = "Estimating the mean vs tail quantiles", 
+     xlab = "", 
+     xlim = c(min(combined_vec), max(combined_vec)))
+
+lines(density(sample_75_quantile), col = "#95DAC1", lwd = 3)
+lines(density(sample_95_quantile), col = "#FFEBA1", lwd = 3)
+lines(density(sample_99_quantile), col = "#FD6F96", lwd = 3)
+grid()
+
+legend("topright", 
+       fill = c("#6F69AC", "#95DAC1", "#FFEBA1", "#FD6F96"), 
+       legend = c("Mean", "75% Quantile", "95% Quantile", "99% Quantile"), 
+       cex = 0.7)
+```
+
+The plot shows how uncertainty increases dramatically when estimating extreme values. The distribution for the mean (purple) is much narrower than for the 99th percentile (pink). This directly translates to credit scoring – where very high or low scores have greater uncertainty.
+
+```{r}
+# Load required packages
+library(dplyr)
+library(magrittr)
+library(rsample)
+library(ggplot2)
+```
+
+## Data Acquisition and Preprocessing
+
+```{r}
+# Load sample data (sample of the lending club data)
+sample <- read.csv("http://bit.ly/42ypcnJ")
+
+# Mark which loan status will be tagged as default
+codes <- c("Charged Off", "Does not meet the credit policy. Status:Charged Off")
+
+# Apply above codes and create target
+sample %<>% mutate(bad_flag = ifelse(loan_status %in% codes, 1, 0))
+
+# Replace missing values with a default value
+sample[is.na(sample)] <- -1
+
+# Get summary tally
+table(sample$bad_flag)
+```
+
+We're using Lending Club data with charged-off loans marked as defaults. The class imbalance shown is typical in credit portfolios and contributes to prediction challenges at distribution extremes.
+
+## Implementing Bootstrap Resampling Strategy
+
+We'll create 100 bootstrap samples to measure how model predictions vary across the score range. This technique creates multiple simulated datasets to measure prediction uncertainty without collecting additional data.
+
+```{r}
+# Create 100 samples
+boot_sample <- bootstraps(data = sample, times = 100)
+
+head(boot_sample, 3)
+
+# Each row represents a separate bootstrapped sample with an analysis set and assessment set
+boot_sample$splits[[1]]
+
+# Show the first 5 rows and 5 columns of the first sample
+analysis(boot_sample$splits[[1]]) %>% .[1:5, 1:5]
+```
+
+Each bootstrap sample contains random draws (with replacement) from our original data, creating slight variations that reveal model sensitivity to different data compositions.
+
+## Developing the Predictive Model Framework
+
+We'll use logistic regression – the standard for credit risk models due to its interpretability and regulatory acceptance. Our model includes typical credit variables like loan amount, income, and credit history metrics.
+
+```{r}
+glm_model <- function(df){
+  
+  # Fit a simple model with a set specification
+  mdl <- glm(bad_flag ~
+               loan_amnt + funded_amnt + annual_inc + delinq_2yrs +
+               inq_last_6mths + mths_since_last_delinq + fico_range_low +
+               mths_since_last_record + revol_util + total_pymnt,
+             family = "binomial",
+             data = df)
+  
+  # Return fitted values
+  return(predict(mdl))
+}
+
+# Test the function
+# Retrieve a data frame
+train <- analysis(boot_sample$splits[[1]])
+
+# Predict
+pred <- glm_model(train)
+
+# Check output
+range(pred)  # Output is on log odds scale
+```
+
+The function returns predictions in log-odds, which we'll later convert to a more intuitive credit score scale.
+
+## Iterative Model Training and Prediction Collection
+
+```{r}
+# First apply the glm fitting function to each of the sample
+# Note the use of lapply
+output <- lapply(boot_sample$splits, function(x){
+  train <- analysis(x)
+  pred <- glm_model(train)
+
+  return(pred)
+})
+
+# Collate all predictions into a vector 
+boot_preds <- do.call(c, output)
+range(boot_preds)
+
+# Get outliers
+q_high <- quantile(boot_preds, 0.99)
+q_low <- quantile(boot_preds, 0.01)
+
+# Truncate the overall distribution to within the lower 1% and upper 1% quantiles
+# Doing this since it creates issues later on when scaling the output
+boot_preds[boot_preds > q_high] <- q_high
+boot_preds[boot_preds < q_low] <- q_low
+
+range(boot_preds)
+
+# Convert to a data frame
+boot_preds <- data.frame(pred = boot_preds, 
+                         id = rep(1:length(boot_sample$splits), each = nrow(sample)))
+head(boot_preds)
+```
+
+We apply our model to each bootstrap sample and collect the predictions, then truncate extreme values (beyond 1st and 99th percentiles) to remove outliers – similar to capping techniques used in production credit models.
+
+## Transforming Predictions to Credit Score Scale
+
+Now we'll convert log-odds to a recognizable credit score using the industry-standard Points to Double Odds (PDO) method. Using parameters similar to real credit systems (PDO=30, Anchor=700), we transform our predictions into intuitive scores where higher numbers indicate lower risk.
+
+```{r}
+scaling_func <- function(vec, PDO = 30, OddsAtAnchor = 5, Anchor = 700){
+  beta <- PDO / log(2)
+  alpha <- Anchor - PDO * OddsAtAnchor
+  
+  # Simple linear scaling of the log odds
+  scr <- alpha - beta * vec  
+  
+  # Round off
+  return(round(scr, 0))
+}
+
+boot_preds$scores <- scaling_func(boot_preds$pred, 30, 2, 700)
+
+# Chart the distribution of predictions across all the samples
+ggplot(boot_preds, aes(x = scores, color = factor(id))) + 
+  geom_density() + 
+  theme_minimal() + 
+  theme(legend.position = "none") + 
+  scale_color_grey() + 
+  labs(title = "Predictions from bootstrapped samples", 
+       subtitle = "Density function", 
+       x = "Predictions (Log odds)", 
+       y = "Density")
+```
+
+Each gray line shows the score distribution from a different bootstrap sample. Where lines cluster tightly, our predictions are stable; where they diverge, we have higher uncertainty.
+
+## Quantifying Prediction Uncertainty Across Score Ranges
+
+Now we can directly measure how prediction reliability varies across score ranges by calculating standard deviation within each score bin. This approach quantifies uncertainty at different score levels.
+
+```{r}
+# Create bins using quantiles
+breaks <- quantile(boot_preds$scores, probs = seq(0, 1, length.out = 20))
+boot_preds$bins <- cut(boot_preds$scores, breaks = unique(breaks), include.lowest = T, right = T)
+
+# Chart standard deviation of model predictions across each score bin
+boot_preds %>%
+  group_by(bins) %>%
+  summarise(std_dev = sd(scores)) %>%
+  ggplot(aes(x = bins, y = std_dev)) +
+  geom_col(color = "black", fill = "#90AACB") +
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 90)) + 
+  theme(legend.position = "none") + 
+  labs(title = "Variability in model predictions across samples", 
+       subtitle = "(measured using standard deviation)", 
+       x = "Score Range", 
+       y = "Standard Deviation")
+```
+
+As expected, the model's predictions are more reliable within a certain range of values (700-800) whereas there is significant variability in the model's predictions in the lowest and highest score buckets.
+
+The chart reveals a clear "U-shape" pattern of prediction variability—a common phenomenon in credit risk modeling. The highest uncertainty appears in the extreme score ranges (very high and very low scores), while predictions in the middle range show greater stability. The chart confirms our hypothesis: variability is highest at score extremes and lowest in the middle range (600-800). This directly informs credit policy – scores in the middle range are most reliable, while decisions at the extremes should incorporate additional caution due to higher uncertainty.
+
+These findings have direct business applications:
+
+1. For extremely high scores, add verification steps before auto-approval
+2. For very low scores, consider manual review rather than automatic rejection
+
+## Advanced Approach: Isolating Training Data Effects
+
+*Credit: Richard Warnung*
+
+For a more controlled analysis, we can train models on bootstrap samples but evaluate them on the same validation set. This isolates the impact of training data variation:
+
+```{r}
+Vs <- function(boot_split){
+  # Train model on the bootstrapped data
+  train <- analysis(boot_split)
+  
+  # Fit model
+  mdl <- glm(bad_flag ~
+               loan_amnt + funded_amnt + annual_inc + delinq_2yrs +
+               inq_last_6mths + mths_since_last_delinq + fico_range_low +
+               mths_since_last_record + revol_util + total_pymnt,
+             family = "binomial",
+             data = train)
+  
+  # Apply to a common validation set
+  validate_preds <- predict(mdl, newdata = validate_set)
+  
+  # Return predictions
+  return(validate_preds)
+}
+```
+
+This method provides a clearer picture of how variations in training data affect model predictions, which is valuable when evaluating model updates in production.
+
+```{r}
+# Create overall training and testing datasets 
+id <- sample(1:nrow(sample), size = nrow(sample)*0.8, replace = F)
+
+train_data <- sample[id,]
+test_data <- sample[-id,]
+
+# Bootstrapped samples are now pulled only from the overall training dataset
+boot_sample <- bootstraps(data = train_data, times = 80)
+
+# Using the same function from before but predicting on the same test dataset
+glm_model <- function(train, test){
+  
+  mdl <- glm(bad_flag ~
+               loan_amnt + funded_amnt + annual_inc + delinq_2yrs +
+               inq_last_6mths + mths_since_last_delinq + fico_range_low +
+               mths_since_last_record + revol_util + total_pymnt,
+             family = "binomial",
+             data = train)
+  
+  # Return fitted values on the test dataset
+  return(predict(mdl, newdata = test))
+}
+
+# Apply the glm fitting function to each of the sample
+# But predict on the same test dataset
+output <- lapply(boot_sample$splits, function(x){
+  train <- analysis(x)
+  pred <- glm_model(train, test_data)
+
+  return(pred)
+})

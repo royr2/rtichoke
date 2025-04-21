@@ -1,0 +1,144 @@
+---
+title: "Loops and Apply Functions in R"
+description: "Learn how to use loops and apply functions for efficient data processing in R"
+date: "2025-03-30"
+categories: [basics, r-programming]
+image: "https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/RStudio.png"
+execute:
+  echo: true
+  warning: false
+  message: false
+  eval: true
+---
+
+## Loops and Apply Functions in R
+
+R offers several ways to perform repetitive tasks through loops and the more efficient apply family of functions.
+
+### For Loops
+
+The `for` loop iterates over elements in a sequence:
+
+```{r}
+# Basic for loop
+for (i in 1:5) {
+  print(paste("Iteration:", i))
+}
+
+# Looping through a vector
+fruits <- c("apple", "banana", "cherry")
+for (fruit in fruits) {
+  print(paste("I like", fruit))
+}
+```
+
+### While Loops
+
+The `while` loop continues until a condition becomes false:
+
+```{r}
+# Basic while loop
+counter <- 1
+while (counter <= 5) {
+  print(paste("Count:", counter))
+  counter <- counter + 1
+}
+```
+
+### Repeat Loops
+
+The `repeat` loop runs indefinitely until a `break` statement:
+
+```{r}
+# Repeat loop with break
+counter <- 1
+repeat {
+  print(paste("Count:", counter))
+  counter <- counter + 1
+  if (counter > 5) {
+    break
+  }
+}
+```
+
+### Control Statements
+
+Use `break` to exit a loop and `next` to skip to the next iteration:
+
+```{r}
+# Using next to skip iterations
+for (i in 1:10) {
+  if (i %% 2 == 0) {  # Skip even numbers
+    next
+  }
+  print(paste("Odd number:", i))
+}
+```
+
+## Apply Functions
+
+The apply family of functions offers a more efficient and concise way to perform iterations in R.
+
+### `apply()` - For matrices and arrays
+
+```{r}
+# Create a matrix
+mat <- matrix(1:9, nrow = 3)
+print(mat)
+
+# Apply sum function to each row
+apply(mat, 1, sum)  # MARGIN=1 for rows
+
+# Apply mean function to each column
+apply(mat, 2, mean)  # MARGIN=2 for columns
+```
+
+### `lapply()` - For lists, returns a list
+
+```{r}
+# List of vectors
+my_list <- list(a = 1:3, b = 4:6, c = 7:9)
+
+# Apply function to each element
+lapply(my_list, sum)
+```
+
+### `sapply()` - Simplified apply, returns vector or matrix
+
+```{r}
+# Same as above but with simplified output
+sapply(my_list, sum)
+
+# Using with a custom function
+sapply(my_list, function(x) x * 2)
+```
+
+### `vapply()` - Like sapply but with pre-specified output type
+
+```{r}
+# Specify the output type for safety
+vapply(my_list, sum, FUN.VALUE = numeric(1))
+```
+
+### `tapply()` - Apply function to subsets of a vector
+
+```{r}
+# Vector and grouping factor
+values <- c(1, 2, 3, 4, 5, 6, 7, 8)
+groups <- c("A", "B", "A", "B", "A", "B", "A", "B")
+
+# Calculate mean by group
+tapply(values, groups, mean)
+```
+
+### `mapply()` - Multivariate version of sapply
+
+```{r}
+# Apply function to multiple lists in parallel
+mapply(sum, list(1:3), list(4:6), list(7:9))
+
+# Create strings with multiple inputs
+mapply(paste, "X", 1:5, "Y", SIMPLIFY = TRUE)
+```
+
+The apply family of functions is generally preferred over loops in R because they are: 1. More concise and readable 2. Often faster for large datasets 3. Aligned with R's vectorized approach to data processing

@@ -1,0 +1,362 @@
+---
+title: "Introduction to R for Analytics"
+date: "2023-03-22"
+categories: [R, Analytics, Introduction]
+image: "../images/r-logo.png"
+execute:
+  echo: true
+  warning: false
+  message: false
+  eval: true
+---
+
+R is a powerful language specifically designed for data analysis and visualization. This guide will walk you through practical examples of using R for real-world analytics tasks.
+
+## Exploring Your First Dataset
+
+R comes with several built-in datasets perfect for practice. Let's start by examining the `mtcars` dataset:
+
+```{r}
+# View the first few rows
+head(mtcars)
+
+# Quick summary of the dataset structure
+str(mtcars)
+
+# Statistical summary of key variables
+summary(mtcars[, c("mpg", "wt", "hp")])
+```
+
+The `mtcars` dataset contains information about 32 cars from Motor Trend magazine, including fuel efficiency (mpg), weight (wt), and horsepower (hp).
+
+## Effective Data Visualization
+
+Visualization is essential for understanding patterns in your data. Let's create some informative plots:
+
+```{r}
+#| label: basic-visualizations
+#| fig-width: 10
+#| fig-height: 8
+
+library(ggplot2)
+
+# 1. A scatter plot with regression line
+p1 <- ggplot(mtcars, aes(x = wt, y = mpg)) +
+  geom_point(aes(size = hp, color = factor(cyl)), alpha = 0.7) +
+  geom_smooth(method = "lm", formula = y ~ x, color = "#2c3e50") +
+  labs(title = "Car Weight vs. Fuel Efficiency",
+       subtitle = "Size represents horsepower, color represents cylinders",
+       x = "Weight (1000 lbs)",
+       y = "Miles Per Gallon") +
+  theme_minimal() +
+  scale_color_brewer(palette = "Set1", name = "Cylinders")
+
+# 2. Distribution of fuel efficiency
+p2 <- ggplot(mtcars, aes(x = mpg, fill = factor(cyl))) +
+  geom_histogram(bins = 10, alpha = 0.7, position = "identity") +
+  labs(title = "Distribution of Fuel Efficiency",
+       x = "Miles Per Gallon",
+       y = "Count") +
+  scale_fill_brewer(palette = "Set1", name = "Cylinders") +
+  theme_minimal()
+
+# Display plots (if using patchwork)
+library(patchwork)
+p1 / p2
+```
+
+These visualizations reveal:
+
+-   A clear negative correlation between car weight and fuel efficiency
+-   Higher cylinder cars tend to be heavier with lower MPG
+-   The MPG distribution varies significantly by cylinder count
+
+## Practical Data Transformation
+
+Data rarely comes in the exact format you need. The `dplyr` package makes transformations straightforward:
+
+```{r}
+#| label: data-transformations
+
+# Load required packages
+library(dplyr)
+library(tibble)  # For rownames_to_column function
+
+# Create an enhanced version of the dataset
+mtcars_enhanced <- mtcars %>%
+  # Add car names as a column (they're currently row names)
+  rownames_to_column("car_name") %>%
+  # Create useful derived metrics
+  mutate(
+    # Efficiency ratio (higher is better)
+    efficiency_ratio = mpg / wt,
+    
+    # Power-to-weight ratio (higher is better)
+    power_to_weight = hp / wt,
+    
+    # Categorize cars by efficiency
+    efficiency_category = case_when(
+      mpg > 25 ~ "High Efficiency",
+      mpg > 15 ~ "Medium Efficiency",
+      TRUE ~ "Low Efficiency"
+    )
+  ) %>%
+  # Arrange from most to least efficient
+  arrange(desc(efficiency_ratio))
+
+# Display the top 5 most efficient cars
+head(mtcars_enhanced[, c("car_name", "mpg", "wt", "hp", "efficiency_ratio", "efficiency_category")], 5)
+```
+
+## Answering Business Questions with Data
+
+Let's use our enhanced dataset to answer some practical questions:
+
+```{r}
+#| label: business-analysis
+
+# Question 1: What are the average characteristics by cylinder count?
+cylinder_analysis <- mtcars_enhanced %>%
+  group_by(cyl) %>%
+  summarize(
+    count = n(),
+    avg_mpg = mean(mpg),
+    avg_weight = mean(wt),
+    avg_horsepower = mean(hp),
+    avg_efficiency_ratio = mean(efficiency_ratio),
+    avg_power_to_weight = mean(power_to_weight)
+  ) %>%
+  arrange(cyl)
+
+# Display the results
+cylinder_analysis
+
+# Question 2: Which transmission type is more fuel efficient?
+transmission_efficiency <- mtcars_enhanced %>%
+  # am: 0 = automatic, 1 = manual
+  mutate(transmission = if_else(am == 1, "Manual", "Automatic")) %>%
+  group_by(transmission) %>%
+  summarize(
+    count = n(),
+    avg_mpg = mean(mpg),
+    median_mpg = median(mpg),
+    mpg_std_dev = sd(mpg)
+  )
+
+# Display the results
+transmission_efficiency
+
+# Visualize the difference
+ggplot(mtcars, aes(x = factor(am, labels = c("Automatic", "Manual")), y = mpg, fill = factor(am))) +
+  geom_boxplot(alpha = 0.7) +
+  geom_jitter(width = 0.1, alpha = 0.5) +
+  labs(title = "Fuel Efficiency by Transmission Type",
+       x = "Transmission Type",
+       y = "Miles Per Gallon") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+## Correlation Analysis for Decision Making
+
+Understanding relationships between variables is crucial for business decisions:
+
+```{r}
+#| label: correlation-analysis
+#| fig-width: 9
+#| fig-height: 7
+
+# Calculate correlations
+cor_matrix <- cor(mtcars[, c("mpg", "wt", "hp", "disp", "qsec")])
+cor_df <- round(cor_matrix, 2)
+
+# Display correlation matrix
+cor_df
+
+# Visualize correlations (requires the corrplot package)
+library(corrplot)
+corrplot(cor_matrix, method = "circle", type = "upper", 
+         tl.col = "black", tl.srt = 45, addCoef.col = "black")
+
+# Scatter plot matrix of key variables
+pairs(mtcars[, c("mpg", "wt", "hp", "disp")], 
+      main = "Scatter Plot Matrix of Key Variables",
+      pch = 21, bg = "lightblue", cex = 1.2)
+```
+
+## Working with Real-World Datasets
+
+Let's analyze the famous Iris dataset to demonstrate a complete workflow:
+
+```{r}
+#| label: iris-analysis
+#| fig-width: 10
+#| fig-height: 8
+
+# Load packages
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+
+# Examine the dataset
+head(iris)
+str(iris)
+
+# Calculate summary statistics by species
+iris_stats <- iris %>%
+  group_by(Species) %>%
+  summarize(across(where(is.numeric), 
+                   list(mean = mean, 
+                        median = median,
+                        sd = sd,
+                        min = min,
+                        max = max)))
+
+# View summary for Sepal.Length
+iris_stats %>% select(Species, starts_with("Sepal.Length"))
+
+# Create a visualization comparing all measurements across species
+iris_long <- iris %>%
+  pivot_longer(
+    cols = -Species,
+    names_to = "Measurement",
+    values_to = "Value"
+  )
+
+# Box plots with data points
+ggplot(iris_long, aes(x = Species, y = Value, fill = Species)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.15, alpha = 0.5, color = "darkgrey") +
+  facet_wrap(~Measurement, scales = "free_y") +
+  labs(title = "Iris Measurements Across Species",
+       subtitle = "Box plots with individual observations") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# Find the most distinguishing features between species
+iris_wide <- iris %>%
+  pivot_longer(cols = -Species, names_to = "Measurement", values_to = "Value") %>%
+  group_by(Measurement, Species) %>%
+  summarise(mean_value = mean(Value), .groups = "drop") %>%
+  pivot_wider(names_from = Species, values_from = mean_value) %>%
+  mutate(versicolor_vs_setosa = abs(versicolor - setosa),
+         virginica_vs_setosa = abs(virginica - setosa),
+         virginica_vs_versicolor = abs(virginica - versicolor),
+         max_difference = pmax(versicolor_vs_setosa, virginica_vs_setosa, virginica_vs_versicolor))
+
+# Display the results ordered by maximum difference
+iris_wide %>% arrange(desc(max_difference))
+```
+
+## Handling Missing Data in Practice
+
+Let's tackle the common challenge of missing data using a practical example:
+
+```{r}
+#| label: missing-data-analysis
+
+# Create a simulated customer dataset with missing values
+set.seed(123) # For reproducibility
+
+customers <- data.frame(
+  customer_id = 1:100,
+  age = sample(18:70, 100, replace = TRUE),
+  income = round(rnorm(100, 50000, 15000)),
+  years_as_customer = sample(0:20, 100, replace = TRUE),
+  purchase_frequency = sample(1:10, 100, replace = TRUE)
+)
+
+# Introduce missing values randomly
+set.seed(456)
+customers$age[sample(1:100, 10)] <- NA
+customers$income[sample(1:100, 15)] <- NA
+customers$purchase_frequency[sample(1:100, 5)] <- NA
+
+# 1. Identify missing data
+missing_summary <- sapply(customers, function(x) sum(is.na(x)))
+missing_summary
+
+# 2. Visualize the pattern of missing data
+library(naniar) # May need to install this package
+vis_miss(customers)
+
+# 3. Handle missing data with multiple approaches
+
+# Option A: Remove rows with any missing values
+clean_customers <- na.omit(customers)
+nrow(customers) - nrow(clean_customers) # Number of rows removed
+
+# Option B: Impute with mean/median (numeric variables only)
+imputed_customers <- customers %>%
+  mutate(
+    age = ifelse(is.na(age), median(age, na.rm = TRUE), age),
+    income = ifelse(is.na(income), mean(income, na.rm = TRUE), income),
+    purchase_frequency = ifelse(is.na(purchase_frequency), 
+                               median(purchase_frequency, na.rm = TRUE), 
+                               purchase_frequency)
+  )
+
+# Option C: Predictive imputation (using age to predict income)
+library(mice) # For more sophisticated imputation
+# Quick imputation model - in practice you'd use more parameters
+imputed_data <- mice(customers, m = 5, method = "pmm", printFlag = FALSE)
+customers_complete <- complete(imputed_data)
+
+# Compare results by calculating customer value score
+calculate_value <- function(df) {
+  df %>%
+    mutate(customer_value = (income/10000) * (purchase_frequency/10) * log(years_as_customer + 1)) %>%
+    arrange(desc(customer_value)) %>%
+    select(customer_id, customer_value, everything())
+}
+
+# Top 5 customers by value (original with NAs removed)
+head(calculate_value(clean_customers), 5)
+
+# Top 5 customers by value (with imputed values)
+head(calculate_value(customers_complete), 5)
+```
+
+## Time Series Analysis for Business Trends
+
+Time series analysis is essential for understanding business trends and forecasting:
+
+```{r}
+#| label: time-series-analysis
+#| fig-width: 10
+#| fig-height: 6
+
+# Load packages
+library(forecast)
+library(tseries)
+
+# Examine the built-in AirPassengers dataset (monthly air passengers from 1949 to 1960)
+data(AirPassengers)
+class(AirPassengers)
+
+# Plot the time series
+autoplots <- autoplot(AirPassengers) +
+  labs(title = "Monthly Air Passengers (1949-1960)",
+       y = "Passenger Count",
+       x = "Year") +
+  theme_minimal()
+
+# Decompose the time series into seasonal components
+decomposed <- decompose(AirPassengers, "multiplicative")
+autoplot(decomposed) +
+  labs(title = "Decomposition of Air Passengers Time Series") +
+  theme_minimal()
+
+# Forecasting future values using auto.arima
+fit <- auto.arima(AirPassengers)
+forecasts <- forecast(fit, h = 24) # Forecast 2 years ahead
+
+# Plot the forecasts
+plot(forecasts, 
+     main = "Air Passengers Forecast (24 months)",
+     xlab = "Year", 
+     ylab = "Passenger Count")
+
+# Summary of the forecast model
+summary(fit)
+```

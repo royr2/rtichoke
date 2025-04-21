@@ -1,0 +1,179 @@
+---
+title: "Reading Data into R"
+description: "Learn how to import data from various file formats using base R functions"
+date: "2025-03-30"
+categories: [data-import, r-programming]
+image: "https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/RStudio.png"
+execute:
+  echo: true
+  warning: false
+  message: false
+  eval: true
+---
+
+## Reading Data into R Using Base Functions
+
+R provides several built-in functions for importing data from various file formats. Here's how to use the most common ones:
+
+### Reading CSV Files
+
+Comma-separated values (CSV) files are one of the most common data formats:
+
+```{r}
+# Create a sample CSV file
+write.csv(mtcars[1:5, ], "sample_cars.csv", row.names = TRUE)
+
+# Read the CSV file
+cars_data <- read.csv("sample_cars.csv")
+head(cars_data)
+
+# Read with specific options
+cars_data2 <- read.csv("sample_cars.csv", 
+                      header = TRUE,       # First row contains column names
+                      sep = ",",           # Separator is a comma
+                      stringsAsFactors = FALSE, # Don't convert strings to factors
+                      na.strings = c("NA", "N/A", "")) # Values to treat as NA
+head(cars_data2)
+```
+
+### Reading Tab-Delimited Files
+
+Tab-delimited files are another common format:
+
+```{r}
+# Create a sample tab-delimited file
+write.table(mtcars[1:5, ], "sample_cars.txt", sep = "\t", row.names = TRUE)
+
+# Read the tab-delimited file
+cars_data_tab <- read.delim("sample_cars.txt")
+head(cars_data_tab)
+
+# Or use read.table with tab separator
+cars_data_tab2 <- read.table("sample_cars.txt", 
+                            header = TRUE, 
+                            sep = "\t")
+head(cars_data_tab2)
+```
+
+### Reading Fixed-Width Files
+
+Fixed-width files have fields of consistent width:
+
+```{r}
+# Create a sample fixed-width file
+cat("John  Smith 35\nMary  Jones 28\nDavid Brown 42\n", file = "sample_people.txt")
+
+# Read the fixed-width file
+people_data <- read.fwf("sample_people.txt", 
+                       widths = c(5, 6, 3),  # Width of each column
+                       col.names = c("First", "Last", "Age"))
+people_data
+```
+
+### Reading from R Data Files
+
+R has its own binary file format for saving and loading R objects:
+
+```{r}
+# Save R objects to a file
+sample_data <- list(x = 1:10, y = letters[1:10])
+save(sample_data, file = "sample_data.RData")
+
+# Load the saved objects
+load("sample_data.RData")
+sample_data
+
+# Save a single object
+saveRDS(mtcars[1:5, ], "sample_cars.rds")
+
+# Read the saved object
+cars_subset <- readRDS("sample_cars.rds")
+head(cars_subset)
+```
+
+### Reading from URLs
+
+You can read data directly from the web:
+
+```{r}
+# Read CSV from a URL (example with a small dataset)
+url <- "https://raw.githubusercontent.com/datasets/iris/master/data/iris.csv"
+iris_data <- try(read.csv(url), silent = TRUE)
+
+# Check if the data was loaded successfully
+if (!inherits(iris_data, "try-error")) {
+  head(iris_data)
+} else {
+  print("Could not access the URL. Check your internet connection.")
+}
+```
+
+### Reading Excel Files
+
+While not part of base R, the `readxl` package is commonly used:
+
+```{r}
+# Check if readxl is installed
+if (!requireNamespace("readxl", quietly = TRUE)) {
+  message("The readxl package is not installed. You can install it with: install.packages('readxl')")
+} else {
+  library(readxl)
+  # This would read an Excel file if it existed
+  # excel_data <- read_excel("sample.xlsx", sheet = 1)
+}
+```
+
+### Reading from Databases
+
+Base R provides the `DBI` package for database connections:
+
+```{r}
+# Example of connecting to SQLite (not run)
+# if (!requireNamespace("RSQLite", quietly = TRUE)) {
+#   message("The RSQLite package is not installed")
+# } else {
+#   library(DBI)
+#   con <- dbConnect(RSQLite::SQLite(), ":memory:")
+#   dbWriteTable(con, "mtcars", mtcars)
+#   data <- dbGetQuery(con, "SELECT * FROM mtcars WHERE cyl = 4")
+#   dbDisconnect(con)
+# }
+```
+
+### Handling File Paths
+
+R provides functions to work with file paths:
+
+```{r}
+# Get current working directory
+getwd()
+
+# List files in the current directory
+list.files(pattern = ".csv")
+
+# Check if a file exists
+file.exists("sample_cars.csv")
+
+# Get full path to a file
+normalizePath("sample_cars.csv", mustWork = FALSE)
+```
+
+### Cleaning Up
+
+Let's remove the sample files we created:
+
+```{r}
+# List of files to remove
+files_to_remove <- c("sample_cars.csv", "sample_cars.txt", 
+                    "sample_people.txt", "sample_data.RData", 
+                    "sample_cars.rds")
+
+# Remove files
+for (file in files_to_remove) {
+  if (file.exists(file)) {
+    file.remove(file)
+  }
+}
+```
+
+Remember to check the documentation with `?read.csv` or similar commands to explore all available options for these functions.

@@ -1,0 +1,32 @@
+"0","#| label: setup"
+"0",""
+"0","# Load required packages"
+"0","library(dplyr)     # For data manipulation"
+"2","
+Attaching package: ‘dplyr’
+
+"
+"2","The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+"
+"2","The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+"
+"0","library(magrittr)  # For pipe operators"
+"0","library(scales)    # For formatting percentages in plots"
+"0","library(pROC)      # For ROC curve analysis"
+"2","Type 'citation(""pROC"")' for a citation.
+"
+"2","
+Attaching package: ‘pROC’
+
+"
+"2","The following objects are masked from ‘package:stats’:
+
+    cov, smooth, var
+
+"

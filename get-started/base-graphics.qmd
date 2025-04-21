@@ -1,0 +1,261 @@
+---
+title: "Introduction to Base Graphics in R"
+description: "Learn how to create plots using R's built-in graphics functions"
+date: "2023-02-15"
+categories: [visualization, r-programming]
+image: "https://raw.githubusercontent.com/rstudio/hex-stickers/master/PNG/RStudio.png"
+execute:
+  echo: true
+  warning: false
+  message: false
+  eval: true
+---
+
+## Introduction to Base Graphics in R
+
+R comes with a powerful built-in graphics system known as "base graphics." These functions provide a straightforward way to create a wide variety of plots without requiring additional packages.
+
+### Basic Plot Types
+
+#### Scatter Plots
+
+```{r}
+# Basic scatter plot
+plot(mtcars$wt, mtcars$mpg, 
+     main = "Car Weight vs. Fuel Efficiency",
+     xlab = "Weight (1000 lbs)",
+     ylab = "Miles Per Gallon",
+     pch = 19,  # Solid circle point type
+     col = "blue")
+
+# Add a grid
+grid()
+
+# Add a trend line
+abline(lm(mpg ~ wt, data = mtcars), col = "red", lwd = 2)
+
+# Add a legend
+legend("topright", 
+       legend = "Trend Line", 
+       col = "red", 
+       lwd = 2)
+```
+
+#### Line Plots
+
+```{r}
+# Create some data
+x <- 1:10
+y <- x^2
+
+# Basic line plot
+plot(x, y, 
+     type = "l",  # 'l' for line
+     main = "Line Plot Example",
+     xlab = "X Values",
+     ylab = "Y Values",
+     col = "darkgreen",
+     lwd = 2)
+
+# Add points to the line
+points(x, y, pch = 19, col = "darkgreen")
+
+# Add another line
+lines(x, 2*x, col = "blue", lwd = 2)
+
+# Add a legend
+legend("topleft", 
+       legend = c("y = x^2", "y = 2x"), 
+       col = c("darkgreen", "blue"), 
+       lwd = 2)
+```
+
+#### Bar Plots
+
+```{r}
+# Create a simple frequency table
+cylinders <- table(mtcars$cyl)
+
+# Basic bar plot
+barplot(cylinders,
+        main = "Car Cylinders Distribution",
+        xlab = "Number of Cylinders",
+        ylab = "Frequency",
+        col = c("lightblue", "skyblue", "steelblue"),
+        border = "white")
+
+# Add text labels on top of bars
+text(x = barplot(cylinders), 
+     y = cylinders + 1, 
+     labels = cylinders, 
+     col = "black")
+```
+
+#### Histograms
+
+```{r}
+# Basic histogram
+hist(mtcars$mpg,
+     main = "Distribution of Fuel Efficiency",
+     xlab = "Miles Per Gallon",
+     col = "lightgreen",
+     border = "white",
+     breaks = 10)  # Number of bins
+
+# Add a density curve
+hist(mtcars$mpg,
+     main = "Distribution with Density Curve",
+     xlab = "Miles Per Gallon",
+     col = "lightgreen",
+     border = "white",
+     freq = FALSE)  # Show density instead of frequency
+
+# Add a normal density curve
+curve(dnorm(x, mean = mean(mtcars$mpg), sd = sd(mtcars$mpg)),
+      add = TRUE, col = "darkred", lwd = 2)
+
+# Add a legend
+legend("topright", 
+       legend = "Normal Distribution", 
+       col = "darkred", 
+       lwd = 2)
+```
+
+#### Box Plots
+
+```{r}
+# Basic box plot
+boxplot(mpg ~ cyl, data = mtcars,
+        main = "Fuel Efficiency by Cylinder Count",
+        xlab = "Number of Cylinders",
+        ylab = "Miles Per Gallon",
+        col = c("lightpink", "lightblue", "lightgreen"))
+
+# Add a title to the plot
+title("Comparison of MPG Distribution")
+```
+
+### Customizing Plots
+
+#### Plot Parameters
+
+```{r}
+# Create a customized scatter plot
+plot(mtcars$wt, mtcars$mpg,
+     main = "Customized Scatter Plot",
+     xlab = "Weight (1000 lbs)",
+     ylab = "Miles Per Gallon",
+     pch = 16,       # Point type
+     col = "purple", # Point color
+     cex = 1.5,      # Point size
+     type = "p",     # Plot type ('p' for points)
+     lwd = 2,        # Line width
+     bty = "l",      # Box type ('l' for L-shaped)
+     xlim = c(1, 6), # X-axis limits
+     ylim = c(10, 35) # Y-axis limits
+)
+```
+
+#### Colors and Point Types
+
+```{r}
+# Create a plot showing different point types and colors
+plot(1:20, 1:20, 
+     type = "n",  # 'n' for no plotting
+     main = "Point Types (pch) in R",
+     xlab = "Point Type (pch value)",
+     ylab = "")
+
+# Add points with different pch values
+for (i in 1:20) {
+  points(i, 10, pch = i, cex = 2)
+  text(i, 12, labels = i)
+}
+
+# Show different colors
+plot(1:8, rep(1, 8), 
+     type = "n",
+     main = "Basic Colors in R",
+     xlab = "", ylab = "",
+     xlim = c(0.5, 8.5), ylim = c(0, 2),
+     axes = FALSE)
+
+colors <- c("black", "red", "green", "blue", "cyan", "magenta", "yellow", "gray")
+for (i in 1:8) {
+  points(i, 1, pch = 19, col = colors[i], cex = 3)
+  text(i, 0.7, labels = colors[i])
+}
+```
+
+### Multiple Plots in One Figure
+
+```{r}
+# Set up a 2x2 plotting area
+par(mfrow = c(2, 2))
+
+# Plot 1: Scatter plot
+plot(mtcars$wt, mtcars$mpg, main = "Weight vs MPG", pch = 19)
+
+# Plot 2: Histogram
+hist(mtcars$mpg, main = "MPG Distribution", col = "lightblue")
+
+# Plot 3: Box plot
+boxplot(mpg ~ cyl, data = mtcars, main = "MPG by Cylinders", col = "lightgreen")
+
+# Plot 4: Bar plot
+barplot(table(mtcars$gear), main = "Gear Count", col = "salmon")
+
+# Reset to 1x1 plotting area
+par(mfrow = c(1, 1))
+```
+
+### Adding Elements to Plots
+
+```{r}
+# Create a basic plot
+plot(mtcars$wt, mtcars$mpg, 
+     type = "n",  # Start with an empty plot
+     main = "Car Weight vs. Fuel Efficiency",
+     xlab = "Weight (1000 lbs)",
+     ylab = "Miles Per Gallon")
+
+# Add points with different colors by cylinder
+cyl_colors <- c("red", "green", "blue")
+for (i in unique(mtcars$cyl)) {
+  subset_idx <- mtcars$cyl == i
+  points(mtcars$wt[subset_idx], mtcars$mpg[subset_idx], 
+         col = cyl_colors[i/4],  # 4,6,8 cylinders mapped to colors
+         pch = 19)
+}
+
+# Add a legend
+legend("topright", 
+       legend = c("4 cylinders", "6 cylinders", "8 cylinders"), 
+       col = cyl_colors, 
+       pch = 19)
+
+# Add text annotations
+text(mtcars$wt[mtcars$mpg > 30], mtcars$mpg[mtcars$mpg > 30], 
+     labels = rownames(mtcars)[mtcars$mpg > 30],
+     pos = 4)  # Position 4 is to the right
+
+# Add a horizontal line at mean MPG
+abline(h = mean(mtcars$mpg), lty = 2, col = "darkgray")
+text(5, mean(mtcars$mpg) + 1, "Mean MPG", col = "darkgray")
+```
+
+### Saving Plots
+
+```{r}
+# Example of how to save a plot (not run)
+# png("my_plot.png", width = 800, height = 600)
+plot(mtcars$wt, mtcars$mpg, main = "Plot to Save", pch = 19, col = "blue")
+# dev.off()  # Close the device to save the file
+
+# Other formats
+# pdf("my_plot.pdf", width = 8, height = 6)
+# jpeg("my_plot.jpg", width = 800, height = 600, quality = 100)
+# svg("my_plot.svg", width = 8, height = 6)
+```
+
+Base graphics in R provide a solid foundation for creating a wide variety of plots. While newer packages like ggplot2 offer more sophisticated options, base graphics remain valuable for quick visualizations and for understanding the fundamentals of plotting in R.

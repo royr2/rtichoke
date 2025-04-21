@@ -1,0 +1,17 @@
+{
+  "hash": "63b9f5abd9d85af9941b9b4654e4b782",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"R'tichoke: A Repository of R Content\"\n---\n\n\n\n\n<div class=\"hero-banner\">\n  <h1>R'tichoke</h1>\n  <p>Peeling back the layers of R programming, one article at a time</p>\n</div>\n\n## Welcome to R'tichoke\n\nR'tichoke is a comprehensive repository of R programming content, tutorials, and resources. Whether you're just starting your journey with R or you're an experienced data scientist looking to expand your toolkit, you'll find valuable content here to help you grow your skills.\n\n## What You'll Find Here\n\n- **Data Visualization**: Techniques for creating compelling visualizations with ggplot2 and other packages\n- **Data Wrangling**: Methods for efficient data manipulation using the tidyverse\n- **Statistical Analysis**: Applied statistics using R's powerful analytical capabilities\n- **Machine Learning**: Practical implementations of ML algorithms in R\n- **Reproducible Research**: Best practices for creating reproducible analyses with R Markdown and Quarto\n\n## Latest Articles\n\nCheck out our [blog](/posts.qmd) for the latest tutorials, case studies, and tips on R programming.\n\n## Getting Started\n\nNew to R? Start here:\n\n1. [Installing R and RStudio](/installation.qmd) - Set up your development environment\n2. [Introduction to Analytics with R](/posts/intro-to-r-analytics.qmd) - Learn the basics\n3. [Data Wrangling with dplyr](/posts/data-wrangling-with-dplyr.qmd) - Level up your data manipulation skills\n\n## About R'tichoke\n\nR'tichoke was created to serve as a centralized repository of high-quality R content. All articles are written in R Markdown (`.qmd` files) with executable code examples, making it easy to follow along and learn by doing.\n\n\n\n\n::: {.cell}\n::: {.cell-output .cell-output-stderr}\n\n```\nWarning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.\nℹ Please use `linewidth` instead.\n```\n\n\n:::\n\n::: {.cell-output-display}\n![R's popularity continues to grow in data science](index_files/figure-html/unnamed-chunk-1-1.png){width=672}\n:::\n:::\n",
+    "supporting": [
+      "index_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
