@@ -157,5 +157,11 @@
   },
   "get-started/data-wrangling-with-dplyr.qmd": {
     "data-wrangling-with-dplyr.html": "978bd9d4"
+  },
+  "get-started/parallel-computing-in-r.qmd": {
+    "parallel-computing-in-r.html": "55d5a538"
+  },
+  "posts/modeling-with-tidymodels.qmd": {
+    "modeling-with-tidymodels.html": "24a07996"
   }
 }

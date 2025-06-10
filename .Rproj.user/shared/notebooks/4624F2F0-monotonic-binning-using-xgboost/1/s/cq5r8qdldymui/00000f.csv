@@ -1,8 +1,0 @@
-"0","# Create a recipe for preprocessing"
-"0","rec <- recipe(bad_flag ~ ., data = model_data) %>%"
-"0","  step_select(where(is.numeric)) %>%  # Keep only numeric variables"
-"0","  step_impute_median(all_predictors())  # Fill missing values with medians"
-"0",""
-"0","# Apply the preprocessing steps"
-"0","rec <- prep(rec, training = model_data)"
-"0","train <- bake(rec, new_data = model_data)"

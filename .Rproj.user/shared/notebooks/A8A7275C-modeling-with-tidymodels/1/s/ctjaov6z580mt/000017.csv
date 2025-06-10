@@ -1,0 +1,4 @@
+"0","# Examine the distributions of key variables"
+"0","par(mfrow = c(2, 2))"
+"0","hist(training(validation_split)$credit_score, "
+"0","     main = ""Credit Score Distribution"", xlab = ""Credit Score"")"

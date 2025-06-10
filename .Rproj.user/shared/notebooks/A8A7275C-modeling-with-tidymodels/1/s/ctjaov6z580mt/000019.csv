@@ -1,0 +1,3 @@
+"0",""
+"0","hist(training(validation_split)$dti_ratio, "
+"0","     main = ""DTI Ratio Distribution"", xlab = ""DTI Ratio"")"

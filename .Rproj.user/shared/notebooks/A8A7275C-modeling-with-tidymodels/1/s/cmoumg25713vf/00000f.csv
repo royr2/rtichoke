@@ -1,0 +1,6 @@
+"0","# Visualize the relationship between key variables and default rate"
+"0","ggplot(data, aes(x = credit_score, y = as.numeric(default) - 1)) +"
+"0","  geom_smooth(method = ""loess"") +"
+"0","  labs(title = ""Default Rate by Credit Score"", "
+"0","       x = ""Credit Score"", y = ""Default Probability"") +"
+"0","  theme_minimal()"

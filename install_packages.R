@@ -38,7 +38,15 @@ packages <- c(
   "xgboost", 
   "ParBayesianOptimization", 
   "mlbench", 
-  "recipes"
+  "recipes", 
+  "tidymodels", 
+  "xgboost", 
+  "themis", 
+  "vip", 
+  "stringr", 
+  "probably", 
+  "ROSE", 
+  "corrplot"
 )
 
 # Install packages if they're not already installed

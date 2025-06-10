@@ -1,0 +1,4 @@
+"0",""
+"0","hist(training(validation_split)$payment_to_income_ratio, "
+"0","     main = ""Payment to Income Ratio"", "
+"0","     xlab = ""Payment to Income Ratio"")"

@@ -1,0 +1,8 @@
+"0","# Examine correlation between numeric predictors"
+"0","credit_cors <- data %>%"
+"0","  select(age, income, employment_length, loan_amount, interest_rate, "
+"0","         credit_score, dti_ratio, delinq_2yrs, revol_util, payment_to_income_ratio) %>%"
+"0","  cor()"
+"0",""
+"0","corrplot(credit_cors, method = ""circle"", type = ""upper"", "
+"0","         tl.col = ""black"", tl.srt = 45, tl.cex = 0.7)"

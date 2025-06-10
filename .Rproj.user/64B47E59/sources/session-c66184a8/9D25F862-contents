@@ -1,0 +1,39 @@
+library(shiny)
+library(shinydashboard)
+library(dplyr)
+library(ggplot2)
+
+# Source modules
+source("R/data/data_import_module.R")
+source("R/data/data_preprocessing_module.R")
+source("R/feature/column_selection_module.R")
+source("R/feature/feature_selection_module.R")
+source("R/model/model_selection_module.R")
+source("R/model/model_training_module.R")
+source("R/diagnostics/model_diagnostics_module.R")
+
+# Define server logic
+server <- function(input, output, session) {
+  
+  # Step 1: Data Import
+  imported_data <- data_import_Server("data_import")
+  
+  # Step 2: Data Preprocessing
+  preprocessed_data <- data_preprocessing_Server("data_preprocessing", imported_data)
+  
+  # Step 3: Column Selection
+  column_config <- column_selection_Server("column_selection", preprocessed_data)
+  
+  # Step 4: Feature Selection
+  feature_config <- feature_selection_Server("feature_selection", column_config)
+  
+  # Step 5: Model Selection
+  model_config <- model_selection_Server("model_selection", feature_config)
+  
+  # Step 6: Model Training
+  trained_model <- model_training_Server("model_training", model_config)
+  
+  # Step 7: Model Diagnostics
+  diagnostic_results <- model_diagnostics_Server("model_diagnostics", trained_model)
+  
+}

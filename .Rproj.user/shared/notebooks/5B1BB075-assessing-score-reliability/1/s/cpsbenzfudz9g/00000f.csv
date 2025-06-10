@@ -1,4 +1,0 @@
-"0","# Load sample data
-sample <- read.csv(""https://github.com/royr2/datasets/blob/main/credit_sample.csv"")
-"
-"2","Warning: EOF within quoted string"

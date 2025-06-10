@@ -1,0 +1,56 @@
+"0","validation_split
+"
+"1","function (data, prop = 3/4, strata = NULL, breaks = 4, pool = 0.1, 
+"
+"1","    ...) 
+"
+"1","{
+"
+"1","    lifecycle::deprecate_warn(""1.2.0"", ""validation_split()"", 
+"
+"1","        ""initial_validation_split()"")
+"
+"1","    check_dots_empty()
+"
+"1","    check_prop(prop)
+"
+"1","    if (!missing(strata)) {
+"
+"1","        strata <- tidyselect::vars_select(names(data), !!enquo(strata))
+"
+"1","        if (length(strata) == 0) {
+"
+"1","            strata <- NULL
+"
+"1","        }
+"
+"1","    }
+"
+"1","    check_strata(strata, data)
+"
+"1","    split_objs <- mc_splits(data = data, prop = prop, times = 1, 
+"
+"1","        strata = strata, breaks = breaks, pool = pool)
+"
+"1","    split_objs$splits <- map(split_objs$splits, rm_out)
+"
+"1","    class(split_objs$splits[[1]]) <- c(""val_split"", ""rsplit"")
+"
+"1","    if (!is.null(strata)) 
+"
+"1","        names(strata) <- NULL
+"
+"1","    val_att <- list(prop = prop, strata = strata, breaks = breaks, 
+"
+"1","        pool = pool)
+"
+"1","    new_rset(splits = split_objs$splits, ids = ""validation"", 
+"
+"1","        attrib = val_att, subclass = c(""validation_split"", ""rset""))
+"
+"1","}
+"
+"1","<bytecode: 0x000001effced7a88>
+"
+"1","<environment: namespace:rsample>
+"

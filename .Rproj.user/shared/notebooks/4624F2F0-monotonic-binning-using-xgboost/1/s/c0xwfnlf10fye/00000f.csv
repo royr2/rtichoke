@@ -1,6 +1,0 @@
-"0","# Define loan statuses that represent defaults"
-"0","codes <- c(""Charged Off"", ""Does not meet the credit policy. Status:Charged Off"")"
-"0",""
-"0","# Create binary target variable"
-"0","model_data <- sample %>%"
-"0","  mutate(bad_flag = ifelse(loan_status %in% codes, 1, 0))"

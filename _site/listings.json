@@ -3,6 +3,7 @@
     "listing": "/posts.html",
     "items": [
       "/posts/assessing-score-reliability.html",
+      "/posts/modeling-with-tidymodels.html",
       "/posts/bayesian-optimization-xgboost.html",
       "/posts/building-particle-swarm-optimizer.html",
       "/posts/custom-charting-functions-ggplot2.html",

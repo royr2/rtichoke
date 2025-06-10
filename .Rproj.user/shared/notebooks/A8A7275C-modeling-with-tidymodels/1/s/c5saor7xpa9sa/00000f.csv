@@ -1,0 +1,8 @@
+"0","# install.packages(c(""tidymodels"", ""xgboost"", ""themis"", ""vip"", ""stringr"", ""probably"", ""ROSE"", ""corrplot""))"
+"0","library(tidymodels)"
+"0","library(xgboost)"
+"0","library(vip)        # For variable importance"
+"0","library(stringr)    # For string manipulation functions"
+"0","library(probably)   # For calibration plots"
+"0","library(ROSE)       # For imbalanced data visualization"
+"0","library(corrplot)   # For correlation visualization"
