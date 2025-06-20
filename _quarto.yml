@@ -11,30 +11,33 @@ website:
         text: Home
       - text: Get Started
         menu:
-          - href: get-started/variables.qmd
-            text: Variables in R
-          - href: get-started/loops.qmd
-            text: Loops and Apply Functions
-          - href: get-started/indexing.qmd
-            text: Indexing Arrays
-          - href: get-started/reading-data.qmd
-            text: Reading Data
-          - href: get-started/dplyr.qmd
-            text: Introduction to dplyr
-          - href: get-started/data-table.qmd
-            text: Introduction to data.table
-          - href: get-started/base-graphics.qmd
-            text: Base Graphics
-          - href: get-started/ggplot2.qmd
-            text: ggplot2 Graphics
-          - href: get-started/r-package-management.qmd
-            text: Installing Packages
+        - href: get-started/variables.qmd
+          text: Variables in R
+        - href: get-started/loops.qmd
+          text: Loops and Apply Functions
+        - href: get-started/indexing.qmd
+          text: Indexing Arrays
+        - href: get-started/reading-data.qmd
+          text: Reading Data
+        - href: get-started/dplyr.qmd
+          text: Introduction to dplyr
+        - href: get-started/data-table.qmd
+          text: Introduction to data.table
+        - href: get-started/base-graphics.qmd
+          text: Base Graphics
+        - href: get-started/ggplot2.qmd
+          text: ggplot2 Graphics
+        - href: get-started/r-package-management.qmd
+          text: Installing Packages      
       - href: installation.qmd
         text: R Installation Guide
       - href: about.qmd
         text: About
       - text: Blog
         href: posts.qmd
+      - href: webr.html
+        text: WebR Playground
+      
   page-footer: 
     left: " 2025 R'tichoke"
     right: 

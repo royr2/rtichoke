@@ -1,0 +1,6 @@
+"0","#| label: installation"
+"0","#| eval: false"
+"0",""
+"0","# install.packages(c(""torch"", ""tidyverse"", ""corrplot""))"
+"0","library(torch)"
+"0","library(tidyverse)"

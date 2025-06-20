@@ -17,3 +17,4 @@ New to R? Start here:
 1. [Installing R and RStudio](/installation.qmd) - Set up your development environment
 2. [Introduction to Analytics with R](/posts/intro-to-r-analytics.qmd) - Learn the basics
 3. [Data Wrangling with dplyr](/posts/data-wrangling-with-dplyr.qmd) - Level up your data manipulation skills
+4. [Interactive R in Your Browser with WebR](/webr.html) - Try out R right in your browser!

@@ -1,0 +1,27 @@
+{
+    "id": "F5B09AEA",
+    "path": "C:/Users/riddh/OneDrive/Desktop/rtichoke-github/posts/multi-task-learning-with-torch.qmd",
+    "project_path": "posts/multi-task-learning-with-torch.qmd",
+    "type": "quarto_markdown",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1750431862014.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "rmdVisualMode": "false",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "585,5",
+        "scrollLine": "497"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1750433738,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1750433738,
+    "read_only": false,
+    "read_only_alternatives": []
+}

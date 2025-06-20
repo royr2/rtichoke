@@ -2,6 +2,8 @@
   {
     "listing": "/posts.html",
     "items": [
+      "/posts/multi-task-learning-with-torch.html",
+      "/posts/simple-neural-net-with-torch.html",
       "/posts/assessing-score-reliability.html",
       "/posts/modeling-with-tidymodels.html",
       "/posts/bayesian-optimization-xgboost.html",
