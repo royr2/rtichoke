@@ -13,7 +13,7 @@ execute:
 
 ## Indexing Arrays in R
 
-R provides powerful and flexible ways to access and manipulate elements in data structures like vectors, matrices, and arrays.
+R provides flexible ways to access and manipulate elements in data structures like vectors, matrices, and arrays.
 
 ### Vector Indexing
 
@@ -39,7 +39,7 @@ x[-(3:5)]      # All elements except third through fifth
 
 ### Logical Indexing
 
-You can use logical vectors to filter elements:
+Logical vectors can be used to filter elements:
 
 ```{r}
 # Create a vector
@@ -150,4 +150,4 @@ fruits %in% c("banana", "date", "fig")  # Tests which elements are in the second
 fruits[fruits %in% c("banana", "date", "fig")]  # Select matching elements
 ```
 
-Remember that R indexing starts at 1, not 0 as in many other programming languages. This is a common source of confusion for beginners coming from languages like Python or JavaScript.
+Remember that R indexing starts at 1, not 0 as in many other programming languages.

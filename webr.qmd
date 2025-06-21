@@ -1,0 +1,92 @@
+---
+title: "Interactive R in Your Browser with WebR"
+image: https://www.r-project.org/Rlogo.png
+---
+
+## Run R Code in the Browser - No Installation Required
+
+The WebR Playground allows users to write and execute R code directly in their browser. This feature is ideal for beginners wanting to experiment with R or for quick code testing when away from the main development environment.
+
+## What is WebR?
+
+[WebR](https://docs.r-wasm.org/webr/latest/) is a version of R compiled to WebAssembly, enabling R code execution directly in web browsers. This provides:
+
+- No installation required
+- Instant access to R functionality
+- Code execution on any device with a modern browser
+
+## Using the WebR Playground
+
+::: {.callout-note}
+## Current Limitations
+
+Please note that this basic implementation has some limitations:
+
+- No plotting capability is available
+- Package installation is not supported
+- Only basic R functionality is available
+
+For full R functionality, RStudio or other complete R environments are recommended.
+:::
+
+## Example Code for Practice
+
+The following simple R code examples can be tested in the WebR Playground:
+
+### Basic Calculations
+
+```r
+# Basic arithmetic
+2 + 2 * 5
+sqrt(16)
+log(10)
+
+# Create and manipulate vectors
+x <- c(1, 2, 3, 4, 5)
+mean(x)
+sd(x)
+sum(x)
+```
+
+### Data Analysis
+
+```r
+# Create some sample data
+x <- 1:10
+y <- c(2, 4, 6, 8, 7, 12, 14, 16, 18, 20)
+
+# Print the data
+cat("x values:", x, "\n")
+cat("y values:", y, "\n")
+
+# Calculate some statistics
+mean_x <- mean(x)
+mean_y <- mean(y)
+cat("Mean of x:", mean_x, "\n")
+cat("Mean of y:", mean_y, "\n")
+
+# Fit a linear model
+model <- lm(y ~ x)
+summary(model)
+```
+
+### Working with Built-in Datasets
+
+```r
+# Explore the built-in mtcars dataset
+data(mtcars)
+head(mtcars)
+summary(mtcars)
+
+# Basic statistics
+cor(mtcars$mpg, mtcars$wt)
+t.test(mtcars$mpg[mtcars$am == 0], mtcars$mpg[mtcars$am == 1])
+```
+
+## Future Enhancements
+
+1. Support for basic plotting
+2. Access to more packages
+3. Ability to save and share code snippets
+
+[Access the WebR Playground →](webr-playground.html)

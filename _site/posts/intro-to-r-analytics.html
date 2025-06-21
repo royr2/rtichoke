@@ -127,11 +127,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">R Installation Guide</span></a>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Get Started</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-get-started">    
+        <li>
+    <a class="dropdown-item" href="../get-started/r-package-management.html">
+ <span class="dropdown-text">Installing Packages</span></a>
+  </li>  
         <li>
     <a class="dropdown-item" href="../get-started/variables.html">
  <span class="dropdown-text">Variables in R</span></a>
@@ -164,23 +172,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
-        <li>
-    <a class="dropdown-item" href="../get-started/r-package-management.html">
- <span class="dropdown-text">Installing Packages</span></a>
-  </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="../installation.html"> 
-<span class="menu-text">R Installation Guide</span></a>
+    <a class="nav-link" href="../webr.html"> 
+<span class="menu-text">WebR Playground</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts.html"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../posts.html"> 
-<span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="https://www.r-bloggers.com/"> 
+<span class="menu-text">R-Bloggers</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -198,13 +206,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#exploring-your-first-dataset" id="toc-exploring-your-first-dataset" class="nav-link active" data-scroll-target="#exploring-your-first-dataset">Exploring Your First Dataset</a></li>
-  <li><a href="#effective-data-visualization" id="toc-effective-data-visualization" class="nav-link" data-scroll-target="#effective-data-visualization">Effective Data Visualization</a></li>
-  <li><a href="#practical-data-transformation" id="toc-practical-data-transformation" class="nav-link" data-scroll-target="#practical-data-transformation">Practical Data Transformation</a></li>
+  <li><a href="#exploring-a-dataset" id="toc-exploring-a-dataset" class="nav-link active" data-scroll-target="#exploring-a-dataset">Exploring a Dataset</a></li>
+  <li><a href="#data-visualization" id="toc-data-visualization" class="nav-link" data-scroll-target="#data-visualization">Data Visualization</a></li>
+  <li><a href="#data-transformation" id="toc-data-transformation" class="nav-link" data-scroll-target="#data-transformation">Data Transformation</a></li>
   <li><a href="#answering-business-questions-with-data" id="toc-answering-business-questions-with-data" class="nav-link" data-scroll-target="#answering-business-questions-with-data">Answering Business Questions with Data</a></li>
   <li><a href="#correlation-analysis-for-decision-making" id="toc-correlation-analysis-for-decision-making" class="nav-link" data-scroll-target="#correlation-analysis-for-decision-making">Correlation Analysis for Decision Making</a></li>
   <li><a href="#working-with-real-world-datasets" id="toc-working-with-real-world-datasets" class="nav-link" data-scroll-target="#working-with-real-world-datasets">Working with Real-World Datasets</a></li>
-  <li><a href="#handling-missing-data-in-practice" id="toc-handling-missing-data-in-practice" class="nav-link" data-scroll-target="#handling-missing-data-in-practice">Handling Missing Data in Practice</a></li>
+  <li><a href="#handling-missing-data" id="toc-handling-missing-data" class="nav-link" data-scroll-target="#handling-missing-data">Handling Missing Data</a></li>
   <li><a href="#time-series-analysis-for-business-trends" id="toc-time-series-analysis-for-business-trends" class="nav-link" data-scroll-target="#time-series-analysis-for-business-trends">Time Series Analysis for Business Trends</a></li>
   </ul>
 </nav>
@@ -242,10 +250,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>R is a powerful language specifically designed for data analysis and visualization. This guide will walk you through practical examples of using R for real-world analytics tasks.</p>
-<section id="exploring-your-first-dataset" class="level2">
-<h2 class="anchored" data-anchor-id="exploring-your-first-dataset">Exploring Your First Dataset</h2>
-<p>R comes with several built-in datasets perfect for practice. Let’s start by examining the <code>mtcars</code> dataset:</p>
+<p>R is a powerful language specifically designed for data analysis and visualization. This guide demonstrates practical examples of using R for real-world analytics tasks.</p>
+<section id="exploring-a-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="exploring-a-dataset">Exploring a Dataset</h2>
+<p>R comes with several built-in datasets perfect for practice. This example examines the <code>mtcars</code> dataset:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View the first few rows</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -288,9 +296,9 @@ Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</code></pre
 </div>
 <p>The <code>mtcars</code> dataset contains information about 32 cars from Motor Trend magazine, including fuel efficiency (mpg), weight (wt), and horsepower (hp).</p>
 </section>
-<section id="effective-data-visualization" class="level2">
-<h2 class="anchored" data-anchor-id="effective-data-visualization">Effective Data Visualization</h2>
-<p>Visualization is essential for understanding patterns in your data. Let’s create some informative plots:</p>
+<section id="data-visualization" class="level2">
+<h2 class="anchored" data-anchor-id="data-visualization">Data Visualization</h2>
+<p>Visualization is essential for understanding patterns in data. The following examples create informative plots:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -332,9 +340,9 @@ Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</code></pre
 <li>The MPG distribution varies significantly by cylinder count</li>
 </ul>
 </section>
-<section id="practical-data-transformation" class="level2">
-<h2 class="anchored" data-anchor-id="practical-data-transformation">Practical Data Transformation</h2>
-<p>Data rarely comes in the exact format you need. The <code>dplyr</code> package makes transformations straightforward:</p>
+<section id="data-transformation" class="level2">
+<h2 class="anchored" data-anchor-id="data-transformation">Data Transformation</h2>
+<p>Data rarely comes in the exact format needed. The <code>dplyr</code> package makes transformations straightforward:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
@@ -376,7 +384,7 @@ Valiant           18.1   6  225 105 2.76 3.460 20.22  1  0    3    1</code></pre
 </section>
 <section id="answering-business-questions-with-data" class="level2">
 <h2 class="anchored" data-anchor-id="answering-business-questions-with-data">Answering Business Questions with Data</h2>
-<p>Let’s use our enhanced dataset to answer some practical questions:</p>
+<p>The enhanced dataset can be used to answer practical questions:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Question 1: What are the average characteristics by cylinder count?</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>cylinder_analysis <span class="ot">&lt;-</span> mtcars_enhanced <span class="sc">%&gt;%</span></span>
@@ -485,7 +493,7 @@ qsec  0.42 -0.17 -0.71 -0.43  1.00</code></pre>
 </section>
 <section id="working-with-real-world-datasets" class="level2">
 <h2 class="anchored" data-anchor-id="working-with-real-world-datasets">Working with Real-World Datasets</h2>
-<p>Let’s analyze the famous Iris dataset to demonstrate a complete workflow:</p>
+<p>The famous Iris dataset demonstrates a complete workflow:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load packages</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
@@ -583,9 +591,9 @@ qsec  0.42 -0.17 -0.71 -0.43  1.00</code></pre>
 </div>
 </div>
 </section>
-<section id="handling-missing-data-in-practice" class="level2">
-<h2 class="anchored" data-anchor-id="handling-missing-data-in-practice">Handling Missing Data in Practice</h2>
-<p>Let’s tackle the common challenge of missing data using a practical example:</p>
+<section id="handling-missing-data" class="level2">
+<h2 class="anchored" data-anchor-id="handling-missing-data">Handling Missing Data</h2>
+<p>Missing data is a common challenge. This practical example demonstrates handling techniques:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a simulated customer dataset with missing values</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) <span class="co"># For reproducibility</span></span>

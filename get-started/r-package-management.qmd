@@ -10,7 +10,7 @@ execute:
   eval: false
 ---
 
-R's true power comes from its vast ecosystem of packages. This guide will show you how to effectively install, update, and manage packages for your data analysis projects.
+R's true power comes from its vast ecosystem of packages. This guide shows how to effectively install, update, and manage packages for data analysis projects.
 
 ## Installing Packages
 
@@ -24,17 +24,66 @@ install.packages("dplyr")
 install.packages(c("ggplot2", "tidyr", "readr"))
 ```
 
-Some packages may require you to select a CRAN mirror for downloading. Simply choose a location near you from the list that appears.
+Some packages may require selecting a CRAN mirror for downloading. Simply choose a location nearby from the list that appears.
+
+To set a CRAN mirror manually:
+
+```{r}
+# Set CRAN mirror manually (example: RStudio mirror)
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+```
+
+## Alternative Package Installers
+
+### Using pacman
+
+The `pacman` package provides a simplified interface for package management with **automatic loading**:
+
+```{r}
+# Install pacman first
+install.packages("pacman")
+
+# Load and install packages in one step
+pacman::p_load(dplyr, ggplot2, tidyr)
+
+# Check if packages are loaded
+pacman::p_loaded(dplyr, ggplot2)
+
+# Unload packages
+pacman::p_unload(dplyr, ggplot2)
+```
+
+**Key advantage**: Combines installation and loading in one function (`p_load`).
+
+### Using pak
+
+The `pak` package offers **fast and reliable package installation** with superior dependency resolution:
+
+```{r}
+# Install pak
+install.packages("pak")
+
+# Install packages with pak
+pak::pkg_install("dplyr")
+
+# Install multiple packages
+pak::pkg_install(c("ggplot2", "tidyr", "readr"))
+
+# Install from GitHub
+pak::pkg_install("tidyverse/ggplot2")
+```
+
+**Key advantages**: Much faster installation, better dependency handling, and works with multiple repositories (CRAN, GitHub, etc.).
 
 ## Loading Packages
 
-Once installed, you need to load packages in each R session before using them:
+Once installed, packages need to be loaded in each R session before using them:
 
 ```{r}
 # Load a package
 library(ggplot2)
 
-# You can now use functions from the package
+# Functions from the package can now be used
 ggplot(mtcars, aes(x = wt, y = mpg)) + 
   geom_point() + 
   theme_minimal()
@@ -42,7 +91,7 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 
 ## Checking Installed Packages
 
-To see what packages are installed on your system:
+To see what packages are installed on the system:
 
 ```{r}
 # List all installed packages

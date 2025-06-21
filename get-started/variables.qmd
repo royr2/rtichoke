@@ -13,7 +13,7 @@ execute:
 
 ## Creating Variables in R
 
-Variables in R are used to store data that can be referenced and manipulated throughout your code. Here's how to create and work with variables:
+Variables in R store data that can be referenced and manipulated throughout code. The following demonstrates how to create and work with variables:
 
 ### Basic Assignment
 
@@ -109,4 +109,4 @@ length(x)
 str(x)
 ```
 
-Remember that R is dynamically typed, so variables can change types during execution. This flexibility is one of R's strengths for data analysis.
+Note that R is dynamically typed, so variables can change types during execution. This flexibility is one of R's strengths for data analysis.

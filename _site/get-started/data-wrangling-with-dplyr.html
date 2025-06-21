@@ -127,11 +127,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">R Installation Guide</span></a>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Get Started</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-get-started">    
+        <li>
+    <a class="dropdown-item" href="../get-started/r-package-management.html">
+ <span class="dropdown-text">Installing Packages</span></a>
+  </li>  
         <li>
     <a class="dropdown-item" href="../get-started/variables.html">
  <span class="dropdown-text">Variables in R</span></a>
@@ -164,23 +172,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
-        <li>
-    <a class="dropdown-item" href="../get-started/r-package-management.html">
- <span class="dropdown-text">Installing Packages</span></a>
-  </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="../installation.html"> 
-<span class="menu-text">R Installation Guide</span></a>
+    <a class="nav-link" href="../webr.html"> 
+<span class="menu-text">WebR Playground</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts.html"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../posts.html"> 
-<span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="https://www.r-bloggers.com/"> 
+<span class="menu-text">R-Bloggers</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -198,7 +206,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#mastering-data-manipulation-with-dplyr" id="toc-mastering-data-manipulation-with-dplyr" class="nav-link active" data-scroll-target="#mastering-data-manipulation-with-dplyr">Mastering Data Manipulation with dplyr</a>
+  <li><a href="#data-manipulation-with-dplyr" id="toc-data-manipulation-with-dplyr" class="nav-link active" data-scroll-target="#data-manipulation-with-dplyr">Data Manipulation with dplyr</a>
   <ul class="collapse">
   <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
   <li><a href="#working-with-the-mtcars-dataset" id="toc-working-with-the-mtcars-dataset" class="nav-link" data-scroll-target="#working-with-the-mtcars-dataset">Working with the mtcars Dataset</a></li>
@@ -254,12 +262,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="mastering-data-manipulation-with-dplyr" class="level1">
-<h1>Mastering Data Manipulation with dplyr</h1>
-<p>The <code>dplyr</code> package is part of the tidyverse and provides a grammar for data manipulation in R. This post will demonstrate some essential data wrangling techniques using built-in datasets.</p>
+<section id="data-manipulation-with-dplyr" class="level1">
+<h1>Data Manipulation with dplyr</h1>
+<p>The <code>dplyr</code> package is part of the tidyverse and provides a grammar for data manipulation in R. This post demonstrates essential data wrangling techniques using built-in datasets.</p>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
-<p>First, let’s load the necessary packages:</p>
+<p>First, load the necessary packages:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
@@ -268,7 +276,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="working-with-the-mtcars-dataset" class="level2">
 <h2 class="anchored" data-anchor-id="working-with-the-mtcars-dataset">Working with the mtcars Dataset</h2>
-<p>We’ll use the built-in <code>mtcars</code> dataset for our examples:</p>
+<p>The built-in <code>mtcars</code> dataset is used for examples:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Look at the mtcars data</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(mtcars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -724,7 +732,7 @@ $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1
 </section>
 <section id="working-with-the-iris-dataset" class="level2">
 <h2 class="anchored" data-anchor-id="working-with-the-iris-dataset">Working with the iris Dataset</h2>
-<p>Let’s also explore another built-in dataset, <code>iris</code>:</p>
+<p>The following example explores another built-in dataset, <code>iris</code>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Look at the iris data</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(iris)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -830,8 +838,7 @@ $ Species      &lt;fct&gt; setosa, setosa, setosa, setosa, setosa, setosa, setos
 </section>
 <section id="conclusion" class="level2">
 <h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>The <code>dplyr</code> package provides a consistent and intuitive way to manipulate data in R. By mastering these basic functions, you’ll be well on your way to efficient data analysis workflows.</p>
-<p>In the next post, we’ll explore how to combine these techniques with other packages in the tidyverse for even more powerful data analysis.</p>
+<p>The <code>dplyr</code> package provides a consistent and intuitive way to manipulate data in R. These basic functions can easily be used to develop more complex workflows!</p>
 
 
 </section>

@@ -13,7 +13,7 @@ execute:
 
 ## Introduction to Base Graphics in R
 
-R comes with a powerful built-in graphics system known as "base graphics." These functions provide a straightforward way to create a wide variety of plots without requiring additional packages.
+R comes with a built-in graphics system known as "base graphics." These functions provide a straightforward way to create plots without requiring additional packages.
 
 ### Basic Plot Types
 
@@ -258,4 +258,4 @@ plot(mtcars$wt, mtcars$mpg, main = "Plot to Save", pch = 19, col = "blue")
 # svg("my_plot.svg", width = 8, height = 6)
 ```
 
-Base graphics in R provide a solid foundation for creating a wide variety of plots. While newer packages like ggplot2 offer more sophisticated options, base graphics remain valuable for quick visualizations and for understanding the fundamentals of plotting in R.
+Base graphics in R provide a foundation for creating plots. While newer packages like ggplot2 offer more sophisticated options, base graphics remain valuable for quick visualizations and understanding plotting fundamentals in R.

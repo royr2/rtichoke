@@ -1,5 +1,5 @@
 ---
-title: "Blog Posts"
+title: ""
 listing:
   contents: posts
   sort: "date desc"
@@ -11,4 +11,3 @@ page-layout: full
 title-block-banner: true
 ---
 
-This page lists all the blog posts.

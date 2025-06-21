@@ -11,12 +11,12 @@ Feel free to reach out on [LinkedIn!](https://linkedin.com/in/riddhimanr)
 
 ## How This Site Works
 
-All content on this site is created using [Quarto](https://quarto.org/), a next-generation version of R Markdown. This allows us to:
+All content on this site is created using [Quarto](https://quarto.org/), a next-generation version of R Markdown. Quarto is great for:
 
-1. Write content in `.qmd` files (Quarto Markdown)
-2. Include executable R code chunks
-3. Generate beautiful, interactive web pages
-4. Create a consistent, organized structure
+1. Writing content in `.qmd` files (Quarto Markdown)
+2. Including executable R code chunks
+3. Generating beautiful, interactive web pages
+4. Creating a consistent, organized structure
 
 ## R Resources
 
@@ -26,4 +26,5 @@ Here are some additional resources for learning R:
 - [RStudio](https://posit.co/products/open-source/rstudio/)
 - [Tidyverse](https://www.tidyverse.org/)
 - [R for Data Science](https://r4ds.had.co.nz/)
-- [R-bloggers](https://www.r-bloggers.com/)
+
+Disclaimer: Parts of this website (including posts) have been generated using GenAI. 

@@ -8,7 +8,7 @@ R'tichoke is a repository of R programming content, tutorials, and resources. Wh
 
 ## Latest Articles
 
-Check out our [blog](/posts.qmd) for the latest tutorials, case studies, and tips on R programming.
+Check out the [blog](/posts.qmd) for tutorials and tips on R programming.
 
 ## Getting Started
 
@@ -16,5 +16,5 @@ New to R? Start here:
 
 1. [Installing R and RStudio](/installation.qmd) - Set up your development environment
 2. [Introduction to Analytics with R](/posts/intro-to-r-analytics.qmd) - Learn the basics
-3. [Data Wrangling with dplyr](/posts/data-wrangling-with-dplyr.qmd) - Level up your data manipulation skills
+3. [Data Wrangling with dplyr](/get-started/data-wrangling-with-dplyr.qmd) - Level up your data manipulation skills
 4. [Interactive R in Your Browser with WebR](/webr.html) - Try out R right in your browser!

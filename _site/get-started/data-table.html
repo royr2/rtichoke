@@ -128,11 +128,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">R Installation Guide</span></a>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Get Started</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-get-started">    
+        <li>
+    <a class="dropdown-item" href="../get-started/r-package-management.html">
+ <span class="dropdown-text">Installing Packages</span></a>
+  </li>  
         <li>
     <a class="dropdown-item" href="../get-started/variables.html">
  <span class="dropdown-text">Variables in R</span></a>
@@ -165,23 +173,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
-        <li>
-    <a class="dropdown-item" href="../get-started/r-package-management.html">
- <span class="dropdown-text">Installing Packages</span></a>
-  </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="../installation.html"> 
-<span class="menu-text">R Installation Guide</span></a>
+    <a class="nav-link" href="../webr.html"> 
+<span class="menu-text">WebR Playground</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts.html"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../posts.html"> 
-<span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="https://www.r-bloggers.com/"> 
+<span class="menu-text">R-Bloggers</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -252,10 +260,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction-to-data.table" class="level2">
 <h2 class="anchored" data-anchor-id="introduction-to-data.table">Introduction to data.table</h2>
-<p>The <code>data.table</code> package is a high-performance extension of R’s <code>data.frame</code> that provides a concise syntax for data manipulation. It’s particularly efficient for large datasets.</p>
+<p>The <code>data.table</code> package is a high-performance extension of R’s <code>data.frame</code> that provides concise syntax for data manipulation. It is particularly efficient for large datasets.</p>
 <section id="getting-started-with-data.table" class="level3">
 <h3 class="anchored" data-anchor-id="getting-started-with-data.table">Getting Started with data.table</h3>
-<p>First, let’s install and load the package:</p>
+<p>First, install and load the package:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install if needed (uncomment to run)</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("data.table")</span></span>
@@ -266,78 +274,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert the built-in mtcars dataset to a data.table</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>dt_cars <span class="ot">&lt;-</span> <span class="fu">as.data.table</span>(mtcars, <span class="at">keep.rownames =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">setnames</span>(dt_cars, <span class="st">"rn"</span>, <span class="st">"model"</span>)  <span class="co"># Rename the rownames column</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>dt_cars</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dt_cars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                  model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am
-                 &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
- 1:           Mazda RX4  21.0     6 160.0   110  3.90 2.620 16.46     0     1
- 2:       Mazda RX4 Wag  21.0     6 160.0   110  3.90 2.875 17.02     0     1
- 3:          Datsun 710  22.8     4 108.0    93  3.85 2.320 18.61     1     1
- 4:      Hornet 4 Drive  21.4     6 258.0   110  3.08 3.215 19.44     1     0
- 5:   Hornet Sportabout  18.7     8 360.0   175  3.15 3.440 17.02     0     0
- 6:             Valiant  18.1     6 225.0   105  2.76 3.460 20.22     1     0
- 7:          Duster 360  14.3     8 360.0   245  3.21 3.570 15.84     0     0
- 8:           Merc 240D  24.4     4 146.7    62  3.69 3.190 20.00     1     0
- 9:            Merc 230  22.8     4 140.8    95  3.92 3.150 22.90     1     0
-10:            Merc 280  19.2     6 167.6   123  3.92 3.440 18.30     1     0
-11:           Merc 280C  17.8     6 167.6   123  3.92 3.440 18.90     1     0
-12:          Merc 450SE  16.4     8 275.8   180  3.07 4.070 17.40     0     0
-13:          Merc 450SL  17.3     8 275.8   180  3.07 3.730 17.60     0     0
-14:         Merc 450SLC  15.2     8 275.8   180  3.07 3.780 18.00     0     0
-15:  Cadillac Fleetwood  10.4     8 472.0   205  2.93 5.250 17.98     0     0
-16: Lincoln Continental  10.4     8 460.0   215  3.00 5.424 17.82     0     0
-17:   Chrysler Imperial  14.7     8 440.0   230  3.23 5.345 17.42     0     0
-18:            Fiat 128  32.4     4  78.7    66  4.08 2.200 19.47     1     1
-19:         Honda Civic  30.4     4  75.7    52  4.93 1.615 18.52     1     1
-20:      Toyota Corolla  33.9     4  71.1    65  4.22 1.835 19.90     1     1
-21:       Toyota Corona  21.5     4 120.1    97  3.70 2.465 20.01     1     0
-22:    Dodge Challenger  15.5     8 318.0   150  2.76 3.520 16.87     0     0
-23:         AMC Javelin  15.2     8 304.0   150  3.15 3.435 17.30     0     0
-24:          Camaro Z28  13.3     8 350.0   245  3.73 3.840 15.41     0     0
-25:    Pontiac Firebird  19.2     8 400.0   175  3.08 3.845 17.05     0     0
-26:           Fiat X1-9  27.3     4  79.0    66  4.08 1.935 18.90     1     1
-27:       Porsche 914-2  26.0     4 120.3    91  4.43 2.140 16.70     0     1
-28:        Lotus Europa  30.4     4  95.1   113  3.77 1.513 16.90     1     1
-29:      Ford Pantera L  15.8     8 351.0   264  4.22 3.170 14.50     0     1
-30:        Ferrari Dino  19.7     6 145.0   175  3.62 2.770 15.50     0     1
-31:       Maserati Bora  15.0     8 301.0   335  3.54 3.570 14.60     0     1
-32:          Volvo 142E  21.4     4 121.0   109  4.11 2.780 18.60     1     1
-                  model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am
-     gear  carb
-    &lt;num&gt; &lt;num&gt;
- 1:     4     4
- 2:     4     4
- 3:     4     1
- 4:     3     1
- 5:     3     2
- 6:     3     1
- 7:     3     4
- 8:     4     2
- 9:     4     2
-10:     4     4
-11:     4     4
-12:     3     3
-13:     3     3
-14:     3     3
-15:     3     4
-16:     3     4
-17:     3     4
-18:     4     1
-19:     4     2
-20:     4     1
-21:     3     1
-22:     3     2
-23:     3     2
-24:     3     4
-25:     3     2
-26:     4     1
-27:     5     2
-28:     5     2
-29:     5     4
-30:     5     6
-31:     5     8
-32:     4     2
-     gear  carb</code></pre>
+<pre><code>               model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am
+              &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
+1:         Mazda RX4  21.0     6   160   110  3.90 2.620 16.46     0     1
+2:     Mazda RX4 Wag  21.0     6   160   110  3.90 2.875 17.02     0     1
+3:        Datsun 710  22.8     4   108    93  3.85 2.320 18.61     1     1
+4:    Hornet 4 Drive  21.4     6   258   110  3.08 3.215 19.44     1     0
+5: Hornet Sportabout  18.7     8   360   175  3.15 3.440 17.02     0     0
+6:           Valiant  18.1     6   225   105  2.76 3.460 20.22     1     0
+    gear  carb
+   &lt;num&gt; &lt;num&gt;
+1:     4     4
+2:     4     4
+3:     4     1
+4:     3     1
+5:     3     2
+6:     3     1</code></pre>
 </div>
 </div>
 </section>
@@ -407,7 +361,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="selecting-and-computing-on-columns-j">Selecting and Computing on Columns (j)</h4>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select specific columns</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, .(mpg, hp, cyl)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>dt_cars[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, .(mpg, hp, cyl)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      mpg    hp   cyl
     &lt;num&gt; &lt;num&gt; &lt;num&gt;
@@ -420,33 +374,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  7:  14.3   245     8
  8:  24.4    62     4
  9:  22.8    95     4
-10:  19.2   123     6
-11:  17.8   123     6
-12:  16.4   180     8
-13:  17.3   180     8
-14:  15.2   180     8
-15:  10.4   205     8
-16:  10.4   215     8
-17:  14.7   230     8
-18:  32.4    66     4
-19:  30.4    52     4
-20:  33.9    65     4
-21:  21.5    97     4
-22:  15.5   150     8
-23:  15.2   150     8
-24:  13.3   245     8
-25:  19.2   175     8
-26:  27.3    66     4
-27:  26.0    91     4
-28:  30.4   113     4
-29:  15.8   264     8
-30:  19.7   175     6
-31:  15.0   335     8
-32:  21.4   109     4
-      mpg    hp   cyl</code></pre>
+10:  19.2   123     6</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute new values</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, .(<span class="at">kpl =</span> mpg <span class="sc">*</span> <span class="fl">0.425</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>dt_cars[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, .(<span class="at">kpl =</span> mpg <span class="sc">*</span> <span class="fl">0.425</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        kpl
       &lt;num&gt;
@@ -459,76 +390,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  7:  6.0775
  8: 10.3700
  9:  9.6900
-10:  8.1600
-11:  7.5650
-12:  6.9700
-13:  7.3525
-14:  6.4600
-15:  4.4200
-16:  4.4200
-17:  6.2475
-18: 13.7700
-19: 12.9200
-20: 14.4075
-21:  9.1375
-22:  6.5875
-23:  6.4600
-24:  5.6525
-25:  8.1600
-26: 11.6025
-27: 11.0500
-28: 12.9200
-29:  6.7150
-30:  8.3725
-31:  6.3750
-32:  9.0950
-        kpl</code></pre>
+10:  8.1600</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select and compute multiple columns</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, .(model, <span class="at">kpl =</span> mpg <span class="sc">*</span> <span class="fl">0.425</span>, <span class="at">hp_per_cyl =</span> hp<span class="sc">/</span>cyl)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>dt_cars[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, .(model, <span class="at">kpl =</span> mpg <span class="sc">*</span> <span class="fl">0.425</span>, <span class="at">hp_per_cyl =</span> hp<span class="sc">/</span>cyl)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                  model     kpl hp_per_cyl
-                 &lt;char&gt;   &lt;num&gt;      &lt;num&gt;
- 1:           Mazda RX4  8.9250   18.33333
- 2:       Mazda RX4 Wag  8.9250   18.33333
- 3:          Datsun 710  9.6900   23.25000
- 4:      Hornet 4 Drive  9.0950   18.33333
- 5:   Hornet Sportabout  7.9475   21.87500
- 6:             Valiant  7.6925   17.50000
- 7:          Duster 360  6.0775   30.62500
- 8:           Merc 240D 10.3700   15.50000
- 9:            Merc 230  9.6900   23.75000
-10:            Merc 280  8.1600   20.50000
-11:           Merc 280C  7.5650   20.50000
-12:          Merc 450SE  6.9700   22.50000
-13:          Merc 450SL  7.3525   22.50000
-14:         Merc 450SLC  6.4600   22.50000
-15:  Cadillac Fleetwood  4.4200   25.62500
-16: Lincoln Continental  4.4200   26.87500
-17:   Chrysler Imperial  6.2475   28.75000
-18:            Fiat 128 13.7700   16.50000
-19:         Honda Civic 12.9200   13.00000
-20:      Toyota Corolla 14.4075   16.25000
-21:       Toyota Corona  9.1375   24.25000
-22:    Dodge Challenger  6.5875   18.75000
-23:         AMC Javelin  6.4600   18.75000
-24:          Camaro Z28  5.6525   30.62500
-25:    Pontiac Firebird  8.1600   21.87500
-26:           Fiat X1-9 11.6025   16.50000
-27:       Porsche 914-2 11.0500   22.75000
-28:        Lotus Europa 12.9200   28.25000
-29:      Ford Pantera L  6.7150   33.00000
-30:        Ferrari Dino  8.3725   29.16667
-31:       Maserati Bora  6.3750   41.87500
-32:          Volvo 142E  9.0950   27.25000
-                  model     kpl hp_per_cyl</code></pre>
+<pre><code>                model     kpl hp_per_cyl
+               &lt;char&gt;   &lt;num&gt;      &lt;num&gt;
+ 1:         Mazda RX4  8.9250   18.33333
+ 2:     Mazda RX4 Wag  8.9250   18.33333
+ 3:        Datsun 710  9.6900   23.25000
+ 4:    Hornet 4 Drive  9.0950   18.33333
+ 5: Hornet Sportabout  7.9475   21.87500
+ 6:           Valiant  7.6925   17.50000
+ 7:        Duster 360  6.0775   30.62500
+ 8:         Merc 240D 10.3700   15.50000
+ 9:          Merc 230  9.6900   23.75000
+10:          Merc 280  8.1600   20.50000</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply functions</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, .(<span class="at">avg_mpg =</span> <span class="fu">mean</span>(mpg), <span class="at">max_hp =</span> <span class="fu">max</span>(hp))]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dt_cars[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, .(<span class="at">avg_mpg =</span> <span class="fu">mean</span>(mpg), <span class="at">max_hp =</span> <span class="fu">max</span>(hp))]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>    avg_mpg max_hp
-      &lt;num&gt;  &lt;num&gt;
-1: 20.09062    335</code></pre>
+<pre><code>   avg_mpg max_hp
+     &lt;num&gt;  &lt;num&gt;
+1:   20.37    245</code></pre>
 </div>
 </div>
 </section>
@@ -620,231 +505,66 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Add a new column</span></span>
 <span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>dt_copy[, efficiency <span class="sc">:</span><span class="er">=</span> mpg<span class="sc">/</span>wt]</span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>dt_copy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dt_copy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Index: &lt;cyl&gt;
-                  model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am
-                 &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
- 1:           Mazda RX4  21.0     6 160.0   110  3.90 2.620 16.46     0     1
- 2:       Mazda RX4 Wag  21.0     6 160.0   110  3.90 2.875 17.02     0     1
- 3:          Datsun 710  22.8     4 108.0    93  3.85 2.320 18.61     1     1
- 4:      Hornet 4 Drive  21.4     6 258.0   110  3.08 3.215 19.44     1     0
- 5:   Hornet Sportabout  18.7     8 360.0   175  3.15 3.440 17.02     0     0
- 6:             Valiant  18.1     6 225.0   105  2.76 3.460 20.22     1     0
- 7:          Duster 360  14.3     8 360.0   245  3.21 3.570 15.84     0     0
- 8:           Merc 240D  24.4     4 146.7    62  3.69 3.190 20.00     1     0
- 9:            Merc 230  22.8     4 140.8    95  3.92 3.150 22.90     1     0
-10:            Merc 280  19.2     6 167.6   123  3.92 3.440 18.30     1     0
-11:           Merc 280C  17.8     6 167.6   123  3.92 3.440 18.90     1     0
-12:          Merc 450SE  16.4     8 275.8   180  3.07 4.070 17.40     0     0
-13:          Merc 450SL  17.3     8 275.8   180  3.07 3.730 17.60     0     0
-14:         Merc 450SLC  15.2     8 275.8   180  3.07 3.780 18.00     0     0
-15:  Cadillac Fleetwood  10.4     8 472.0   205  2.93 5.250 17.98     0     0
-16: Lincoln Continental  10.4     8 460.0   215  3.00 5.424 17.82     0     0
-17:   Chrysler Imperial  14.7     8 440.0   230  3.23 5.345 17.42     0     0
-18:            Fiat 128  32.4     4  78.7    66  4.08 2.200 19.47     1     1
-19:         Honda Civic  30.4     4  75.7    52  4.93 1.615 18.52     1     1
-20:      Toyota Corolla  33.9     4  71.1    65  4.22 1.835 19.90     1     1
-21:       Toyota Corona  21.5     4 120.1    97  3.70 2.465 20.01     1     0
-22:    Dodge Challenger  15.5     8 318.0   150  2.76 3.520 16.87     0     0
-23:         AMC Javelin  15.2     8 304.0   150  3.15 3.435 17.30     0     0
-24:          Camaro Z28  13.3     8 350.0   245  3.73 3.840 15.41     0     0
-25:    Pontiac Firebird  19.2     8 400.0   175  3.08 3.845 17.05     0     0
-26:           Fiat X1-9  27.3     4  79.0    66  4.08 1.935 18.90     1     1
-27:       Porsche 914-2  26.0     4 120.3    91  4.43 2.140 16.70     0     1
-28:        Lotus Europa  30.4     4  95.1   113  3.77 1.513 16.90     1     1
-29:      Ford Pantera L  15.8     8 351.0   264  4.22 3.170 14.50     0     1
-30:        Ferrari Dino  19.7     6 145.0   175  3.62 2.770 15.50     0     1
-31:       Maserati Bora  15.0     8 301.0   335  3.54 3.570 14.60     0     1
-32:          Volvo 142E  21.4     4 121.0   109  4.11 2.780 18.60     1     1
-                  model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am
-     gear  carb efficiency
-    &lt;num&gt; &lt;num&gt;      &lt;num&gt;
- 1:     4     4   8.015267
- 2:     4     4   7.304348
- 3:     4     1   9.827586
- 4:     3     1   6.656299
- 5:     3     2   5.436047
- 6:     3     1   5.231214
- 7:     3     4   4.005602
- 8:     4     2   7.648903
- 9:     4     2   7.238095
-10:     4     4   5.581395
-11:     4     4   5.174419
-12:     3     3   4.029484
-13:     3     3   4.638070
-14:     3     3   4.021164
-15:     3     4   1.980952
-16:     3     4   1.917404
-17:     3     4   2.750234
-18:     4     1  14.727273
-19:     4     2  18.823529
-20:     4     1  18.474114
-21:     3     1   8.722110
-22:     3     2   4.403409
-23:     3     2   4.425036
-24:     3     4   3.463542
-25:     3     2   4.993498
-26:     4     1  14.108527
-27:     5     2  12.149533
-28:     5     2  20.092531
-29:     5     4   4.984227
-30:     5     6   7.111913
-31:     5     8   4.201681
-32:     4     2   7.697842
-     gear  carb efficiency</code></pre>
+<pre><code>               model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am
+              &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
+1:         Mazda RX4  21.0     6   160   110  3.90 2.620 16.46     0     1
+2:     Mazda RX4 Wag  21.0     6   160   110  3.90 2.875 17.02     0     1
+3:        Datsun 710  22.8     4   108    93  3.85 2.320 18.61     1     1
+4:    Hornet 4 Drive  21.4     6   258   110  3.08 3.215 19.44     1     0
+5: Hornet Sportabout  18.7     8   360   175  3.15 3.440 17.02     0     0
+6:           Valiant  18.1     6   225   105  2.76 3.460 20.22     1     0
+    gear  carb efficiency
+   &lt;num&gt; &lt;num&gt;      &lt;num&gt;
+1:     4     4   8.015267
+2:     4     4   7.304348
+3:     4     1   9.827586
+4:     3     1   6.656299
+5:     3     2   5.436047
+6:     3     1   5.231214</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Update existing values</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>dt_copy[cyl <span class="sc">==</span> <span class="dv">4</span>, mpg <span class="sc">:</span><span class="er">=</span> mpg <span class="sc">*</span> <span class="fl">1.1</span>]  <span class="co"># Increase mpg by 10% for 4-cylinder cars</span></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>dt_copy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dt_copy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Index: &lt;cyl&gt;
-                  model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am
-                 &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
- 1:           Mazda RX4 21.00     6 160.0   110  3.90 2.620 16.46     0     1
- 2:       Mazda RX4 Wag 21.00     6 160.0   110  3.90 2.875 17.02     0     1
- 3:          Datsun 710 25.08     4 108.0    93  3.85 2.320 18.61     1     1
- 4:      Hornet 4 Drive 21.40     6 258.0   110  3.08 3.215 19.44     1     0
- 5:   Hornet Sportabout 18.70     8 360.0   175  3.15 3.440 17.02     0     0
- 6:             Valiant 18.10     6 225.0   105  2.76 3.460 20.22     1     0
- 7:          Duster 360 14.30     8 360.0   245  3.21 3.570 15.84     0     0
- 8:           Merc 240D 26.84     4 146.7    62  3.69 3.190 20.00     1     0
- 9:            Merc 230 25.08     4 140.8    95  3.92 3.150 22.90     1     0
-10:            Merc 280 19.20     6 167.6   123  3.92 3.440 18.30     1     0
-11:           Merc 280C 17.80     6 167.6   123  3.92 3.440 18.90     1     0
-12:          Merc 450SE 16.40     8 275.8   180  3.07 4.070 17.40     0     0
-13:          Merc 450SL 17.30     8 275.8   180  3.07 3.730 17.60     0     0
-14:         Merc 450SLC 15.20     8 275.8   180  3.07 3.780 18.00     0     0
-15:  Cadillac Fleetwood 10.40     8 472.0   205  2.93 5.250 17.98     0     0
-16: Lincoln Continental 10.40     8 460.0   215  3.00 5.424 17.82     0     0
-17:   Chrysler Imperial 14.70     8 440.0   230  3.23 5.345 17.42     0     0
-18:            Fiat 128 35.64     4  78.7    66  4.08 2.200 19.47     1     1
-19:         Honda Civic 33.44     4  75.7    52  4.93 1.615 18.52     1     1
-20:      Toyota Corolla 37.29     4  71.1    65  4.22 1.835 19.90     1     1
-21:       Toyota Corona 23.65     4 120.1    97  3.70 2.465 20.01     1     0
-22:    Dodge Challenger 15.50     8 318.0   150  2.76 3.520 16.87     0     0
-23:         AMC Javelin 15.20     8 304.0   150  3.15 3.435 17.30     0     0
-24:          Camaro Z28 13.30     8 350.0   245  3.73 3.840 15.41     0     0
-25:    Pontiac Firebird 19.20     8 400.0   175  3.08 3.845 17.05     0     0
-26:           Fiat X1-9 30.03     4  79.0    66  4.08 1.935 18.90     1     1
-27:       Porsche 914-2 28.60     4 120.3    91  4.43 2.140 16.70     0     1
-28:        Lotus Europa 33.44     4  95.1   113  3.77 1.513 16.90     1     1
-29:      Ford Pantera L 15.80     8 351.0   264  4.22 3.170 14.50     0     1
-30:        Ferrari Dino 19.70     6 145.0   175  3.62 2.770 15.50     0     1
-31:       Maserati Bora 15.00     8 301.0   335  3.54 3.570 14.60     0     1
-32:          Volvo 142E 23.54     4 121.0   109  4.11 2.780 18.60     1     1
-                  model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am
-     gear  carb efficiency
-    &lt;num&gt; &lt;num&gt;      &lt;num&gt;
- 1:     4     4   8.015267
- 2:     4     4   7.304348
- 3:     4     1   9.827586
- 4:     3     1   6.656299
- 5:     3     2   5.436047
- 6:     3     1   5.231214
- 7:     3     4   4.005602
- 8:     4     2   7.648903
- 9:     4     2   7.238095
-10:     4     4   5.581395
-11:     4     4   5.174419
-12:     3     3   4.029484
-13:     3     3   4.638070
-14:     3     3   4.021164
-15:     3     4   1.980952
-16:     3     4   1.917404
-17:     3     4   2.750234
-18:     4     1  14.727273
-19:     4     2  18.823529
-20:     4     1  18.474114
-21:     3     1   8.722110
-22:     3     2   4.403409
-23:     3     2   4.425036
-24:     3     4   3.463542
-25:     3     2   4.993498
-26:     4     1  14.108527
-27:     5     2  12.149533
-28:     5     2  20.092531
-29:     5     4   4.984227
-30:     5     6   7.111913
-31:     5     8   4.201681
-32:     4     2   7.697842
-     gear  carb efficiency</code></pre>
+<pre><code>               model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am
+              &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
+1:         Mazda RX4 21.00     6   160   110  3.90 2.620 16.46     0     1
+2:     Mazda RX4 Wag 21.00     6   160   110  3.90 2.875 17.02     0     1
+3:        Datsun 710 25.08     4   108    93  3.85 2.320 18.61     1     1
+4:    Hornet 4 Drive 21.40     6   258   110  3.08 3.215 19.44     1     0
+5: Hornet Sportabout 18.70     8   360   175  3.15 3.440 17.02     0     0
+6:           Valiant 18.10     6   225   105  2.76 3.460 20.22     1     0
+    gear  carb efficiency
+   &lt;num&gt; &lt;num&gt;      &lt;num&gt;
+1:     4     4   8.015267
+2:     4     4   7.304348
+3:     4     1   9.827586
+4:     3     1   6.656299
+5:     3     2   5.436047
+6:     3     1   5.231214</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Delete columns</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>dt_copy[, <span class="fu">c</span>(<span class="st">"carb"</span>, <span class="st">"vs"</span>) <span class="sc">:</span><span class="er">=</span> <span class="cn">NULL</span>]</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>dt_copy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dt_copy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Index: &lt;cyl&gt;
-                  model   mpg   cyl  disp    hp  drat    wt  qsec    am  gear
-                 &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
- 1:           Mazda RX4 21.00     6 160.0   110  3.90 2.620 16.46     1     4
- 2:       Mazda RX4 Wag 21.00     6 160.0   110  3.90 2.875 17.02     1     4
- 3:          Datsun 710 25.08     4 108.0    93  3.85 2.320 18.61     1     4
- 4:      Hornet 4 Drive 21.40     6 258.0   110  3.08 3.215 19.44     0     3
- 5:   Hornet Sportabout 18.70     8 360.0   175  3.15 3.440 17.02     0     3
- 6:             Valiant 18.10     6 225.0   105  2.76 3.460 20.22     0     3
- 7:          Duster 360 14.30     8 360.0   245  3.21 3.570 15.84     0     3
- 8:           Merc 240D 26.84     4 146.7    62  3.69 3.190 20.00     0     4
- 9:            Merc 230 25.08     4 140.8    95  3.92 3.150 22.90     0     4
-10:            Merc 280 19.20     6 167.6   123  3.92 3.440 18.30     0     4
-11:           Merc 280C 17.80     6 167.6   123  3.92 3.440 18.90     0     4
-12:          Merc 450SE 16.40     8 275.8   180  3.07 4.070 17.40     0     3
-13:          Merc 450SL 17.30     8 275.8   180  3.07 3.730 17.60     0     3
-14:         Merc 450SLC 15.20     8 275.8   180  3.07 3.780 18.00     0     3
-15:  Cadillac Fleetwood 10.40     8 472.0   205  2.93 5.250 17.98     0     3
-16: Lincoln Continental 10.40     8 460.0   215  3.00 5.424 17.82     0     3
-17:   Chrysler Imperial 14.70     8 440.0   230  3.23 5.345 17.42     0     3
-18:            Fiat 128 35.64     4  78.7    66  4.08 2.200 19.47     1     4
-19:         Honda Civic 33.44     4  75.7    52  4.93 1.615 18.52     1     4
-20:      Toyota Corolla 37.29     4  71.1    65  4.22 1.835 19.90     1     4
-21:       Toyota Corona 23.65     4 120.1    97  3.70 2.465 20.01     0     3
-22:    Dodge Challenger 15.50     8 318.0   150  2.76 3.520 16.87     0     3
-23:         AMC Javelin 15.20     8 304.0   150  3.15 3.435 17.30     0     3
-24:          Camaro Z28 13.30     8 350.0   245  3.73 3.840 15.41     0     3
-25:    Pontiac Firebird 19.20     8 400.0   175  3.08 3.845 17.05     0     3
-26:           Fiat X1-9 30.03     4  79.0    66  4.08 1.935 18.90     1     4
-27:       Porsche 914-2 28.60     4 120.3    91  4.43 2.140 16.70     1     5
-28:        Lotus Europa 33.44     4  95.1   113  3.77 1.513 16.90     1     5
-29:      Ford Pantera L 15.80     8 351.0   264  4.22 3.170 14.50     1     5
-30:        Ferrari Dino 19.70     6 145.0   175  3.62 2.770 15.50     1     5
-31:       Maserati Bora 15.00     8 301.0   335  3.54 3.570 14.60     1     5
-32:          Volvo 142E 23.54     4 121.0   109  4.11 2.780 18.60     1     4
-                  model   mpg   cyl  disp    hp  drat    wt  qsec    am  gear
-    efficiency
-         &lt;num&gt;
- 1:   8.015267
- 2:   7.304348
- 3:   9.827586
- 4:   6.656299
- 5:   5.436047
- 6:   5.231214
- 7:   4.005602
- 8:   7.648903
- 9:   7.238095
-10:   5.581395
-11:   5.174419
-12:   4.029484
-13:   4.638070
-14:   4.021164
-15:   1.980952
-16:   1.917404
-17:   2.750234
-18:  14.727273
-19:  18.823529
-20:  18.474114
-21:   8.722110
-22:   4.403409
-23:   4.425036
-24:   3.463542
-25:   4.993498
-26:  14.108527
-27:  12.149533
-28:  20.092531
-29:   4.984227
-30:   7.111913
-31:   4.201681
-32:   7.697842
-    efficiency</code></pre>
+<pre><code>               model   mpg   cyl  disp    hp  drat    wt  qsec    am  gear
+              &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
+1:         Mazda RX4 21.00     6   160   110  3.90 2.620 16.46     1     4
+2:     Mazda RX4 Wag 21.00     6   160   110  3.90 2.875 17.02     1     4
+3:        Datsun 710 25.08     4   108    93  3.85 2.320 18.61     1     4
+4:    Hornet 4 Drive 21.40     6   258   110  3.08 3.215 19.44     0     3
+5: Hornet Sportabout 18.70     8   360   175  3.15 3.440 17.02     0     3
+6:           Valiant 18.10     6   225   105  2.76 3.460 20.22     0     3
+   efficiency
+        &lt;num&gt;
+1:   8.015267
+2:   7.304348
+3:   9.827586
+4:   6.656299
+5:   5.436047
+6:   5.231214</code></pre>
 </div>
 </div>
 </section>
@@ -1084,7 +804,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a larger dataset for demonstration</span></span>
 <span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fl">1e5</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fl">1e6</span></span>
 <span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>dt_large <span class="ot">&lt;-</span> <span class="fu">data.table</span>(</span>
 <span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span>n,</span>
 <span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, n, <span class="at">replace =</span> <span class="cn">TRUE</span>),</span>
@@ -1095,18 +815,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(dt_large[, .(<span class="at">mean_x =</span> <span class="fu">mean</span>(x)), <span class="at">by =</span> y])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-   0.00    0.00    0.02 </code></pre>
+   0.01    0.00    0.02 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare with equivalent dplyr operation (if dplyr is installed)</span></span>
-<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">requireNamespace</span>(<span class="st">"dplyr"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
-<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>  df_large <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(dt_large)</span>
-<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">system.time</span>(</span>
-<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">summarise</span>(dplyr<span class="sc">::</span><span class="fu">group_by</span>(df_large, y), <span class="at">mean_x =</span> <span class="fu">mean</span>(x))</span>
-<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>df_large <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(dt_large)</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(dplyr<span class="sc">::</span><span class="fu">summarise</span>(dplyr<span class="sc">::</span><span class="fu">group_by</span>(df_large, y), <span class="at">mean_x =</span> <span class="fu">mean</span>(x)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-   0.01    0.00    0.01 </code></pre>
+   0.19    0.00    0.19 </code></pre>
 </div>
 </div>
 <p>data.table is particularly valuable when working with large datasets due to its efficient memory usage and optimized C implementation.</p>

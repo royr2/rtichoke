@@ -2,7 +2,7 @@
 title: "Building a Simple Neural Network in R with torch"
 date: "2024-12-05"
 categories: [R, Deep Learning, torch]
-image: "../images/torch.png"
+image: "../images/nn.png"
 execute:
   echo: true
   warning: false

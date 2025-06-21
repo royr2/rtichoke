@@ -13,11 +13,11 @@ execute:
 
 ## Introduction to ggplot2 Graphics
 
-The `ggplot2` package, part of the tidyverse, implements the Grammar of Graphics to create elegant and complex plots with a consistent syntax. It's one of the most popular visualization packages in R.
+The `ggplot2` package, part of the tidyverse, implements the Grammar of Graphics to create elegant and complex plots with consistent syntax. It is one of the most popular visualization packages in R.
 
 ### Getting Started with ggplot2
 
-First, let's install and load the package:
+First, install and load the package:
 
 ```{r}
 # Install if needed (uncomment to run)
@@ -32,7 +32,7 @@ data(mtcars)
 
 ### The Grammar of Graphics
 
-ggplot2 is based on the idea that you can build any plot from the same components:
+ggplot2 is based on the idea that any plot can be built from the same components:
 
 1.  **Data**: The dataset you want to visualize
 2.  **Aesthetics**: Mapping of variables to visual properties

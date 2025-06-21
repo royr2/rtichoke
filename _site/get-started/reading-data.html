@@ -128,11 +128,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">R Installation Guide</span></a>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Get Started</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-get-started">    
+        <li>
+    <a class="dropdown-item" href="../get-started/r-package-management.html">
+ <span class="dropdown-text">Installing Packages</span></a>
+  </li>  
         <li>
     <a class="dropdown-item" href="../get-started/variables.html">
  <span class="dropdown-text">Variables in R</span></a>
@@ -165,23 +173,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
-        <li>
-    <a class="dropdown-item" href="../get-started/r-package-management.html">
- <span class="dropdown-text">Installing Packages</span></a>
-  </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="../installation.html"> 
-<span class="menu-text">R Installation Guide</span></a>
+    <a class="nav-link" href="../webr.html"> 
+<span class="menu-text">WebR Playground</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts.html"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../posts.html"> 
-<span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="https://www.r-bloggers.com/"> 
+<span class="menu-text">R-Bloggers</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -199,9 +207,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#reading-data-into-r-using-base-functions" id="toc-reading-data-into-r-using-base-functions" class="nav-link active" data-scroll-target="#reading-data-into-r-using-base-functions">Reading Data into R Using Base Functions</a>
-  <ul class="collapse">
-  <li><a href="#reading-csv-files" id="toc-reading-csv-files" class="nav-link" data-scroll-target="#reading-csv-files">Reading CSV Files</a></li>
+  <li><a href="#reading-csv-files" id="toc-reading-csv-files" class="nav-link active" data-scroll-target="#reading-csv-files">Reading CSV Files</a></li>
   <li><a href="#reading-tab-delimited-files" id="toc-reading-tab-delimited-files" class="nav-link" data-scroll-target="#reading-tab-delimited-files">Reading Tab-Delimited Files</a></li>
   <li><a href="#reading-fixed-width-files" id="toc-reading-fixed-width-files" class="nav-link" data-scroll-target="#reading-fixed-width-files">Reading Fixed-Width Files</a></li>
   <li><a href="#reading-from-r-data-files" id="toc-reading-from-r-data-files" class="nav-link" data-scroll-target="#reading-from-r-data-files">Reading from R Data Files</a></li>
@@ -210,7 +216,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#reading-from-databases" id="toc-reading-from-databases" class="nav-link" data-scroll-target="#reading-from-databases">Reading from Databases</a></li>
   <li><a href="#handling-file-paths" id="toc-handling-file-paths" class="nav-link" data-scroll-target="#handling-file-paths">Handling File Paths</a></li>
   <li><a href="#cleaning-up" id="toc-cleaning-up" class="nav-link" data-scroll-target="#cleaning-up">Cleaning Up</a></li>
-  </ul></li>
   </ul>
 </nav>
     </div>
@@ -251,11 +256,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="reading-data-into-r-using-base-functions" class="level2">
-<h2 class="anchored" data-anchor-id="reading-data-into-r-using-base-functions">Reading Data into R Using Base Functions</h2>
-<p>R provides several built-in functions for importing data from various file formats. Here’s how to use the most common ones:</p>
-<section id="reading-csv-files" class="level3">
-<h3 class="anchored" data-anchor-id="reading-csv-files">Reading CSV Files</h3>
+<p>R provides built-in functions for importing data from various file formats. Here are the most common ones:</p>
+<section id="reading-csv-files" class="level2">
+<h2 class="anchored" data-anchor-id="reading-csv-files">Reading CSV Files</h2>
 <p>Comma-separated values (CSV) files are one of the most common data formats:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample CSV file</span></span>
@@ -289,8 +292,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="reading-tab-delimited-files" class="level3">
-<h3 class="anchored" data-anchor-id="reading-tab-delimited-files">Reading Tab-Delimited Files</h3>
+<section id="reading-tab-delimited-files" class="level2">
+<h2 class="anchored" data-anchor-id="reading-tab-delimited-files">Reading Tab-Delimited Files</h2>
 <p>Tab-delimited files are another common format:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample tab-delimited file</span></span>
@@ -322,8 +325,8 @@ Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre
 </div>
 </div>
 </section>
-<section id="reading-fixed-width-files" class="level3">
-<h3 class="anchored" data-anchor-id="reading-fixed-width-files">Reading Fixed-Width Files</h3>
+<section id="reading-fixed-width-files" class="level2">
+<h2 class="anchored" data-anchor-id="reading-fixed-width-files">Reading Fixed-Width Files</h2>
 <p>Fixed-width files have fields of consistent width:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample fixed-width file</span></span>
@@ -342,8 +345,8 @@ Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre
 </div>
 </div>
 </section>
-<section id="reading-from-r-data-files" class="level3">
-<h3 class="anchored" data-anchor-id="reading-from-r-data-files">Reading from R Data Files</h3>
+<section id="reading-from-r-data-files" class="level2">
+<h2 class="anchored" data-anchor-id="reading-from-r-data-files">Reading from R Data Files</h2>
 <p>R has its own binary file format for saving and loading R objects:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save R objects to a file</span></span>
@@ -376,8 +379,8 @@ Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre
 </div>
 </div>
 </section>
-<section id="reading-from-urls" class="level3">
-<h3 class="anchored" data-anchor-id="reading-from-urls">Reading from URLs</h3>
+<section id="reading-from-urls" class="level2">
+<h2 class="anchored" data-anchor-id="reading-from-urls">Reading from URLs</h2>
 <p>You can read data directly from the web:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read CSV from a URL (example with a small dataset)</span></span>
@@ -395,8 +398,8 @@ Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre
 </div>
 </div>
 </section>
-<section id="reading-excel-files" class="level3">
-<h3 class="anchored" data-anchor-id="reading-excel-files">Reading Excel Files</h3>
+<section id="reading-excel-files" class="level2">
+<h2 class="anchored" data-anchor-id="reading-excel-files">Reading Excel Files</h2>
 <p>While not part of base R, the <code>readxl</code> package is commonly used:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if readxl is installed</span></span>
@@ -409,8 +412,8 @@ Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="reading-from-databases" class="level3">
-<h3 class="anchored" data-anchor-id="reading-from-databases">Reading from Databases</h3>
+<section id="reading-from-databases" class="level2">
+<h2 class="anchored" data-anchor-id="reading-from-databases">Reading from Databases</h2>
 <p>Base R provides the <code>DBI</code> package for database connections:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example of connecting to SQLite (not run)</span></span>
@@ -425,14 +428,14 @@ Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre
 <span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co"># }</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="handling-file-paths" class="level3">
-<h3 class="anchored" data-anchor-id="handling-file-paths">Handling File Paths</h3>
+<section id="handling-file-paths" class="level2">
+<h2 class="anchored" data-anchor-id="handling-file-paths">Handling File Paths</h2>
 <p>R provides functions to work with file paths:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get current working directory</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">getwd</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "C:/Users/riddh/OneDrive/Desktop/rtichoke/get-started"</code></pre>
+<pre><code>[1] "C:/Users/riddh/OneDrive/Desktop/rtichoke-github/get-started"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List files in the current directory</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="at">pattern =</span> <span class="st">".csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -447,12 +450,12 @@ Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get full path to a file</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">normalizePath</span>(<span class="st">"sample_cars.csv"</span>, <span class="at">mustWork =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "C:\\Users\\riddh\\OneDrive\\Desktop\\rtichoke\\get-started\\sample_cars.csv"</code></pre>
+<pre><code>[1] "C:\\Users\\riddh\\OneDrive\\Desktop\\rtichoke-github\\get-started\\sample_cars.csv"</code></pre>
 </div>
 </div>
 </section>
-<section id="cleaning-up" class="level3">
-<h3 class="anchored" data-anchor-id="cleaning-up">Cleaning Up</h3>
+<section id="cleaning-up" class="level2">
+<h2 class="anchored" data-anchor-id="cleaning-up">Cleaning Up</h2>
 <p>Let’s remove the sample files we created:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List of files to remove</span></span>
@@ -470,7 +473,6 @@ Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</code></pre
 <p>Remember to check the documentation with <code>?read.csv</code> or similar commands to explore all available options for these functions.</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

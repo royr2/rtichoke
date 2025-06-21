@@ -128,11 +128,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">R Installation Guide</span></a>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Get Started</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-get-started">    
+        <li>
+    <a class="dropdown-item" href="../get-started/r-package-management.html">
+ <span class="dropdown-text">Installing Packages</span></a>
+  </li>  
         <li>
     <a class="dropdown-item" href="../get-started/variables.html">
  <span class="dropdown-text">Variables in R</span></a>
@@ -165,23 +173,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
-        <li>
-    <a class="dropdown-item" href="../get-started/r-package-management.html">
- <span class="dropdown-text">Installing Packages</span></a>
-  </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="../installation.html"> 
-<span class="menu-text">R Installation Guide</span></a>
+    <a class="nav-link" href="../webr.html"> 
+<span class="menu-text">WebR Playground</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts.html"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../posts.html"> 
-<span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="https://www.r-bloggers.com/"> 
+<span class="menu-text">R-Bloggers</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -256,10 +264,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction-to-ggplot2-graphics" class="level2">
 <h2 class="anchored" data-anchor-id="introduction-to-ggplot2-graphics">Introduction to ggplot2 Graphics</h2>
-<p>The <code>ggplot2</code> package, part of the tidyverse, implements the Grammar of Graphics to create elegant and complex plots with a consistent syntax. It’s one of the most popular visualization packages in R.</p>
+<p>The <code>ggplot2</code> package, part of the tidyverse, implements the Grammar of Graphics to create elegant and complex plots with consistent syntax. It is one of the most popular visualization packages in R.</p>
 <section id="getting-started-with-ggplot2" class="level3">
 <h3 class="anchored" data-anchor-id="getting-started-with-ggplot2">Getting Started with ggplot2</h3>
-<p>First, let’s install and load the package:</p>
+<p>First, install and load the package:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install if needed (uncomment to run)</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("ggplot2")</span></span>
@@ -273,7 +281,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="the-grammar-of-graphics" class="level3">
 <h3 class="anchored" data-anchor-id="the-grammar-of-graphics">The Grammar of Graphics</h3>
-<p>ggplot2 is based on the idea that you can build any plot from the same components:</p>
+<p>ggplot2 is based on the idea that any plot can be built from the same components:</p>
 <ol type="1">
 <li><strong>Data</strong>: The dataset you want to visualize</li>
 <li><strong>Aesthetics</strong>: Mapping of variables to visual properties</li>

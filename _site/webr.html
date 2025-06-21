@@ -100,15 +100,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-EMPXPEL31W"></script>
-
-<script type="text/javascript">
-
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
-</script>
 
 
 <link rel="stylesheet" href="styles.css">
@@ -135,11 +126,19 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
     <a class="nav-link" href="./index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./installation.html"> 
+<span class="menu-text">R Installation Guide</span></a>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Get Started</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-get-started">    
+        <li>
+    <a class="dropdown-item" href="./get-started/r-package-management.html">
+ <span class="dropdown-text">Installing Packages</span></a>
+  </li>  
         <li>
     <a class="dropdown-item" href="./get-started/variables.html">
  <span class="dropdown-text">Variables in R</span></a>
@@ -172,31 +171,23 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
     <a class="dropdown-item" href="./get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
-        <li>
-    <a class="dropdown-item" href="./get-started/r-package-management.html">
- <span class="dropdown-text">Installing Packages</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="./get-started/parallel-computing-in-r.html">
- <span class="dropdown-text">Parallel Computing in R</span></a>
-  </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="./installation.html"> 
-<span class="menu-text">R Installation Guide</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
-<span class="menu-text">About</span></a>
+    <a class="nav-link active" href="./webr.html" aria-current="page"> 
+<span class="menu-text">WebR Playground</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./posts.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./webr-playground.html"> 
-<span class="menu-text">WebR Playground</span></a>
+    <a class="nav-link" href="./about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://www.r-bloggers.com/"> 
+<span class="menu-text">R-Bloggers</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -214,10 +205,10 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#run-r-code-in-your-browser---no-installation-required" id="toc-run-r-code-in-your-browser---no-installation-required" class="nav-link active" data-scroll-target="#run-r-code-in-your-browser---no-installation-required">Run R Code in Your Browser - No Installation Required!</a></li>
+  <li><a href="#run-r-code-in-the-browser---no-installation-required" id="toc-run-r-code-in-the-browser---no-installation-required" class="nav-link active" data-scroll-target="#run-r-code-in-the-browser---no-installation-required">Run R Code in the Browser - No Installation Required</a></li>
   <li><a href="#what-is-webr" id="toc-what-is-webr" class="nav-link" data-scroll-target="#what-is-webr">What is WebR?</a></li>
-  <li><a href="#try-our-webr-playground" id="toc-try-our-webr-playground" class="nav-link" data-scroll-target="#try-our-webr-playground">Try Our WebR Playground</a></li>
-  <li><a href="#example-code-to-try" id="toc-example-code-to-try" class="nav-link" data-scroll-target="#example-code-to-try">Example Code to Try</a>
+  <li><a href="#using-the-webr-playground" id="toc-using-the-webr-playground" class="nav-link" data-scroll-target="#using-the-webr-playground">Using the WebR Playground</a></li>
+  <li><a href="#example-code-for-practice" id="toc-example-code-for-practice" class="nav-link" data-scroll-target="#example-code-for-practice">Example Code for Practice</a>
   <ul class="collapse">
   <li><a href="#basic-calculations" id="toc-basic-calculations" class="nav-link" data-scroll-target="#basic-calculations">Basic Calculations</a></li>
   <li><a href="#data-analysis" id="toc-data-analysis" class="nav-link" data-scroll-target="#data-analysis">Data Analysis</a></li>
@@ -249,22 +240,21 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </header>
 
 
-<section id="run-r-code-in-your-browser---no-installation-required" class="level2">
-<h2 class="anchored" data-anchor-id="run-r-code-in-your-browser---no-installation-required">Run R Code in Your Browser - No Installation Required!</h2>
-<p>Have you ever wanted to try out R code quickly without installing anything? The WebR Playground lets you write and execute R code directly in your browser. It’s perfect for beginners who want to experiment with R or for quick code testing when you’re away from your main development environment.</p>
+<section id="run-r-code-in-the-browser---no-installation-required" class="level2">
+<h2 class="anchored" data-anchor-id="run-r-code-in-the-browser---no-installation-required">Run R Code in the Browser - No Installation Required</h2>
+<p>The WebR Playground allows users to write and execute R code directly in their browser. This feature is ideal for beginners wanting to experiment with R or for quick code testing when away from the main development environment.</p>
 </section>
 <section id="what-is-webr" class="level2">
 <h2 class="anchored" data-anchor-id="what-is-webr">What is WebR?</h2>
-<p><a href="https://docs.r-wasm.org/webr/latest/">WebR</a> is a version of R compiled to WebAssembly, allowing you to run R code directly in your web browser. This means:</p>
+<p><a href="https://docs.r-wasm.org/webr/latest/">WebR</a> is a version of R compiled to WebAssembly, enabling R code execution directly in web browsers. This provides:</p>
 <ul>
 <li>No installation required</li>
 <li>Instant access to R functionality</li>
-<li>Run code on any device with a modern browser</li>
+<li>Code execution on any device with a modern browser</li>
 </ul>
 </section>
-<section id="try-our-webr-playground" class="level2">
-<h2 class="anchored" data-anchor-id="try-our-webr-playground">Try Our WebR Playground</h2>
-<p>We’ve created a simple <a href=".\webr-playground.html">WebR Playground</a> that you can use right now. Just click the link and start coding!</p>
+<section id="using-the-webr-playground" class="level2">
+<h2 class="anchored" data-anchor-id="using-the-webr-playground">Using the WebR Playground</h2>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -281,13 +271,13 @@ Current Limitations
 <li>Package installation is not supported</li>
 <li>Only basic R functionality is available</li>
 </ul>
-<p>For full R functionality, we recommend using RStudio or other complete R environments.</p>
+<p>For full R functionality, RStudio or other complete R environments are recommended.</p>
 </div>
 </div>
 </section>
-<section id="example-code-to-try" class="level2">
-<h2 class="anchored" data-anchor-id="example-code-to-try">Example Code to Try</h2>
-<p>Here are some simple R code examples you can try in the WebR Playground:</p>
+<section id="example-code-for-practice" class="level2">
+<h2 class="anchored" data-anchor-id="example-code-for-practice">Example Code for Practice</h2>
+<p>The following simple R code examples can be tested in the WebR Playground:</p>
 <section id="basic-calculations" class="level3">
 <h3 class="anchored" data-anchor-id="basic-calculations">Basic Calculations</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic arithmetic</span></span>
@@ -335,14 +325,12 @@ Current Limitations
 </section>
 <section id="future-enhancements" class="level2">
 <h2 class="anchored" data-anchor-id="future-enhancements">Future Enhancements</h2>
-<p>We’re working on enhancing our WebR Playground with more features in the future, including:</p>
 <ol type="1">
 <li>Support for basic plotting</li>
 <li>Access to more packages</li>
 <li>Ability to save and share code snippets</li>
 </ol>
-<p>In the meantime, enjoy experimenting with R code in your browser!</p>
-<p><a href=".\webr-playground.html">Try the WebR Playground Now →</a></p>
+<p><a href="webr-playground.html">Access the WebR Playground →</a></p>
 
 
 </section>
@@ -438,7 +426,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/rtichoke\.netlify\.app");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

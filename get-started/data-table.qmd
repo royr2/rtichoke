@@ -13,11 +13,11 @@ execute:
 
 ## Introduction to data.table
 
-The `data.table` package is a high-performance extension of R's `data.frame` that provides a concise syntax for data manipulation. It's particularly efficient for large datasets.
+The `data.table` package is a high-performance extension of R's `data.frame` that provides concise syntax for data manipulation. It is particularly efficient for large datasets.
 
 ### Getting Started with data.table
 
-First, let's install and load the package:
+First, install and load the package:
 
 ```{r}
 # Install if needed (uncomment to run)
@@ -29,7 +29,7 @@ library(data.table)
 # Convert the built-in mtcars dataset to a data.table
 dt_cars <- as.data.table(mtcars, keep.rownames = TRUE)
 setnames(dt_cars, "rn", "model")  # Rename the rownames column
-dt_cars
+head(dt_cars)
 ```
 
 ### Basic Syntax: \[i, j, by\]
@@ -53,16 +53,16 @@ dt_cars[1:5]
 
 ```{r}
 # Select specific columns
-dt_cars[, .(mpg, hp, cyl)]
+dt_cars[1:10, .(mpg, hp, cyl)]
 
 # Compute new values
-dt_cars[, .(kpl = mpg * 0.425)]
+dt_cars[1:10, .(kpl = mpg * 0.425)]
 
 # Select and compute multiple columns
-dt_cars[, .(model, kpl = mpg * 0.425, hp_per_cyl = hp/cyl)]
+dt_cars[1:10, .(model, kpl = mpg * 0.425, hp_per_cyl = hp/cyl)]
 
 # Apply functions
-dt_cars[, .(avg_mpg = mean(mpg), max_hp = max(hp))]
+dt_cars[1:10, .(avg_mpg = mean(mpg), max_hp = max(hp))]
 ```
 
 #### Grouping (by)
@@ -104,15 +104,15 @@ dt_copy <- copy(dt_cars)
 
 # Add a new column
 dt_copy[, efficiency := mpg/wt]
-dt_copy
+head(dt_copy)
 
 # Update existing values
 dt_copy[cyl == 4, mpg := mpg * 1.1]  # Increase mpg by 10% for 4-cylinder cars
-dt_copy
+head(dt_copy)
 
 # Delete columns
 dt_copy[, c("carb", "vs") := NULL]
-dt_copy
+head(dt_copy)
 ```
 
 ### Keys and Indexing
@@ -191,7 +191,7 @@ data.table is designed for performance:
 ```{r}
 # Create a larger dataset for demonstration
 set.seed(123)
-n <- 1e5
+n <- 1e6
 dt_large <- data.table(
   id = 1:n,
   x = sample(1:100, n, replace = TRUE),
@@ -202,12 +202,8 @@ dt_large <- data.table(
 system.time(dt_large[, .(mean_x = mean(x)), by = y])
 
 # Compare with equivalent dplyr operation (if dplyr is installed)
-if (requireNamespace("dplyr", quietly = TRUE)) {
-  df_large <- as.data.frame(dt_large)
-  system.time(
-    dplyr::summarise(dplyr::group_by(df_large, y), mean_x = mean(x))
-  )
-}
+df_large <- as.data.frame(dt_large)
+system.time(dplyr::summarise(dplyr::group_by(df_large, y), mean_x = mean(x)))
 ```
 
 data.table is particularly valuable when working with large datasets due to its efficient memory usage and optimized C implementation.

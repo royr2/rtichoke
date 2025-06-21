@@ -18,3 +18,40 @@
 .sidebar nav[role=doc-toc] ul>li>ul {
   margin-top: 0.25rem;
 }
+
+/* Highlight WebR Playground in navbar */
+.webr-highlight a {
+  background-color: #28a745 !important;
+  color: white !important;
+  border-radius: 4px !important;
+  padding: 8px 12px !important;
+  font-weight: bold !important;
+  transition: background-color 0.3s ease !important;
+}
+
+.webr-highlight a:hover {
+  background-color: #218838 !important;
+  color: white !important;
+}
+
+/* Shimmer effect CSS */
+.shimmer {
+  color: grey;
+  display:inline-block;
+  -webkit-mask:linear-gradient(-60deg,#000 30%,#0005,#000 70%) right/300% 100%;
+  background-repeat: no-repeat;
+  animation: shimmer 2.5s infinite;
+}
+
+.bottomhalf{
+  padding:10px;
+  padding-bottom:4px;
+  background-image:url("https://i.sstatic.net/MeQxk.png");
+  background-size:contain;
+  background-repeat:no-repeat;
+  background-position:center center
+}
+
+@keyframes shimmer {
+  100% {-webkit-mask-position:left}
+}

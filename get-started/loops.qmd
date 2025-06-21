@@ -13,7 +13,7 @@ execute:
 
 ## Loops and Apply Functions in R
 
-R offers several ways to perform repetitive tasks through loops and the more efficient apply family of functions.
+R offers several methods to perform repetitive tasks through loops and the more efficient apply family of functions.
 
 ### For Loops
 

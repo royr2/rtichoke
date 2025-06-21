@@ -2,7 +2,7 @@
 title: "Building Models in R with tidymodels"
 date: "2024-10-12"
 categories: [R, Machine Learning, tidymodels]
-image: "../images/tidymodels-logo.png"
+image: "../images/tidymodels.png"
 execute:
   echo: true
   warning: false
