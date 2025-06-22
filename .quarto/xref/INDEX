@@ -172,5 +172,8 @@
   },
   "webr.qmd": {
     "webr.html": "641dbd7a"
+  },
+  "posts/portfolio_optimisation_pso.qmd": {
+    "portfolio_optimisation_pso.html": "75d1a33d"
   }
 }

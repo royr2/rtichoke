@@ -1,0 +1,4 @@
+"0",""
+"0","#hist(simulate_correlation(0.8), main = ""Starting with Correlated Data"", col = ""slateblue"")"
+"0","#hist(simulate_correlation(0.001), main = ""Starting with Random Data"", col = ""lightblue"")"
+"0","#par(mfrow = c(1, 1))"

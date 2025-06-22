@@ -1,0 +1,10 @@
+"0","# Method 2: Using probably package (more robust)"
+"0","# Create calibration using the probably package"
+"0","cal_object <- cal_estimate_logistic(xgb_val_results, "
+"0","                                    truth = default, "
+"0","                                    estimate = .pred_yes,"
+"0","                                    event_level = ""second"")"
+"1","[1m[33mError[39m in `get_prediction_data()`:[22m
+[38;5;250m[33m![38;5;250m The selectors in `estimate` resolves to 1 values ([34m"".pred_yes""[38;5;250m) but there are 2 class levels ([34m""no""[38;5;250m and [34m""yes""[38;5;250m).[39m
+[90mRun `]8;;x-r-run:rlang::last_trace()rlang::last_trace()]8;;` to see where the error occurred.[39m
+"

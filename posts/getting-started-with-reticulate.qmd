@@ -1,5 +1,5 @@
 ---
-title: "Getting Started with Python using R and reticulate"
+title: "Getting Started with Python using R and Reticulate"
 date: "2023-01-15"
 categories: [R, Python, reticulate]
 image: "../images/reticulate.png"
@@ -10,11 +10,9 @@ execute:
   eval: false
 ---
 
-Want to use Python's powerful libraries without leaving R? The reticulate package gives you the best of both worlds - R's elegant data handling and visualization with Python's machine learning and scientific computing tools. This post shows you how to set up and use this powerful bridge between languages.
+Want to use Python's powerful libraries without leaving R? The reticulate package gives you the best of both worlds - R's elegant data handling and visualization with Python's machine learning and scientific computing tools. This post dives into how to set up a python environment using RStudio and the `reticulate` package and use this powerful bridge between languages. Here's a quick 4-step process to get started. 
 
-## Quick Setup in 4 Steps
-
-### 1. Install reticulate
+## Install reticulate
 
 ```{r}
 #| label: install-reticulate
@@ -23,7 +21,7 @@ install.packages("reticulate")
 library(reticulate)
 ```
 
-### 2. Install Python via Miniconda
+## Install Python via Miniconda
 
 The easiest approach is to let reticulate handle Python installation for you:
 
@@ -33,7 +31,7 @@ The easiest approach is to let reticulate handle Python installation for you:
 install_miniconda(path = "c:/miniconda")
 ```
 
-### 3. Connect to Python
+## Connect to Python
 
 Reticulate creates a default environment called `r-reticulate`. Let's connect to it:
 
@@ -47,7 +45,7 @@ conda_list()
 use_condaenv("r-reticulate")
 ```
 
-### 4. Install Python Packages
+## Install Python Packages
 
 Now you can install any Python packages you need:
 
@@ -57,7 +55,7 @@ Now you can install any Python packages you need:
 py_install(c("pandas", "scikit-learn", "matplotlib"))
 ```
 
-## Three Ways to Use Python in R
+## Different Ways to Use Python in R
 
 ### 1. Import Python Modules Directly
 
@@ -122,7 +120,7 @@ coefficients
 
 ## Real-World Applications
 
-Here are some powerful ways to combine R and Python in your data science workflow:
+Here are some ways to combine R and Python in your data science workflow:
 
 ### Data Science Pipeline
 
@@ -148,7 +146,7 @@ clean_data %>%
   scale_color_viridis_c()
 ```
 
-### When to Use Each Language
+### The Choice Between `R` and `Python`
 
 **Use R for:**
 
@@ -164,4 +162,4 @@ clean_data %>%
 - Computer vision
 - Advanced machine learning algorithms
 
-With reticulate, you don't have to choose - use the best tool for each part of your analysis!
+However, with reticulate, you don't have to choose! Use the best tool for each part of your analysis!

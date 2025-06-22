@@ -651,7 +651,7 @@ purchase_frequency
 <span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Option C: Predictive imputation (using age to predict income)</span></span>
 <span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mice) <span class="co"># For more sophisticated imputation</span></span>
-<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick imputation model - in practice you'd use more parameters</span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick imputation model - in practice more parameters would be used</span></span>
 <span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>imputed_data <span class="ot">&lt;-</span> <span class="fu">mice</span>(customers, <span class="at">m =</span> <span class="dv">5</span>, <span class="at">method =</span> <span class="st">"pmm"</span>, <span class="at">printFlag =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>customers_complete <span class="ot">&lt;-</span> <span class="fu">complete</span>(imputed_data)</span>
 <span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a></span>

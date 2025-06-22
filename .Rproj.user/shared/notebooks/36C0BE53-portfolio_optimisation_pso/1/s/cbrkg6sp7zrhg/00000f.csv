@@ -1,0 +1,5 @@
+"0","# Read ticker list from NSE (National Stock Exchange of India) website"
+"0","ticker_list <- read.csv(""https://raw.githubusercontent.com/royr2/datasets/refs/heads/main/ind_nifty50list.csv"")"
+"0",""
+"0","# View the first few rows "
+"0","head(ticker_list[,1:3], 5)"

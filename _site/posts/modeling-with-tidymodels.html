@@ -207,30 +207,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#required-packages" id="toc-required-packages" class="nav-link active" data-scroll-target="#required-packages">Required Packages</a></li>
-  <li><a href="#creating-a-realistic-credit-scoring-dataset" id="toc-creating-a-realistic-credit-scoring-dataset" class="nav-link" data-scroll-target="#creating-a-realistic-credit-scoring-dataset">Creating a Realistic Credit Scoring Dataset</a></li>
-  <li><a href="#data-splitting" id="toc-data-splitting" class="nav-link" data-scroll-target="#data-splitting">Data Splitting</a></li>
+  <li><a href="#synthetic-data-generation" id="toc-synthetic-data-generation" class="nav-link" data-scroll-target="#synthetic-data-generation">Synthetic Data Generation</a></li>
+  <li><a href="#stratified-partitioning" id="toc-stratified-partitioning" class="nav-link" data-scroll-target="#stratified-partitioning">Stratified Partitioning</a></li>
   <li><a href="#feature-engineering-and-preprocessing" id="toc-feature-engineering-and-preprocessing" class="nav-link" data-scroll-target="#feature-engineering-and-preprocessing">Feature Engineering and Preprocessing</a></li>
-  <li><a href="#model-specification-and-tuning" id="toc-model-specification-and-tuning" class="nav-link" data-scroll-target="#model-specification-and-tuning">Model Specification and Tuning</a></li>
-  <li><a href="#finalizing-and-evaluating-the-models" id="toc-finalizing-and-evaluating-the-models" class="nav-link" data-scroll-target="#finalizing-and-evaluating-the-models">Finalizing and Evaluating the Models</a></li>
-  <li><a href="#feature-importance-and-model-interpretation" id="toc-feature-importance-and-model-interpretation" class="nav-link" data-scroll-target="#feature-importance-and-model-interpretation">Feature Importance and Model Interpretation</a></li>
-  <li><a href="#extract-feature-importance-from-xgboost-model" id="toc-extract-feature-importance-from-xgboost-model" class="nav-link" data-scroll-target="#extract-feature-importance-from-xgboost-model">Extract feature importance from XGBoost model</a></li>
-  <li><a href="#extract-coefficients-from-logistic-regression-model" id="toc-extract-coefficients-from-logistic-regression-model" class="nav-link" data-scroll-target="#extract-coefficients-from-logistic-regression-model">Extract coefficients from logistic regression model</a></li>
-  <li><a href="#create-calibration-plots-for-both-models" id="toc-create-calibration-plots-for-both-models" class="nav-link" data-scroll-target="#create-calibration-plots-for-both-models">Create calibration plots for both models</a></li>
-  <li><a href="#the-feature-importance-plots-show-which-variables-have-the-strongest-influence-on-default-prediction." id="toc-the-feature-importance-plots-show-which-variables-have-the-strongest-influence-on-default-prediction." class="nav-link" data-scroll-target="#the-feature-importance-plots-show-which-variables-have-the-strongest-influence-on-default-prediction.">The feature importance plots show which variables have the strongest influence on default prediction.</a></li>
-  <li><a href="#in-credit-scoring-its-important-that-these-align-with-domain-knowledge." id="toc-in-credit-scoring-its-important-that-these-align-with-domain-knowledge." class="nav-link" data-scroll-target="#in-credit-scoring-its-important-that-these-align-with-domain-knowledge.">In credit scoring, it’s important that these align with domain knowledge.</a></li>
-  <li><a href="#the-calibration-plots-show-how-well-the-predicted-probabilities-match-the-actual-default-rates." id="toc-the-calibration-plots-show-how-well-the-predicted-probabilities-match-the-actual-default-rates." class="nav-link" data-scroll-target="#the-calibration-plots-show-how-well-the-predicted-probabilities-match-the-actual-default-rates.">The calibration plots show how well the predicted probabilities match the actual default rates.</a>
-  <ul class="collapse">
-  <li><a href="#final-evaluation-on-test-set" id="toc-final-evaluation-on-test-set" class="nav-link" data-scroll-target="#final-evaluation-on-test-set">Final Evaluation on Test Set</a></li>
-  </ul></li>
-  <li><a href="#make-predictions-on-the-test-set-with-the-xgboost-model" id="toc-make-predictions-on-the-test-set-with-the-xgboost-model" class="nav-link" data-scroll-target="#make-predictions-on-the-test-set-with-the-xgboost-model">Make predictions on the test set with the XGBoost model</a></li>
-  <li><a href="#calculate-performance-metrics" id="toc-calculate-performance-metrics" class="nav-link" data-scroll-target="#calculate-performance-metrics">Calculate performance metrics</a></li>
-  <li><a href="#calculate-auc-on-test-set" id="toc-calculate-auc-on-test-set" class="nav-link" data-scroll-target="#calculate-auc-on-test-set">Calculate AUC on test set</a></li>
-  <li><a href="#create-a-gains-table-commonly-used-in-credit-scoring" id="toc-create-a-gains-table-commonly-used-in-credit-scoring" class="nav-link" data-scroll-target="#create-a-gains-table-commonly-used-in-credit-scoring">Create a gains table (commonly used in credit scoring)</a></li>
-  <li><a href="#display-the-gains-table" id="toc-display-the-gains-table" class="nav-link" data-scroll-target="#display-the-gains-table">Display the gains table</a></li>
-  <li><a href="#create-a-lift-chart" id="toc-create-a-lift-chart" class="nav-link" data-scroll-target="#create-a-lift-chart">Create a lift chart</a>
-  <ul class="collapse">
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
-  </ul></li>
+  <li><a href="#model-architecture-and-hyperparameter-optimization" id="toc-model-architecture-and-hyperparameter-optimization" class="nav-link" data-scroll-target="#model-architecture-and-hyperparameter-optimization">Model Architecture and Hyperparameter Optimization</a></li>
+  <li><a href="#model-finalization-and-performance-evaluation" id="toc-model-finalization-and-performance-evaluation" class="nav-link" data-scroll-target="#model-finalization-and-performance-evaluation">Model Finalization and Performance Evaluation</a></li>
+  <li><a href="#interpretability-and-feature-importance" id="toc-interpretability-and-feature-importance" class="nav-link" data-scroll-target="#interpretability-and-feature-importance">Interpretability and Feature Importance</a></li>
+  <li><a href="#test-set-evaluation" id="toc-test-set-evaluation" class="nav-link" data-scroll-target="#test-set-evaluation">Test Set Evaluation</a></li>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link" data-scroll-target="#key-takeaways">Key Takeaways</a></li>
   </ul>
 </nav>
     </div>
@@ -282,9 +266,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)   <span class="co"># For correlation visualization</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="creating-a-realistic-credit-scoring-dataset" class="level2">
-<h2 class="anchored" data-anchor-id="creating-a-realistic-credit-scoring-dataset">Creating a Realistic Credit Scoring Dataset</h2>
-<p>We’ll simulate a realistic credit dataset with common variables found in credit scoring models. The data will include demographic information, loan characteristics, and credit history variables.</p>
+<section id="synthetic-data-generation" class="level2">
+<h2 class="anchored" data-anchor-id="synthetic-data-generation">Synthetic Data Generation</h2>
+<p>This tutorial uses a simulated credit dataset incorporating realistic variable distributions commonly encountered in credit scoring applications. The synthetic data includes demographic information, loan characteristics, and credit history variables with appropriate statistical relationships.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10000</span>  <span class="co"># Larger sample size for more realistic modeling</span></span>
@@ -319,8 +303,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Interest rate depends on credit score and loan term</span></span>
 <span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">interest_rate =</span> <span class="dv">25</span> <span class="sc">-</span> (credit_score <span class="sc">-</span> <span class="dv">300</span>) <span class="sc">*</span> (<span class="dv">15</span><span class="sc">/</span><span class="dv">550</span>) <span class="sc">+</span> </span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">ifelse</span>(loan_term <span class="sc">==</span> <span class="dv">36</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="fu">ifelse</span>(loan_term <span class="sc">==</span> <span class="dv">60</span>, <span class="dv">0</span>, <span class="fl">1.5</span>)) <span class="sc">+</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">1.5</span>),</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ifelse</span>(loan_term <span class="sc">==</span> <span class="dv">36</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="fu">ifelse</span>(loan_term <span class="sc">==</span> <span class="dv">60</span>, <span class="dv">0</span>, <span class="fl">1.5</span>)) <span class="sc">+</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">1.5</span>),</span>
 <span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Loan purpose with realistic probabilities</span></span>
 <span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">loan_purpose =</span> <span class="fu">sample</span>(</span>
@@ -331,7 +315,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add some derived features that have predictive power</span></span>
 <span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">payment_amount =</span> (loan_amount <span class="sc">*</span> (interest_rate<span class="sc">/</span><span class="dv">100</span><span class="sc">/</span><span class="dv">12</span>) <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">+</span> interest_rate<span class="sc">/</span><span class="dv">100</span><span class="sc">/</span><span class="dv">12</span>)<span class="sc">^</span>loan_term) <span class="sc">/</span> </span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>                    ((<span class="dv">1</span> <span class="sc">+</span> interest_rate<span class="sc">/</span><span class="dv">100</span><span class="sc">/</span><span class="dv">12</span>)<span class="sc">^</span>loan_term <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>      ((<span class="dv">1</span> <span class="sc">+</span> interest_rate<span class="sc">/</span><span class="dv">100</span><span class="sc">/</span><span class="dv">12</span>)<span class="sc">^</span>loan_term <span class="sc">-</span> <span class="dv">1</span>),</span>
 <span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">payment_to_income_ratio =</span> (payment_amount <span class="sc">*</span> <span class="dv">12</span>) <span class="sc">/</span> income</span>
 <span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
@@ -428,9 +412,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="data-splitting" class="level2">
-<h2 class="anchored" data-anchor-id="data-splitting">Data Splitting</h2>
-<p>Credit default datasets are typically imbalanced, with defaults being the minority class. We’ll use a stratified split to maintain the class distribution.</p>
+<section id="stratified-partitioning" class="level2">
+<h2 class="anchored" data-anchor-id="stratified-partitioning">Stratified Partitioning</h2>
+<p>Credit default datasets typically exhibit class imbalance, with default events representing the minority class. We implement stratified sampling to preserve the class distribution across training, validation, and test partitions.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create initial train/test split (80/20)</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">456</span>)</span>
@@ -470,8 +454,7 @@ Percentage:</code></pre>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize class imbalance</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>ROSE<span class="sc">::</span><span class="fu">roc.curve</span>(<span class="fu">training</span>(validation_split)<span class="sc">$</span>default <span class="sc">==</span> <span class="st">"yes"</span>, </span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                <span class="fu">training</span>(validation_split)<span class="sc">$</span>credit_score,</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">plotit =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">main =</span> <span class="st">"ROC Curve for Credit Score Alone"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">plotit =</span> <span class="cn">TRUE</span>,                <span class="at">main =</span> <span class="st">"ROC Curve for Credit Score Alone"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -486,7 +469,7 @@ Percentage:</code></pre>
 </section>
 <section id="feature-engineering-and-preprocessing" class="level2">
 <h2 class="anchored" data-anchor-id="feature-engineering-and-preprocessing">Feature Engineering and Preprocessing</h2>
-<p>Now we’ll create a comprehensive recipe with feature engineering steps relevant to credit scoring, including handling the class imbalance.</p>
+<p>The following section develops a preprocessing recipe incorporating domain-specific feature engineering techniques relevant to credit risk modeling, including class imbalance handling strategies.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Examine the distributions of key variables</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
@@ -512,7 +495,7 @@ Percentage:</code></pre>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a comprehensive recipe with domain knowledge</span></span>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a recipe</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>credit_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(default <span class="sc">~</span> ., <span class="at">data =</span> <span class="fu">training</span>(validation_split)) <span class="sc">%&gt;%</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove ID column</span></span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_rm</span>(customer_id) <span class="sc">%&gt;%</span></span>
@@ -591,7 +574,7 @@ $ loan_purpose_major_purchase     &lt;dbl&gt; -0.2968579, -0.2968579, -0.2968579
 $ loan_purpose_medical            &lt;dbl&gt; -0.299178, -0.299178, -0.299178, -0.29…
 $ loan_purpose_other              &lt;dbl&gt; -0.2208157, -0.2208157, -0.2208157, -0…</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify class balance after SMOTE</span></span>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(recipe_data<span class="sc">$</span>default)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -599,16 +582,10 @@ $ loan_purpose_other              &lt;dbl&gt; -0.2208157, -0.2208157, -0.2208157
 5661  339 </code></pre>
 </div>
 </div>
-<p>The feature engineering steps above incorporate domain knowledge specific to credit risk modeling:</p>
-<ul>
-<li>We create derived features that capture payment capacity, credit utilization, and borrower stability</li>
-<li>We transform highly skewed variables using Yeo-Johnson transformations</li>
-<li>We normalize all numeric predictors to put them on the same scale</li>
-</ul>
 </section>
-<section id="model-specification-and-tuning" class="level2">
-<h2 class="anchored" data-anchor-id="model-specification-and-tuning">Model Specification and Tuning</h2>
-<p>For credit scoring, we’ll compare two models: a logistic regression model (commonly used in the financial industry for its interpretability) and an XGBoost model (for its predictive power). We’ll tune both models using cross-validation.</p>
+<section id="model-architecture-and-hyperparameter-optimization" class="level2">
+<h2 class="anchored" data-anchor-id="model-architecture-and-hyperparameter-optimization">Model Architecture and Hyperparameter Optimization</h2>
+<p>This section implements both traditional (logistic regression) and modern (XGBoost) algorithms. Logistic regression provides interpretability required for regulatory compliance, while XGBoost offers superior predictive performance. Both models undergo systematic hyperparameter tuning using cross-validation.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the logistic regression model</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>log_reg_spec <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
@@ -636,7 +613,7 @@ $ loan_purpose_other              &lt;dbl&gt; -0.2208157, -0.2208157, -0.2208157
 <span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="fu">tune</span>(),</span>
 <span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">learn_rate =</span> <span class="fu">tune</span>()</span>
 <span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
-<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"xgboost"</span>, <span class="at">objective =</span> <span class="st">"binary:logistic"</span>, <span class="at">scale_pos_weight =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"xgboost"</span>, <span class="at">objective =</span> <span class="st">"binary:logistic"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
 <span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an XGBoost workflow</span></span>
@@ -646,13 +623,13 @@ $ loan_purpose_other              &lt;dbl&gt; -0.2208157, -0.2208157, -0.2208157
 <span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the tuning grid for XGBoost</span></span>
 <span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>xgb_grid <span class="ot">&lt;-</span> <span class="fu">grid_latin_hypercube</span>(</span>
-<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trees</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">500</span>)),</span>
-<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tree_depth</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">10</span>)),</span>
-<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">min_n</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">20</span>)),</span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trees</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">100</span>)),</span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tree_depth</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">6</span>)),</span>
+<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">min_n</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">8</span>)),</span>
 <span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">loss_reduction</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.001</span>, <span class="fl">1.0</span>)),</span>
 <span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mtry</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">20</span>)),</span>
 <span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">learn_rate</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="sc">-</span><span class="dv">1</span>), <span class="at">trans =</span> <span class="fu">log10_trans</span>()),</span>
-<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">size =</span> <span class="dv">15</span></span>
+<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">size =</span> <span class="dv">10</span></span>
 <span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Create cross-validation folds with stratification</span></span>
@@ -700,11 +677,10 @@ $ loan_purpose_other              &lt;dbl&gt; -0.2208157, -0.2208157, -0.2208157
 6 0.00167     0.25 roc_auc binary     0.852     3 0.00837 Preprocessor1_Model15</code></pre>
 </div>
 </div>
-<p>The results above show how both models perform across different hyperparameter settings. XGBoost typically achieves higher predictive performance, while logistic regression offers better interpretability. For credit scoring applications, both aspects are important.</p>
 </section>
-<section id="finalizing-and-evaluating-the-models" class="level2">
-<h2 class="anchored" data-anchor-id="finalizing-and-evaluating-the-models">Finalizing and Evaluating the Models</h2>
-<p>We’ll finalize both models using their best hyperparameters and evaluate them on the validation set.</p>
+<section id="model-finalization-and-performance-evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="model-finalization-and-performance-evaluation">Model Finalization and Performance Evaluation</h2>
+<p>This section focuses on finalizing both models using their optimal hyperparameters and evaluating model performance on the validation dataset.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select best hyperparameters based on ROC AUC</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>best_log_reg_params <span class="ot">&lt;-</span> <span class="fu">select_best</span>(log_reg_tuned, <span class="at">metric =</span> <span class="st">"roc_auc"</span>)</span>
@@ -766,86 +742,175 @@ XGBoost Validation Metrics:</code></pre>
 <pre><code># A tibble: 4 × 3
   .metric     .estimator .estimate
   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-1 accuracy    binary        0.948 
-2 kap         binary        0.0339
-3 mn_log_loss binary        4.82  
-4 roc_auc     binary        0.158 </code></pre>
+1 accuracy    binary         0.948
+2 kap         binary         0.111
+3 mn_log_loss binary         3.24 
+4 roc_auc     binary         0.172</code></pre>
 </div>
 </div>
 </section>
-<section id="feature-importance-and-model-interpretation" class="level2">
-<h2 class="anchored" data-anchor-id="feature-importance-and-model-interpretation">Feature Importance and Model Interpretation</h2>
-<p>Understanding which features drive the predictions is crucial for credit scoring models.</p>
-<p>#| label: feature-importance #| fig-width: 10 #| fig-height: 12</p>
+<section id="interpretability-and-feature-importance" class="level2">
+<h2 class="anchored" data-anchor-id="interpretability-and-feature-importance">Interpretability and Feature Importance</h2>
+<p>Understanding feature contributions to prediction outcomes represents a critical requirement for credit scoring models, particularly for regulatory compliance and business decision-making.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract feature importance from XGBoost model</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>xgb_importance <span class="ot">&lt;-</span> final_xgb_model <span class="sc">%&gt;%</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_parsnip</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vip</span>(<span class="at">num_features =</span> <span class="dv">15</span>) <span class="sc">+</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"XGBoost Feature Importance"</span>)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>xgb_importance</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="modeling-with-tidymodels_files/figure-html/feature-importance-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract coefficients from logistic regression model</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>log_reg_importance <span class="ot">&lt;-</span> final_log_reg_model <span class="sc">%&gt;%</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_parsnip</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vip</span>(<span class="at">num_features =</span> <span class="dv">15</span>) <span class="sc">+</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Logistic Regression Coefficient Importance"</span>)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>log_reg_importance</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="modeling-with-tidymodels_files/figure-html/feature-importance-2.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create calibration plots for both models</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>log_reg_cal <span class="ot">&lt;-</span> log_reg_val_results <span class="sc">%&gt;%</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cal_plot_breaks</span>(<span class="at">truth =</span> default, <span class="at">estimate =</span> .pred_yes, <span class="at">event_level =</span> <span class="st">"second"</span>, <span class="at">num_breaks =</span> <span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Logistic Regression Probability Calibration"</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>xgb_cal <span class="ot">&lt;-</span> xgb_val_results <span class="sc">%&gt;%</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cal_plot_breaks</span>(<span class="at">truth =</span> default, <span class="at">estimate =</span> .pred_yes, <span class="at">event_level =</span> <span class="st">"second"</span>, <span class="at">num_breaks =</span> <span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"XGBoost Probability Calibration"</span>)</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>log_reg_cal</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="modeling-with-tidymodels_files/figure-html/feature-importance-3.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>xgb_cal</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="modeling-with-tidymodels_files/figure-html/feature-importance-4.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
-<section id="extract-feature-importance-from-xgboost-model" class="level1">
-<h1>Extract feature importance from XGBoost model</h1>
-<p>xgb_importance &lt;- final_xgb_model %&gt;% extract_fit_parsnip() %&gt;% vip(num_features = 15) + labs(title = “XGBoost Feature Importance”)</p>
-<p>xgb_importance</p>
+<section id="test-set-evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="test-set-evaluation">Test Set Evaluation</h2>
+<p>The final evaluation employs the optimal model (XGBoost) on the held-out test dataset to provide an unbiased assessment of generalization performance and operational effectiveness.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Make predictions on the test set with the XGBoost model</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>test_results <span class="ot">&lt;-</span> final_xgb_model <span class="sc">%&gt;%</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">predict</span>(test_data) <span class="sc">%&gt;%</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="fu">predict</span>(final_xgb_model, test_data, <span class="at">type =</span> <span class="st">"prob"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(test_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(default, customer_id, credit_score))</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate performance metrics</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>test_metrics <span class="ot">&lt;-</span> test_results <span class="sc">%&gt;%</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> default, <span class="at">estimate =</span> .pred_class, .pred_yes)</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Final Test Set Performance Metrics:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Final Test Set Performance Metrics:</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(test_metrics)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+  .metric     .estimator .estimate
+  &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
+1 accuracy    binary        0.932 
+2 kap         binary        0.0316
+3 mn_log_loss binary        3.21  
+4 roc_auc     binary        0.172 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate AUC on test set</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>test_auc <span class="ot">&lt;-</span> test_results <span class="sc">%&gt;%</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_auc</span>(<span class="at">truth =</span> default, .pred_yes)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Test Set ROC AUC: "</span>, test_auc<span class="sc">$</span>.estimate, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Test Set ROC AUC:  0.1723324 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a gains table (commonly used in credit scoring)</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>gains_table <span class="ot">&lt;-</span> test_results <span class="sc">%&gt;%</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">risk_decile =</span> <span class="fu">ntile</span>(.pred_yes, <span class="dv">10</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(risk_decile) <span class="sc">%&gt;%</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_accounts =</span> <span class="fu">n</span>(),</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">defaults =</span> <span class="fu">sum</span>(default <span class="sc">==</span> <span class="st">"yes"</span>),</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">non_defaults =</span> <span class="fu">sum</span>(default <span class="sc">==</span> <span class="st">"no"</span>),</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">default_rate =</span> <span class="fu">mean</span>(default <span class="sc">==</span> <span class="st">"yes"</span>),</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_score =</span> <span class="fu">mean</span>(credit_score)) <span class="sc">%&gt;%</span> </span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(default_rate)) <span class="sc">%&gt;%</span> </span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">cumulative_defaults =</span> <span class="fu">cumsum</span>(defaults),</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_defaults_captured =</span> cumulative_defaults <span class="sc">/</span> <span class="fu">sum</span>(defaults),</span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">cumulative_accounts =</span> <span class="fu">cumsum</span>(total_accounts),</span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_accounts =</span> cumulative_accounts <span class="sc">/</span> <span class="fu">sum</span>(total_accounts),</span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">lift =</span> default_rate <span class="sc">/</span> (<span class="fu">sum</span>(defaults) <span class="sc">/</span> <span class="fu">sum</span>(total_accounts))</span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the gains table</span></span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>gains_table</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 11
+   risk_decile total_accounts defaults non_defaults default_rate avg_score
+         &lt;int&gt;          &lt;int&gt;    &lt;int&gt;        &lt;int&gt;        &lt;dbl&gt;     &lt;dbl&gt;
+ 1          10            200       58          142        0.29       577.
+ 2           9            200       26          174        0.13       628.
+ 3           8            200       19          181        0.095      640.
+ 4           7            200        8          192        0.04       665.
+ 5           6            200        7          193        0.035      682.
+ 6           4            200        6          194        0.03       727.
+ 7           2            200        2          198        0.01       776.
+ 8           5            200        2          198        0.01       716.
+ 9           1            200        1          199        0.005      790.
+10           3            200        1          199        0.005      757.
+# ℹ 5 more variables: cumulative_defaults &lt;int&gt;, pct_defaults_captured &lt;dbl&gt;,
+#   cumulative_accounts &lt;int&gt;, pct_accounts &lt;dbl&gt;, lift &lt;dbl&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a lift chart</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(gains_table, <span class="fu">aes</span>(<span class="at">x =</span> pct_accounts, <span class="at">y =</span> lift)) <span class="sc">+</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Lift Chart"</span>,</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Percentage of Accounts"</span>,</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Lift"</span>) <span class="sc">+</span>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="modeling-with-tidymodels_files/figure-html/final-evaluation-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
-<section id="extract-coefficients-from-logistic-regression-model" class="level1">
-<h1>Extract coefficients from logistic regression model</h1>
-<p>log_reg_importance &lt;- final_log_reg_model %&gt;% extract_fit_parsnip() %&gt;% vip(num_features = 15) + labs(title = “Logistic Regression Coefficient Importance”)</p>
-<p>log_reg_importance</p>
-</section>
-<section id="create-calibration-plots-for-both-models" class="level1">
-<h1>Create calibration plots for both models</h1>
-<p>log_reg_cal &lt;- log_reg_val_results %&gt;% cal_plot_breaks(truth = default, estimate = .pred_yes) + labs(title = “Logistic Regression Probability Calibration”)</p>
-<p>xgb_cal &lt;- xgb_val_results %&gt;% cal_plot_breaks(truth = default, estimate = .pred_yes) + labs(title = “XGBoost Probability Calibration”)</p>
-<p>log_reg_cal xgb_cal</p>
-</section>
-<section id="the-feature-importance-plots-show-which-variables-have-the-strongest-influence-on-default-prediction." class="level1">
-<h1>The feature importance plots show which variables have the strongest influence on default prediction.</h1>
-</section>
-<section id="in-credit-scoring-its-important-that-these-align-with-domain-knowledge." class="level1">
-<h1>In credit scoring, it’s important that these align with domain knowledge.</h1>
-</section>
-<section id="the-calibration-plots-show-how-well-the-predicted-probabilities-match-the-actual-default-rates." class="level1">
-<h1>The calibration plots show how well the predicted probabilities match the actual default rates.</h1>
-<section id="final-evaluation-on-test-set" class="level2">
-<h2 class="anchored" data-anchor-id="final-evaluation-on-test-set">Final Evaluation on Test Set</h2>
-<p>Now let’s evaluate our best model (XGBoost) on the held-out test set for an unbiased assessment of its performance.</p>
-<p>#| label: final-evaluation</p>
-</section>
-</section>
-<section id="make-predictions-on-the-test-set-with-the-xgboost-model" class="level1">
-<h1>Make predictions on the test set with the XGBoost model</h1>
-<p>test_results &lt;- final_xgb_model %&gt;% predict(test_data) %&gt;% bind_cols(predict(final_xgb_model, test_data, type = “prob”)) %&gt;% bind_cols(test_data %&gt;% select(default, customer_id, credit_score))</p>
-</section>
-<section id="calculate-performance-metrics" class="level1">
-<h1>Calculate performance metrics</h1>
-<p>test_metrics &lt;- test_results %&gt;% metrics(truth = default, estimate = .pred_class, .pred_yes)</p>
-<p>cat(“Final Test Set Performance Metrics:”) print(test_metrics)</p>
-</section>
-<section id="calculate-auc-on-test-set" class="level1">
-<h1>Calculate AUC on test set</h1>
-<p>test_auc &lt;- test_results %&gt;% roc_auc(truth = default, .pred_yes) cat(“Set ROC AUC:”, test_auc$.estimate, “”)</p>
-</section>
-<section id="create-a-gains-table-commonly-used-in-credit-scoring" class="level1">
-<h1>Create a gains table (commonly used in credit scoring)</h1>
-<p>gains_table &lt;- test_results %&gt;% mutate(risk_decile = ntile(.pred_yes, 10)) %&gt;% group_by(risk_decile) %&gt;% summarise( total_accounts = n(), defaults = sum(default == “yes”), non_defaults = sum(default == “no”), default_rate = mean(default == “yes”), avg_score = mean(credit_score)) %&gt;% arrange(desc(default_rate)) %&gt;% mutate( cumulative_defaults = cumsum(defaults), pct_defaults_captured = cumulative_defaults / sum(defaults), cumulative_accounts = cumsum(total_accounts), pct_accounts = cumulative_accounts / sum(total_accounts), lift = default_rate / (sum(defaults) / sum(total_accounts)) )</p>
-</section>
-<section id="display-the-gains-table" class="level1">
-<h1>Display the gains table</h1>
-<p>gains_table</p>
-</section>
-<section id="create-a-lift-chart" class="level1">
-<h1>Create a lift chart</h1>
-<p>ggplot(gains_table, aes(x = pct_accounts, y = lift)) + geom_line() + geom_point() + geom_hline(yintercept = 1, linetype = “dashed”, color = “red”) + labs(title = “Lift Chart”, x = “Percentage of Accounts”, y = “Lift”) + theme_minimal()</p>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>In this post, we’ve demonstrated how to build a credit scoring model using the tidymodels framework. We covered:</p>
-<ol type="1">
-<li>Creating a realistic credit dataset with domain-specific features</li>
-<li>Implementing a comprehensive feature engineering pipeline</li>
-<li>Training and tuning both traditional (logistic regression) and modern (XGBoost) models</li>
-<li>Evaluating model performance using industry-standard metrics</li>
-<li>Creating interpretable visualizations of model results</li>
-</ol>
-<p>The tidymodels framework provides a consistent and modular approach to building machine learning models, making it easier to experiment with different algorithms and preprocessing steps while maintaining good statistical practices.</p>
+<section id="key-takeaways" class="level2">
+<h2 class="anchored" data-anchor-id="key-takeaways">Key Takeaways</h2>
+<ul>
+<li><strong>The tidymodels ecosystem provides a unified approach</strong> to machine learning workflows, ensuring consistency and reproducibility across model development phases</li>
+<li><strong>Domain knowledge integration is critical</strong> for effective feature engineering</li>
+<li><strong>Comparative modeling approaches enhance decision-making</strong> by balancing interpretability requirements with predictive performance needs</li>
+<li><strong>Systematic hyperparameter optimization improves model performance</strong> while preventing overfitting through cross-validation techniques</li>
+<li><strong>Comprehensive evaluation frameworks ensure robust assessment</strong> of model generalization and operational effectiveness</li>
+<li><strong>Model interpretability analysis supports regulatory compliance</strong> and business decision-making in financial applications</li>
+</ul>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

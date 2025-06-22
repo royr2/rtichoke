@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2024-01-28">
 
-<title>Measuring Model Performance Using a Gains Table – R’tichoke</title>
+<title>Evaluating Binary Classification Models Using Gains Tables – R'tichoke</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -127,11 +127,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">R Installation Guide</span></a>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Get Started</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-get-started">    
+        <li>
+    <a class="dropdown-item" href="../get-started/r-package-management.html">
+ <span class="dropdown-text">Installing Packages</span></a>
+  </li>  
         <li>
     <a class="dropdown-item" href="../get-started/variables.html">
  <span class="dropdown-text">Variables in R</span></a>
@@ -164,23 +172,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
-        <li>
-    <a class="dropdown-item" href="../get-started/r-package-management.html">
- <span class="dropdown-text">Installing Packages</span></a>
-  </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="../installation.html"> 
-<span class="menu-text">R Installation Guide</span></a>
+    <a class="nav-link" href="../webr.html"> 
+<span class="menu-text">WebR Playground</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts.html"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../posts.html"> 
-<span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="https://www.r-bloggers.com/"> 
+<span class="menu-text">R-Bloggers</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -198,27 +206,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#measuring-model-performance-using-a-gains-table" id="toc-measuring-model-performance-using-a-gains-table" class="nav-link active" data-scroll-target="#measuring-model-performance-using-a-gains-table">Measuring Model Performance Using a Gains Table</a>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#package-dependencies" id="toc-package-dependencies" class="nav-link" data-scroll-target="#package-dependencies">Package Dependencies</a></li>
+  <li><a href="#dataset-preparation" id="toc-dataset-preparation" class="nav-link" data-scroll-target="#dataset-preparation">Dataset Preparation</a></li>
+  <li><a href="#target-definition" id="toc-target-definition" class="nav-link" data-scroll-target="#target-definition">Target Definition</a></li>
+  <li><a href="#model-development" id="toc-model-development" class="nav-link" data-scroll-target="#model-development">Model Development</a></li>
+  <li><a href="#gains-table-construction" id="toc-gains-table-construction" class="nav-link" data-scroll-target="#gains-table-construction">Gains Table Construction</a>
   <ul class="collapse">
-  <li><a href="#what-is-a-gains-table" id="toc-what-is-a-gains-table" class="nav-link" data-scroll-target="#what-is-a-gains-table">What is a Gains Table?</a></li>
-  <li><a href="#required-libraries" id="toc-required-libraries" class="nav-link" data-scroll-target="#required-libraries">Required Libraries</a></li>
-  <li><a href="#sample-dataset" id="toc-sample-dataset" class="nav-link" data-scroll-target="#sample-dataset">Sample Dataset</a></li>
-  <li><a href="#defining-the-target-variable" id="toc-defining-the-target-variable" class="nav-link" data-scroll-target="#defining-the-target-variable">Defining the Target Variable</a></li>
-  <li><a href="#building-a-simple-model" id="toc-building-a-simple-model" class="nav-link" data-scroll-target="#building-a-simple-model">Building a Simple Model</a></li>
-  <li><a href="#creating-the-gains-table" id="toc-creating-the-gains-table" class="nav-link" data-scroll-target="#creating-the-gains-table">Creating the Gains Table</a>
+  <li><a href="#population-discretization-into-bins" id="toc-population-discretization-into-bins" class="nav-link" data-scroll-target="#population-discretization-into-bins">Population Discretization into Bins</a></li>
+  <li><a href="#basic-statistical-measures-by-segment" id="toc-basic-statistical-measures-by-segment" class="nav-link" data-scroll-target="#basic-statistical-measures-by-segment">Basic Statistical Measures by Segment</a></li>
+  <li><a href="#cumulative-distribution" id="toc-cumulative-distribution" class="nav-link" data-scroll-target="#cumulative-distribution">Cumulative Distribution</a></li>
+  <li><a href="#performance-metrics" id="toc-performance-metrics" class="nav-link" data-scroll-target="#performance-metrics">Performance Metrics</a></li>
+  </ul></li>
+  <li><a href="#reusable-function" id="toc-reusable-function" class="nav-link" data-scroll-target="#reusable-function">Reusable Function</a>
   <ul class="collapse">
-  <li><a href="#step-1-discretize-predictions-into-bins" id="toc-step-1-discretize-predictions-into-bins" class="nav-link" data-scroll-target="#step-1-discretize-predictions-into-bins">Step 1: Discretize Predictions into Bins</a></li>
-  <li><a href="#step-2-calculate-basic-statistics-for-each-bin" id="toc-step-2-calculate-basic-statistics-for-each-bin" class="nav-link" data-scroll-target="#step-2-calculate-basic-statistics-for-each-bin">Step 2: Calculate Basic Statistics for Each Bin</a></li>
-  <li><a href="#step-3-add-distribution-metrics" id="toc-step-3-add-distribution-metrics" class="nav-link" data-scroll-target="#step-3-add-distribution-metrics">Step 3: Add Distribution Metrics</a></li>
-  <li><a href="#step-4-add-performance-metrics" id="toc-step-4-add-performance-metrics" class="nav-link" data-scroll-target="#step-4-add-performance-metrics">Step 4: Add Performance Metrics</a></li>
+  <li><a href="#function-implementation" id="toc-function-implementation" class="nav-link" data-scroll-target="#function-implementation">Function Implementation</a></li>
   </ul></li>
-  <li><a href="#creating-a-reusable-function" id="toc-creating-a-reusable-function" class="nav-link" data-scroll-target="#creating-a-reusable-function">Creating a Reusable Function</a>
-  <ul class="collapse">
-  <li><a href="#using-the-function" id="toc-using-the-function" class="nav-link" data-scroll-target="#using-the-function">Using the Function</a></li>
-  </ul></li>
-  <li><a href="#interpreting-the-gains-table" id="toc-interpreting-the-gains-table" class="nav-link" data-scroll-target="#interpreting-the-gains-table">Interpreting the Gains Table</a></li>
-  <li><a href="#practical-applications" id="toc-practical-applications" class="nav-link" data-scroll-target="#practical-applications">Practical Applications</a></li>
-  </ul></li>
+  <li><a href="#interpretation" id="toc-interpretation" class="nav-link" data-scroll-target="#interpretation">Interpretation</a></li>
+  <li><a href="#applications-in-credit-risk-analytics" id="toc-applications-in-credit-risk-analytics" class="nav-link" data-scroll-target="#applications-in-credit-risk-analytics">Applications in Credit Risk Analytics</a></li>
   </ul>
 </nav>
     </div>
@@ -227,7 +232,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Measuring Model Performance Using a Gains Table</h1>
+<h1 class="title">Evaluating Binary Classification Models Using Gains Tables</h1>
   <div class="quarto-categories">
     <div class="quarto-category">R</div>
     <div class="quarto-category">Credit Risk Analytics</div>
@@ -255,15 +260,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="measuring-model-performance-using-a-gains-table" class="level1">
-<h1>Measuring Model Performance Using a Gains Table</h1>
-<p>In credit risk modeling, analysts often use a tool called a <strong>gains table</strong> (or KS table) to measure and quantify the performance of classification models. This post explores how to build and interpret such a table using R.</p>
-<section id="what-is-a-gains-table" class="level2">
-<h2 class="anchored" data-anchor-id="what-is-a-gains-table">What is a Gains Table?</h2>
-<p>A gains table discretizes the population (typically a test or validation set) into groups based on the model’s output (probability, log odds, or scores). Usually, each group represents 10% of the total population (deciles). The table then presents summary statistics for each group and analyzes the cumulative distributions of events (defaults) and non-events to quantify the model’s performance.</p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>In credit risk modeling and binary classification applications, analysts employ gains tables (also known as KS tables) as a fundamental tool for measuring and quantifying model performance. This tutorial dives into the construction and interpretion of gains tables using R. ## Theoretical Foundation: Understanding Gains Tables</p>
+<p>A gains table systematically discretizes the population (typically a validation or test dataset) into groups based on the model’s output predictions (probability scores, log odds, or risk scores). Each group conventionally represents 10% of the total population (deciles), though alternative binning strategies may be employed. The output presents summary statistics for each group and analyzes the cumulative distributions of events (defaults) and non-events to quantify the model’s discriminatory performance.</p>
 </section>
-<section id="required-libraries" class="level2">
-<h2 class="anchored" data-anchor-id="required-libraries">Required Libraries</h2>
+<section id="package-dependencies" class="level2">
+<h2 class="anchored" data-anchor-id="package-dependencies">Package Dependencies</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
@@ -272,9 +275,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="sample-dataset" class="level2">
-<h2 class="anchored" data-anchor-id="sample-dataset">Sample Dataset</h2>
-<p>We’ll use a sample from the Lending Club dataset, which contains information about loans and their outcomes.</p>
+<section id="dataset-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-preparation">Dataset Preparation</h2>
+<p>This tutorial utilizes a sample from the Lending Club dataset, which contains comprehensive loan information and associated outcomes suitable for credit risk modeling applications.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the sample data</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sample <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://bit.ly/42ypcnJ"</span>)</span>
@@ -286,9 +289,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="defining-the-target-variable" class="level2">
-<h2 class="anchored" data-anchor-id="defining-the-target-variable">Defining the Target Variable</h2>
-<p>First, we need to create a target (outcome) variable to model. Since this is a credit risk use case, we’ll identify borrowers who defaulted on their payments.</p>
+<section id="target-definition" class="level2">
+<h2 class="anchored" data-anchor-id="target-definition">Target Definition</h2>
+<p>The initial step requires the creation of a binary target variable for modeling purposes. In this credit risk application, we identify borrowers who defaulted on their loan obligations.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check unique loan statuses</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sample<span class="sc">$</span>loan_status)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -312,16 +315,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>sample <span class="sc">%&gt;%</span> </span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">events =</span> <span class="fu">sum</span>(bad_flag <span class="sc">==</span> <span class="dv">1</span>), </span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">non_events =</span> <span class="fu">sum</span>(bad_flag <span class="sc">==</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">event_rate =</span> events<span class="sc">/</span>(events <span class="sc">+</span> non_events))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(            <span class="at">event_rate =</span> events<span class="sc">/</span>(events <span class="sc">+</span> non_events))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  events non_events event_rate
 1   1162       8838     0.1162</code></pre>
 </div>
 </div>
 </section>
-<section id="building-a-simple-model" class="level2">
-<h2 class="anchored" data-anchor-id="building-a-simple-model">Building a Simple Model</h2>
-<p>Next, let’s build a quick model, the output of which we’ll use to create the gains table.</p>
+<section id="model-development" class="level2">
+<h2 class="anchored" data-anchor-id="model-development">Model Development</h2>
+<p>Subsequently, we develop a logistic regression model to generate predictions that will serve as the foundation for gains table construction.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace NA values with a default value</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>sample[<span class="fu">is.na</span>(sample)] <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">1</span></span>
@@ -358,11 +361,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>test<span class="sc">$</span>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(mdl, <span class="at">newdata =</span> test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="creating-the-gains-table" class="level2">
-<h2 class="anchored" data-anchor-id="creating-the-gains-table">Creating the Gains Table</h2>
-<p>Now let’s build the gains table step by step:</p>
-<section id="step-1-discretize-predictions-into-bins" class="level3">
-<h3 class="anchored" data-anchor-id="step-1-discretize-predictions-into-bins">Step 1: Discretize Predictions into Bins</h3>
+<section id="gains-table-construction" class="level2">
+<h2 class="anchored" data-anchor-id="gains-table-construction">Gains Table Construction</h2>
+<p>The following section demonstrates the step-by-step construction of a comprehensive gains table through systematic binning and statistical analysis.</p>
+<section id="population-discretization-into-bins" class="level3">
+<h3 class="anchored" data-anchor-id="population-discretization-into-bins">Population Discretization into Bins</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create deciles based on model predictions</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>q <span class="ot">&lt;-</span> <span class="fu">quantile</span>(test<span class="sc">$</span>pred, <span class="at">probs =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">11</span>))</span>
@@ -374,14 +377,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the bin levels (note they're in increasing order)</span></span>
 <span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(test<span class="sc">$</span>bins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] "[-5.37,-3.3]"  "(-3.3,-2.9]"   "(-2.9,-2.66]"  "(-2.66,-2.45]"
- [5] "(-2.45,-2.25]" "(-2.25,-2.07]" "(-2.07,-1.86]" "(-1.86,-1.61]"
- [9] "(-1.61,-1.23]" "(-1.23,1.6]"  </code></pre>
+<pre><code> [1] "[-5.33,-3.3]"  "(-3.3,-2.9]"   "(-2.9,-2.66]"  "(-2.66,-2.47]"
+ [5] "(-2.47,-2.28]" "(-2.28,-2.1]"  "(-2.1,-1.91]"  "(-1.91,-1.65]"
+ [9] "(-1.65,-1.24]" "(-1.24,2.03]" </code></pre>
 </div>
 </div>
 </section>
-<section id="step-2-calculate-basic-statistics-for-each-bin" class="level3">
-<h3 class="anchored" data-anchor-id="step-2-calculate-basic-statistics-for-each-bin">Step 2: Calculate Basic Statistics for Each Bin</h3>
+<section id="basic-statistical-measures-by-segment" class="level3">
+<h3 class="anchored" data-anchor-id="basic-statistical-measures-by-segment">Basic Statistical Measures by Segment</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create initial gains table with counts</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>gains_table <span class="ot">&lt;-</span> test <span class="sc">%&gt;%</span> </span>
@@ -409,82 +412,82 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">[-5.37,-3.3]</td>
+<td style="text-align: left;">[-5.33,-3.3]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">295</td>
-<td style="text-align: left;">1.7%</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">298</td>
+<td style="text-align: left;">0.7%</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">(-3.3,-2.9]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: left;">2.7%</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">291</td>
+<td style="text-align: left;">3.0%</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">(-2.9,-2.66]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: left;">2.7%</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">290</td>
+<td style="text-align: left;">3.3%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.66,-2.45]</td>
+<td style="text-align: left;">(-2.66,-2.47]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">11</td>
-<td style="text-align: right;">289</td>
-<td style="text-align: left;">3.7%</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">280</td>
+<td style="text-align: left;">6.7%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.45,-2.25]</td>
+<td style="text-align: left;">(-2.47,-2.28]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">22</td>
-<td style="text-align: right;">278</td>
-<td style="text-align: left;">7.3%</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">263</td>
+<td style="text-align: left;">12.3%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.25,-2.07]</td>
+<td style="text-align: left;">(-2.28,-2.1]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">34</td>
-<td style="text-align: right;">266</td>
-<td style="text-align: left;">11.3%</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">258</td>
+<td style="text-align: left;">14.0%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.07,-1.86]</td>
+<td style="text-align: left;">(-2.1,-1.91]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">56</td>
-<td style="text-align: right;">244</td>
-<td style="text-align: left;">18.7%</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">252</td>
+<td style="text-align: left;">16.0%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.86,-1.61]</td>
+<td style="text-align: left;">(-1.91,-1.65]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">65</td>
-<td style="text-align: right;">235</td>
-<td style="text-align: left;">21.7%</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">247</td>
+<td style="text-align: left;">17.7%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-1.61,-1.23]</td>
+<td style="text-align: left;">(-1.65,-1.24]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">59</td>
-<td style="text-align: right;">241</td>
-<td style="text-align: left;">19.7%</td>
+<td style="text-align: right;">79</td>
+<td style="text-align: right;">221</td>
+<td style="text-align: left;">26.3%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.23,1.6]</td>
+<td style="text-align: left;">(-1.24,2.03]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">75</td>
-<td style="text-align: right;">225</td>
-<td style="text-align: left;">25.0%</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">220</td>
+<td style="text-align: left;">26.7%</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 </section>
-<section id="step-3-add-distribution-metrics" class="level3">
-<h3 class="anchored" data-anchor-id="step-3-add-distribution-metrics">Step 3: Add Distribution Metrics</h3>
+<section id="cumulative-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="cumulative-distribution">Cumulative Distribution</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add population percentage and cumulative distributions</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>gains_table <span class="sc">%&lt;&gt;%</span></span>
@@ -522,101 +525,101 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">[-5.37,-3.3]</td>
+<td style="text-align: left;">[-5.33,-3.3]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">295</td>
-<td style="text-align: left;">1.7%</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">298</td>
+<td style="text-align: left;">0.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.0145773</td>
-<td style="text-align: right;">0.1110275</td>
+<td style="text-align: right;">0.0052632</td>
+<td style="text-align: right;">0.1137405</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">(-3.3,-2.9]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: left;">2.7%</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">291</td>
+<td style="text-align: left;">3.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.0379009</td>
-<td style="text-align: right;">0.2209259</td>
+<td style="text-align: right;">0.0289474</td>
+<td style="text-align: right;">0.2248092</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">(-2.9,-2.66]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: left;">2.7%</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">290</td>
+<td style="text-align: left;">3.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.0612245</td>
-<td style="text-align: right;">0.3308242</td>
+<td style="text-align: right;">0.0552632</td>
+<td style="text-align: right;">0.3354962</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.66,-2.45]</td>
+<td style="text-align: left;">(-2.66,-2.47]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">11</td>
-<td style="text-align: right;">289</td>
-<td style="text-align: left;">3.7%</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">280</td>
+<td style="text-align: left;">6.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.0932945</td>
-<td style="text-align: right;">0.4395935</td>
+<td style="text-align: right;">0.1078947</td>
+<td style="text-align: right;">0.4423664</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.45,-2.25]</td>
+<td style="text-align: left;">(-2.47,-2.28]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">22</td>
-<td style="text-align: right;">278</td>
-<td style="text-align: left;">7.3%</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">263</td>
+<td style="text-align: left;">12.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.1574344</td>
-<td style="text-align: right;">0.5442228</td>
+<td style="text-align: right;">0.2052632</td>
+<td style="text-align: right;">0.5427481</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.25,-2.07]</td>
+<td style="text-align: left;">(-2.28,-2.1]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">34</td>
-<td style="text-align: right;">266</td>
-<td style="text-align: left;">11.3%</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">258</td>
+<td style="text-align: left;">14.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.2565598</td>
-<td style="text-align: right;">0.6443357</td>
+<td style="text-align: right;">0.3157895</td>
+<td style="text-align: right;">0.6412214</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.07,-1.86]</td>
+<td style="text-align: left;">(-2.1,-1.91]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">56</td>
-<td style="text-align: right;">244</td>
-<td style="text-align: left;">18.7%</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">252</td>
+<td style="text-align: left;">16.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.4198251</td>
-<td style="text-align: right;">0.7361686</td>
+<td style="text-align: right;">0.4421053</td>
+<td style="text-align: right;">0.7374046</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.86,-1.61]</td>
+<td style="text-align: left;">(-1.91,-1.65]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">65</td>
-<td style="text-align: right;">235</td>
-<td style="text-align: left;">21.7%</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">247</td>
+<td style="text-align: left;">17.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.6093294</td>
-<td style="text-align: right;">0.8246142</td>
+<td style="text-align: right;">0.5815789</td>
+<td style="text-align: right;">0.8316794</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-1.61,-1.23]</td>
+<td style="text-align: left;">(-1.65,-1.24]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">59</td>
-<td style="text-align: right;">241</td>
-<td style="text-align: left;">19.7%</td>
+<td style="text-align: right;">79</td>
+<td style="text-align: right;">221</td>
+<td style="text-align: left;">26.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.7813411</td>
-<td style="text-align: right;">0.9153180</td>
+<td style="text-align: right;">0.7894737</td>
+<td style="text-align: right;">0.9160305</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.23,1.6]</td>
+<td style="text-align: left;">(-1.24,2.03]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">75</td>
-<td style="text-align: right;">225</td>
-<td style="text-align: left;">25.0%</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">220</td>
+<td style="text-align: left;">26.7%</td>
 <td style="text-align: left;">10.0%</td>
 <td style="text-align: right;">1.0000000</td>
 <td style="text-align: right;">1.0000000</td>
@@ -626,8 +629,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="step-4-add-performance-metrics" class="level3">
-<h3 class="anchored" data-anchor-id="step-4-add-performance-metrics">Step 4: Add Performance Metrics</h3>
+<section id="performance-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="performance-metrics">Performance Metrics</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add KS statistic, capture rate, and cumulative event rate</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>gains_table <span class="sc">%&lt;&gt;%</span></span>
@@ -679,134 +682,134 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">[-5.37,-3.3]</td>
+<td style="text-align: left;">[-5.33,-3.3]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">295</td>
-<td style="text-align: left;">1.7%</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">298</td>
+<td style="text-align: left;">0.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">1.5%</td>
-<td style="text-align: left;">11.1%</td>
-<td style="text-align: right;">0.10</td>
+<td style="text-align: left;">0.5%</td>
+<td style="text-align: left;">11.4%</td>
+<td style="text-align: right;">0.11</td>
 <td style="text-align: left;">1%</td>
-<td style="text-align: left;">1.7%</td>
+<td style="text-align: left;">0.7%</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">(-3.3,-2.9]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: left;">2.7%</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">291</td>
+<td style="text-align: left;">3.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">3.8%</td>
-<td style="text-align: left;">22.1%</td>
-<td style="text-align: right;">0.18</td>
-<td style="text-align: left;">4%</td>
-<td style="text-align: left;">2.2%</td>
+<td style="text-align: left;">2.9%</td>
+<td style="text-align: left;">22.5%</td>
+<td style="text-align: right;">0.20</td>
+<td style="text-align: left;">3%</td>
+<td style="text-align: left;">1.8%</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">(-2.9,-2.66]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: left;">2.7%</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">290</td>
+<td style="text-align: left;">3.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">6.1%</td>
-<td style="text-align: left;">33.1%</td>
-<td style="text-align: right;">0.27</td>
+<td style="text-align: left;">5.5%</td>
+<td style="text-align: left;">33.5%</td>
+<td style="text-align: right;">0.28</td>
 <td style="text-align: left;">6%</td>
 <td style="text-align: left;">2.3%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.66,-2.45]</td>
+<td style="text-align: left;">(-2.66,-2.47]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">11</td>
-<td style="text-align: right;">289</td>
-<td style="text-align: left;">3.7%</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">280</td>
+<td style="text-align: left;">6.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">9.3%</td>
-<td style="text-align: left;">44.0%</td>
-<td style="text-align: right;">0.35</td>
-<td style="text-align: left;">9%</td>
-<td style="text-align: left;">2.7%</td>
+<td style="text-align: left;">10.8%</td>
+<td style="text-align: left;">44.2%</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: left;">11%</td>
+<td style="text-align: left;">3.4%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.45,-2.25]</td>
+<td style="text-align: left;">(-2.47,-2.28]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">22</td>
-<td style="text-align: right;">278</td>
-<td style="text-align: left;">7.3%</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">263</td>
+<td style="text-align: left;">12.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">15.7%</td>
-<td style="text-align: left;">54.4%</td>
-<td style="text-align: right;">0.39</td>
-<td style="text-align: left;">16%</td>
-<td style="text-align: left;">3.6%</td>
+<td style="text-align: left;">20.5%</td>
+<td style="text-align: left;">54.3%</td>
+<td style="text-align: right;">0.34</td>
+<td style="text-align: left;">21%</td>
+<td style="text-align: left;">5.2%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.25,-2.07]</td>
+<td style="text-align: left;">(-2.28,-2.1]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">34</td>
-<td style="text-align: right;">266</td>
-<td style="text-align: left;">11.3%</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">258</td>
+<td style="text-align: left;">14.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">25.7%</td>
-<td style="text-align: left;">64.4%</td>
-<td style="text-align: right;">0.39</td>
-<td style="text-align: left;">26%</td>
-<td style="text-align: left;">4.9%</td>
+<td style="text-align: left;">31.6%</td>
+<td style="text-align: left;">64.1%</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: left;">32%</td>
+<td style="text-align: left;">6.7%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.07,-1.86]</td>
+<td style="text-align: left;">(-2.1,-1.91]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">56</td>
-<td style="text-align: right;">244</td>
-<td style="text-align: left;">18.7%</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">252</td>
+<td style="text-align: left;">16.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">42.0%</td>
-<td style="text-align: left;">73.6%</td>
-<td style="text-align: right;">0.32</td>
-<td style="text-align: left;">42%</td>
-<td style="text-align: left;">6.9%</td>
+<td style="text-align: left;">44.2%</td>
+<td style="text-align: left;">73.7%</td>
+<td style="text-align: right;">0.30</td>
+<td style="text-align: left;">44%</td>
+<td style="text-align: left;">8.0%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.86,-1.61]</td>
+<td style="text-align: left;">(-1.91,-1.65]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">65</td>
-<td style="text-align: right;">235</td>
-<td style="text-align: left;">21.7%</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">247</td>
+<td style="text-align: left;">17.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">60.9%</td>
-<td style="text-align: left;">82.5%</td>
-<td style="text-align: right;">0.22</td>
-<td style="text-align: left;">61%</td>
-<td style="text-align: left;">8.7%</td>
+<td style="text-align: left;">58.2%</td>
+<td style="text-align: left;">83.2%</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: left;">58%</td>
+<td style="text-align: left;">9.2%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-1.61,-1.23]</td>
+<td style="text-align: left;">(-1.65,-1.24]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">59</td>
-<td style="text-align: right;">241</td>
-<td style="text-align: left;">19.7%</td>
+<td style="text-align: right;">79</td>
+<td style="text-align: right;">221</td>
+<td style="text-align: left;">26.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">78.1%</td>
-<td style="text-align: left;">91.5%</td>
+<td style="text-align: left;">78.9%</td>
+<td style="text-align: left;">91.6%</td>
 <td style="text-align: right;">0.13</td>
-<td style="text-align: left;">78%</td>
-<td style="text-align: left;">9.9%</td>
+<td style="text-align: left;">79%</td>
+<td style="text-align: left;">11.1%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.23,1.6]</td>
+<td style="text-align: left;">(-1.24,2.03]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">75</td>
-<td style="text-align: right;">225</td>
-<td style="text-align: left;">25.0%</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">220</td>
+<td style="text-align: left;">26.7%</td>
 <td style="text-align: left;">10.0%</td>
 <td style="text-align: left;">100.0%</td>
 <td style="text-align: left;">100.0%</td>
 <td style="text-align: right;">0.00</td>
 <td style="text-align: left;">100%</td>
-<td style="text-align: left;">11.4%</td>
+<td style="text-align: left;">12.7%</td>
 </tr>
 </tbody>
 </table>
@@ -814,9 +817,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 </section>
-<section id="creating-a-reusable-function" class="level2">
-<h2 class="anchored" data-anchor-id="creating-a-reusable-function">Creating a Reusable Function</h2>
-<p>Let’s encapsulate all the above steps into a single function that can be reused for any binary classification model:</p>
+<section id="reusable-function" class="level2">
+<h2 class="anchored" data-anchor-id="reusable-function">Reusable Function</h2>
+<p>The following implementation encapsulates the gains table construction process within a comprehensive, reusable function suitable for any binary classification model evaluation:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>gains_table <span class="ot">&lt;-</span> <span class="cf">function</span>(act, pred, <span class="at">increasing =</span> <span class="cn">TRUE</span>, <span class="at">nBins =</span> <span class="dv">10</span>) {</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  </span>
@@ -852,8 +855,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>           <span class="at">c.non_events_pct =</span> <span class="fu">percent</span>(c.non_events_pct, <span class="fl">0.1</span>, <span class="dv">100</span>))</span>
 <span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="using-the-function" class="level3">
-<h3 class="anchored" data-anchor-id="using-the-function">Using the Function</h3>
+<section id="function-implementation" class="level3">
+<h3 class="anchored" data-anchor-id="function-implementation">Function Implementation</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate a gains table with bins in descending order</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">gains_table</span>(test<span class="sc">$</span>bad_flag, test<span class="sc">$</span>pred, <span class="cn">FALSE</span>, <span class="dv">10</span>)</span>
@@ -890,134 +893,134 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">(-1.23,1.6]</td>
+<td style="text-align: left;">(-1.24,2.03]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">75</td>
-<td style="text-align: right;">225</td>
-<td style="text-align: left;">25.0%</td>
+<td style="text-align: right;">80</td>
+<td style="text-align: right;">220</td>
+<td style="text-align: left;">26.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">21.9%</td>
-<td style="text-align: left;">8.5%</td>
+<td style="text-align: left;">21.1%</td>
+<td style="text-align: left;">8.4%</td>
 <td style="text-align: right;">0.13</td>
-<td style="text-align: left;">22%</td>
-<td style="text-align: left;">25.0%</td>
+<td style="text-align: left;">21%</td>
+<td style="text-align: left;">26.7%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.61,-1.23]</td>
+<td style="text-align: left;">(-1.65,-1.24]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">59</td>
-<td style="text-align: right;">241</td>
-<td style="text-align: left;">19.7%</td>
+<td style="text-align: right;">79</td>
+<td style="text-align: right;">221</td>
+<td style="text-align: left;">26.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">39.1%</td>
-<td style="text-align: left;">17.5%</td>
-<td style="text-align: right;">0.22</td>
-<td style="text-align: left;">39%</td>
-<td style="text-align: left;">22.3%</td>
+<td style="text-align: left;">41.8%</td>
+<td style="text-align: left;">16.8%</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: left;">42%</td>
+<td style="text-align: left;">26.5%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-1.86,-1.61]</td>
+<td style="text-align: left;">(-1.91,-1.65]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">65</td>
-<td style="text-align: right;">235</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">247</td>
+<td style="text-align: left;">17.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">55.8%</td>
+<td style="text-align: left;">26.3%</td>
+<td style="text-align: right;">0.30</td>
+<td style="text-align: left;">56%</td>
+<td style="text-align: left;">23.6%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-2.1,-1.91]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">252</td>
+<td style="text-align: left;">16.0%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">68.4%</td>
+<td style="text-align: left;">35.9%</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: left;">68%</td>
 <td style="text-align: left;">21.7%</td>
-<td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">58.0%</td>
-<td style="text-align: left;">26.4%</td>
-<td style="text-align: right;">0.32</td>
-<td style="text-align: left;">58%</td>
-<td style="text-align: left;">22.1%</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">(-2.07,-1.86]</td>
-<td style="text-align: right;">300</td>
-<td style="text-align: right;">56</td>
-<td style="text-align: right;">244</td>
-<td style="text-align: left;">18.7%</td>
-<td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">74.3%</td>
-<td style="text-align: left;">35.6%</td>
-<td style="text-align: right;">0.39</td>
-<td style="text-align: left;">74%</td>
-<td style="text-align: left;">21.2%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.25,-2.07]</td>
+<td style="text-align: left;">(-2.28,-2.1]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">34</td>
-<td style="text-align: right;">266</td>
-<td style="text-align: left;">11.3%</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">258</td>
+<td style="text-align: left;">14.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">84.3%</td>
-<td style="text-align: left;">45.6%</td>
-<td style="text-align: right;">0.39</td>
-<td style="text-align: left;">84%</td>
-<td style="text-align: left;">19.3%</td>
+<td style="text-align: left;">79.5%</td>
+<td style="text-align: left;">45.7%</td>
+<td style="text-align: right;">0.34</td>
+<td style="text-align: left;">79%</td>
+<td style="text-align: left;">20.1%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.45,-2.25]</td>
+<td style="text-align: left;">(-2.47,-2.28]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">22</td>
-<td style="text-align: right;">278</td>
-<td style="text-align: left;">7.3%</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">263</td>
+<td style="text-align: left;">12.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">90.7%</td>
-<td style="text-align: left;">56.0%</td>
-<td style="text-align: right;">0.35</td>
-<td style="text-align: left;">91%</td>
-<td style="text-align: left;">17.3%</td>
+<td style="text-align: left;">89.2%</td>
+<td style="text-align: left;">55.8%</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: left;">89%</td>
+<td style="text-align: left;">18.8%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.66,-2.45]</td>
+<td style="text-align: left;">(-2.66,-2.47]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">11</td>
-<td style="text-align: right;">289</td>
-<td style="text-align: left;">3.7%</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">280</td>
+<td style="text-align: left;">6.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">93.9%</td>
-<td style="text-align: left;">66.9%</td>
-<td style="text-align: right;">0.27</td>
+<td style="text-align: left;">94.5%</td>
+<td style="text-align: left;">66.5%</td>
+<td style="text-align: right;">0.28</td>
 <td style="text-align: left;">94%</td>
-<td style="text-align: left;">15.3%</td>
+<td style="text-align: left;">17.1%</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">(-2.9,-2.66]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: left;">2.7%</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">290</td>
+<td style="text-align: left;">3.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">96.2%</td>
-<td style="text-align: left;">77.9%</td>
-<td style="text-align: right;">0.18</td>
-<td style="text-align: left;">96%</td>
-<td style="text-align: left;">13.8%</td>
+<td style="text-align: left;">97.1%</td>
+<td style="text-align: left;">77.5%</td>
+<td style="text-align: right;">0.20</td>
+<td style="text-align: left;">97%</td>
+<td style="text-align: left;">15.4%</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">(-3.3,-2.9]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: left;">2.7%</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">291</td>
+<td style="text-align: left;">3.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">98.5%</td>
-<td style="text-align: left;">88.9%</td>
-<td style="text-align: right;">0.10</td>
+<td style="text-align: left;">99.5%</td>
+<td style="text-align: left;">88.6%</td>
+<td style="text-align: right;">0.11</td>
 <td style="text-align: left;">99%</td>
-<td style="text-align: left;">12.5%</td>
+<td style="text-align: left;">14.0%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">[-5.37,-3.3]</td>
+<td style="text-align: left;">[-5.33,-3.3]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">295</td>
-<td style="text-align: left;">1.7%</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">298</td>
+<td style="text-align: left;">0.7%</td>
 <td style="text-align: left;">10.0%</td>
 <td style="text-align: left;">100.0%</td>
 <td style="text-align: left;">100.0%</td>
 <td style="text-align: right;">0.00</td>
 <td style="text-align: left;">100%</td>
-<td style="text-align: left;">11.4%</td>
+<td style="text-align: left;">12.7%</td>
 </tr>
 </tbody>
 </table>
@@ -1025,30 +1028,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 </section>
-<section id="interpreting-the-gains-table" class="level2">
-<h2 class="anchored" data-anchor-id="interpreting-the-gains-table">Interpreting the Gains Table</h2>
-<p>A gains table provides several key insights into model performance:</p>
+<section id="interpretation" class="level2">
+<h2 class="anchored" data-anchor-id="interpretation">Interpretation</h2>
+<p>A properly constructed gains table provides multiple critical insights into model performance characteristics:</p>
 <ol type="1">
-<li><p><strong>Monotonicity</strong>: The event rates should consistently increase (or decrease) across bins. This confirms that the model effectively rank-orders risk.</p></li>
-<li><p><strong>Bin Consistency</strong>: If bin sizes are not consistent (ideally ~10% each), it suggests the model is assigning the same output/score to many borrowers (clumping), which could pose issues when deciding cutoffs.</p></li>
-<li><p><strong>KS Statistic</strong>: The maximum value of the KS column indicates the model’s discriminatory power. A higher value (closer to 1) indicates better separation between good and bad borrowers.</p></li>
-<li><p><strong>Capture Rate</strong>: Shows what percentage of all bad accounts are captured at each cutoff point.</p></li>
-<li><p><strong>Cumulative Event Rate</strong>: Indicates the bad rate among all accounts up to that bin, useful for setting approval thresholds.</p></li>
+<li><p><strong>Monotonicity Assessment</strong>: Event rates should demonstrate consistent increases (or decreases) across bins, confirming the model’s effectiveness in rank-ordering risk levels.</p></li>
+<li><p><strong>Population Distribution</strong>: Consistent bin sizes (ideally ~10% each) indicate appropriate score distribution. Inconsistent sizes suggest score clustering, which may complicate threshold determination.</p></li>
+<li><p><strong>Kolmogorov-Smirnov (KS) Statistic</strong>: The maximum KS value represents the model’s discriminatory power. Higher values (approaching 1.0) indicate superior separation between positive and negative cases.</p></li>
+<li><p><strong>Capture Rate</strong>: Demonstrates the percentage of total events captured at each threshold, essential for operational decision-making.</p></li>
+<li><p><strong>Cumulative Event Rate</strong>: Indicates the event rate among all cases up to each bin, facilitating approval threshold establishment.</p></li>
 </ol>
 </section>
-<section id="practical-applications" class="level2">
-<h2 class="anchored" data-anchor-id="practical-applications">Practical Applications</h2>
-<p>In credit risk management, the gains table helps with:</p>
+<section id="applications-in-credit-risk-analytics" class="level2">
+<h2 class="anchored" data-anchor-id="applications-in-credit-risk-analytics">Applications in Credit Risk Analytics</h2>
+<p>Gains tables serve multiple critical functions in credit risk management environments:</p>
 <ol type="1">
-<li><p><strong>Setting Cutoffs</strong>: Identifying appropriate score thresholds for approving or rejecting applications.</p></li>
-<li><p><strong>Strategy Development</strong>: Creating tiered strategies (e.g., approve, review, decline) based on risk levels.</p></li>
-<li><p><strong>Performance Monitoring</strong>: Tracking model performance over time by comparing actual vs.&nbsp;expected distributions.</p></li>
-<li><p><strong>Model Comparison</strong>: Evaluating different models by comparing their KS statistics and capture rates.</p></li>
+<li><p><strong>Threshold Optimization</strong>: Identification of appropriate score thresholds for automated approval or rejection decisions.</p></li>
+<li><p><strong>Tiered Strategy Development</strong>: Construction of multi-tier decision strategies (approve, manual review, decline) based on quantified risk levels.</p></li>
+<li><p><strong>Model Performance Monitoring</strong>: Longitudinal tracking of model performance through comparison of actual versus expected distributions.</p></li>
+<li><p><strong>Comparative Model Evaluation</strong>: Systematic comparison of alternative models through KS statistics and capture rate analysis.</p></li>
 </ol>
-<p>The gains table is a powerful tool for evaluating binary classification models, especially in credit risk applications. By providing a structured view of how well a model separates good and bad cases across the score distribution, it helps analysts make informed decisions about model quality and operational implementation.</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

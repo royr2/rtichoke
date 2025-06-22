@@ -1,5 +1,5 @@
 ---
-title: "Measuring Model Performance Using a Gains Table"
+title: "Evaluating Binary Classification Models Using Gains Tables"
 date: "2024-01-28"
 categories: [R, Credit Risk Analytics, Model Evaluation]
 image: "../images/gains.png"
@@ -10,15 +10,14 @@ execute:
   eval: true
 ---
 
-# Measuring Model Performance Using a Gains Table
+## Introduction
 
-In credit risk modeling, analysts often use a tool called a **gains table** (or KS table) to measure and quantify the performance of classification models. This post explores how to build and interpret such a table using R.
+In credit risk modeling and binary classification applications, analysts employ gains tables (also known as KS tables) as a fundamental tool for measuring and quantifying model performance. This tutorial dives into the construction and interpretion of gains tables using R.
+## Theoretical Foundation: Understanding Gains Tables
 
-## What is a Gains Table?
+A gains table systematically discretizes the population (typically a validation or test dataset) into groups based on the model's output predictions (probability scores, log odds, or risk scores). Each group conventionally represents 10% of the total population (deciles), though alternative binning strategies may be employed. The output presents summary statistics for each group and analyzes the cumulative distributions of events (defaults) and non-events to quantify the model's discriminatory performance.
 
-A gains table discretizes the population (typically a test or validation set) into groups based on the model's output (probability, log odds, or scores). Usually, each group represents 10% of the total population (deciles). The table then presents summary statistics for each group and analyzes the cumulative distributions of events (defaults) and non-events to quantify the model's performance.
-
-## Required Libraries
+## Package Dependencies
 
 ```{r}
 #| label: setup
@@ -30,9 +29,9 @@ library(knitr)
 library(scales)
 ```
 
-## Sample Dataset
+## Dataset Preparation
 
-We'll use a sample from the Lending Club dataset, which contains information about loans and their outcomes.
+This tutorial utilizes a sample from the Lending Club dataset, which contains comprehensive loan information and associated outcomes suitable for credit risk modeling applications.
 
 ```{r}
 #| label: data-load
@@ -44,9 +43,9 @@ sample <- read.csv("https://bit.ly/42ypcnJ")
 dim(sample)
 ```
 
-## Defining the Target Variable
+## Target Definition
 
-First, we need to create a target (outcome) variable to model. Since this is a credit risk use case, we'll identify borrowers who defaulted on their payments.
+The initial step requires the creation of a binary target variable for modeling purposes. In this credit risk application, we identify borrowers who defaulted on their loan obligations.
 
 ```{r}
 #| label: target-definition
@@ -64,12 +63,12 @@ sample %<>% mutate(bad_flag = ifelse(loan_status %in% codes, 1, 0))
 sample %>% 
   summarise(events = sum(bad_flag == 1), 
             non_events = sum(bad_flag == 0)) %>% 
-  mutate(event_rate = events/(events + non_events))
+  mutate(            event_rate = events/(events + non_events))
 ```
 
-## Building a Simple Model
+## Model Development
 
-Next, let's build a quick model, the output of which we'll use to create the gains table.
+Subsequently, we develop a logistic regression model to generate predictions that will serve as the foundation for gains table construction.
 
 ```{r}
 #| label: data-prep
@@ -112,11 +111,11 @@ mdl <- glm(
 test$pred <- predict(mdl, newdata = test)
 ```
 
-## Creating the Gains Table
+## Gains Table Construction
 
-Now let's build the gains table step by step:
+The following section demonstrates the step-by-step construction of a comprehensive gains table through systematic binning and statistical analysis.
 
-### Step 1: Discretize Predictions into Bins
+### Population Discretization into Bins
 
 ```{r}
 #| label: binning
@@ -132,7 +131,7 @@ test$bins <- cut(test$pred, breaks = q, include.lowest = TRUE,
 levels(test$bins)
 ```
 
-### Step 2: Calculate Basic Statistics for Each Bin
+### Basic Statistical Measures by Segment
 
 ```{r}
 #| label: basic-stats
@@ -152,7 +151,7 @@ gains_table %<>%
 kable(gains_table)
 ```
 
-### Step 3: Add Distribution Metrics
+### Cumulative Distribution
 
 ```{r}
 #| label: distribution-metrics
@@ -169,7 +168,7 @@ gains_table %<>%
 kable(gains_table)
 ```
 
-### Step 4: Add Performance Metrics
+### Performance Metrics
 
 ```{r}
 #| label: performance-metrics
@@ -194,9 +193,9 @@ gains_table %<>%
 kable(gains_table)
 ```
 
-## Creating a Reusable Function
+## Reusable Function
 
-Let's encapsulate all the above steps into a single function that can be reused for any binary classification model:
+The following implementation encapsulates the gains table construction process within a comprehensive, reusable function suitable for any binary classification model evaluation:
 
 ```{r}
 #| label: gains-function
@@ -236,7 +235,7 @@ gains_table <- function(act, pred, increasing = TRUE, nBins = 10) {
 }
 ```
 
-### Using the Function
+### Function Implementation
 
 ```{r}
 #| label: function-demo
@@ -246,30 +245,28 @@ tab <- gains_table(test$bad_flag, test$pred, FALSE, 10)
 kable(tab)
 ```
 
-## Interpreting the Gains Table
+## Interpretation
 
-A gains table provides several key insights into model performance:
+A properly constructed gains table provides multiple critical insights into model performance characteristics:
 
-1. **Monotonicity**: The event rates should consistently increase (or decrease) across bins. This confirms that the model effectively rank-orders risk.
+1. **Monotonicity Assessment**: Event rates should demonstrate consistent increases (or decreases) across bins, confirming the model's effectiveness in rank-ordering risk levels.
 
-2. **Bin Consistency**: If bin sizes are not consistent (ideally ~10% each), it suggests the model is assigning the same output/score to many borrowers (clumping), which could pose issues when deciding cutoffs.
+2. **Population Distribution**: Consistent bin sizes (ideally ~10% each) indicate appropriate score distribution. Inconsistent sizes suggest score clustering, which may complicate threshold determination.
 
-3. **KS Statistic**: The maximum value of the KS column indicates the model's discriminatory power. A higher value (closer to 1) indicates better separation between good and bad borrowers.
+3. **Kolmogorov-Smirnov (KS) Statistic**: The maximum KS value represents the model's discriminatory power. Higher values (approaching 1.0) indicate superior separation between positive and negative cases.
 
-4. **Capture Rate**: Shows what percentage of all bad accounts are captured at each cutoff point.
+4. **Capture Rate**: Demonstrates the percentage of total events captured at each threshold, essential for operational decision-making.
 
-5. **Cumulative Event Rate**: Indicates the bad rate among all accounts up to that bin, useful for setting approval thresholds.
+5. **Cumulative Event Rate**: Indicates the event rate among all cases up to each bin, facilitating approval threshold establishment.
 
-## Practical Applications
+## Applications in Credit Risk Analytics
 
-In credit risk management, the gains table helps with:
+Gains tables serve multiple critical functions in credit risk management environments:
 
-1. **Setting Cutoffs**: Identifying appropriate score thresholds for approving or rejecting applications.
+1. **Threshold Optimization**: Identification of appropriate score thresholds for automated approval or rejection decisions.
 
-2. **Strategy Development**: Creating tiered strategies (e.g., approve, review, decline) based on risk levels.
+2. **Tiered Strategy Development**: Construction of multi-tier decision strategies (approve, manual review, decline) based on quantified risk levels.
 
-3. **Performance Monitoring**: Tracking model performance over time by comparing actual vs. expected distributions.
+3. **Model Performance Monitoring**: Longitudinal tracking of model performance through comparison of actual versus expected distributions.
 
-4. **Model Comparison**: Evaluating different models by comparing their KS statistics and capture rates.
-
-The gains table is a powerful tool for evaluating binary classification models, especially in credit risk applications. By providing a structured view of how well a model separates good and bad cases across the score distribution, it helps analysts make informed decisions about model quality and operational implementation.
+4. **Comparative Model Evaluation**: Systematic comparison of alternative models through KS statistics and capture rate analysis.

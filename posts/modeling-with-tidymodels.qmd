@@ -28,9 +28,9 @@ library(ROSE)       # For imbalanced data visualization
 library(corrplot)   # For correlation visualization
 ```
 
-## Creating a Realistic Credit Scoring Dataset
+## Synthetic Data Generation
 
-We'll simulate a realistic credit dataset with common variables found in credit scoring models. The data will include demographic information, loan characteristics, and credit history variables.
+This tutorial uses a simulated credit dataset incorporating realistic variable distributions commonly encountered in credit scoring applications. The synthetic data includes demographic information, loan characteristics, and credit history variables with appropriate statistical relationships.
 
 ```{r}
 set.seed(123)
@@ -66,8 +66,8 @@ data <- data %>%
   mutate(
     # Interest rate depends on credit score and loan term
     interest_rate = 25 - (credit_score - 300) * (15/550) + 
-                    ifelse(loan_term == 36, -1, ifelse(loan_term == 60, 0, 1.5)) +
-                    rnorm(n, 0, 1.5),
+      ifelse(loan_term == 36, -1, ifelse(loan_term == 60, 0, 1.5)) +
+      rnorm(n, 0, 1.5),
     
     # Loan purpose with realistic probabilities
     loan_purpose = sample(
@@ -78,7 +78,7 @@ data <- data %>%
     
     # Add some derived features that have predictive power
     payment_amount = (loan_amount * (interest_rate/100/12) * (1 + interest_rate/100/12)^loan_term) / 
-                    ((1 + interest_rate/100/12)^loan_term - 1),
+      ((1 + interest_rate/100/12)^loan_term - 1),
     payment_to_income_ratio = (payment_amount * 12) / income
   )
 
@@ -118,7 +118,6 @@ table(data$default)
 prop.table(table(data$default))
 ```
 
-
 ```{r}
 # Visualize the default rate
 ggplot(data, aes(x = default, fill = default)) +
@@ -138,7 +137,6 @@ ggplot(data, aes(x = credit_score, y = as.numeric(default) - 1)) +
   theme_minimal()
 ```
 
-
 ```{r}
 # Examine correlation between numeric predictors
 credit_cors <- data %>%
@@ -150,10 +148,9 @@ corrplot(credit_cors, method = "circle", type = "upper",
          tl.col = "black", tl.srt = 45, tl.cex = 0.7)
 ```
 
+## Stratified Partitioning
 
-## Data Splitting
-
-Credit default datasets are typically imbalanced, with defaults being the minority class. We'll use a stratified split to maintain the class distribution.
+Credit default datasets typically exhibit class imbalance, with default events representing the minority class. We implement stratified sampling to preserve the class distribution across training, validation, and test partitions.
 
 ```{r}
 # Create initial train/test split (80/20)
@@ -178,13 +175,12 @@ print(train_class_props * 100)
 # Visualize class imbalance
 ROSE::roc.curve(training(validation_split)$default == "yes", 
                 training(validation_split)$credit_score,
-                plotit = TRUE,
-                main = "ROC Curve for Credit Score Alone")
+                plotit = TRUE,                main = "ROC Curve for Credit Score Alone")
 ```
 
 ## Feature Engineering and Preprocessing
 
-Now we'll create a comprehensive recipe with feature engineering steps relevant to credit scoring, including handling the class imbalance.
+The following section develops a preprocessing recipe incorporating domain-specific feature engineering techniques relevant to credit risk modeling, including class imbalance handling strategies.
 
 ```{r}
 # Examine the distributions of key variables
@@ -206,7 +202,7 @@ par(mfrow = c(1, 1))
 ```
 
 ```{r}
-# Create a comprehensive recipe with domain knowledge
+# Create a recipe
 credit_recipe <- recipe(default ~ ., data = training(validation_split)) %>%
   # Remove ID column
   step_rm(customer_id) %>%
@@ -255,19 +251,13 @@ prepped_recipe
 recipe_data <- bake(prepped_recipe, new_data = NULL)
 glimpse(recipe_data)
 
-# Verify class balance after SMOTE
+# Verify
 table(recipe_data$default)
 ```
 
-The feature engineering steps above incorporate domain knowledge specific to credit risk modeling:
+## Model Architecture and Hyperparameter Optimization
 
-- We create derived features that capture payment capacity, credit utilization, and borrower stability
-- We transform highly skewed variables using Yeo-Johnson transformations
-- We normalize all numeric predictors to put them on the same scale
-
-## Model Specification and Tuning
-
-For credit scoring, we'll compare two models: a logistic regression model (commonly used in the financial industry for its interpretability) and an XGBoost model (for its predictive power). We'll tune both models using cross-validation.
+This section implements both traditional (logistic regression) and modern (XGBoost) algorithms. Logistic regression provides interpretability required for regulatory compliance, while XGBoost offers superior predictive performance. Both models undergo systematic hyperparameter tuning using cross-validation.
 
 ```{r}
 # Define the logistic regression model
@@ -296,7 +286,7 @@ xgb_spec <- boost_tree(
   mtry = tune(),
   learn_rate = tune()
 ) %>%
-  set_engine("xgboost", objective = "binary:logistic", scale_pos_weight = 5) %>%
+  set_engine("xgboost", objective = "binary:logistic") %>%
   set_mode("classification")
 
 # Create an XGBoost workflow
@@ -306,13 +296,13 @@ xgb_workflow <- workflow() %>%
 
 # Define the tuning grid for XGBoost
 xgb_grid <- grid_latin_hypercube(
-  trees(range = c(100, 500)),
-  tree_depth(range = c(3, 10)),
-  min_n(range = c(2, 20)),
+  trees(range = c(50, 100)),
+  tree_depth(range = c(3, 6)),
+  min_n(range = c(2, 8)),
   loss_reduction(range = c(0.001, 1.0)),
   mtry(range = c(5, 20)),
   learn_rate(range = c(-4, -1), trans = log10_trans()),
-  size = 15
+  size = 10
 )
 
 # Create cross-validation folds with stratification
@@ -350,11 +340,9 @@ log_reg_results <- log_reg_tuned %>% collect_metrics()
 log_reg_results %>% filter(.metric == "roc_auc") %>% arrange(desc(mean)) %>% head()
 ```
 
-The results above show how both models perform across different hyperparameter settings. XGBoost typically achieves higher predictive performance, while logistic regression offers better interpretability. For credit scoring applications, both aspects are important.
+## Model Finalization and Performance Evaluation
 
-## Finalizing and Evaluating the Models
-
-We'll finalize both models using their best hyperparameters and evaluate them on the validation set.
+This section focuses on finalizing both models using their optimal hyperparameters and evaluating model performance on the validation dataset.
 
 ```{r}
 #| label: model-evaluation
@@ -402,9 +390,9 @@ cat("\nXGBoost Validation Metrics:\n")
 print(xgb_val_metrics)
 ```
 
-## Feature Importance and Model Interpretation
+## Interpretability and Feature Importance
 
-Understanding which features drive the predictions is crucial for credit scoring models.
+Understanding feature contributions to prediction outcomes represents a critical requirement for credit scoring models, particularly for regulatory compliance and business decision-making.
 
 ```{r}
 #| label: feature-importance
@@ -429,23 +417,20 @@ log_reg_importance
 
 # Create calibration plots for both models
 log_reg_cal <- log_reg_val_results %>%
-  cal_plot_breaks(truth = default, estimate = .pred_yes) +
+  cal_plot_breaks(truth = default, estimate = .pred_yes, event_level = "second", num_breaks = 5) +
   labs(title = "Logistic Regression Probability Calibration")
 
 xgb_cal <- xgb_val_results %>%
-  cal_plot_breaks(truth = default, estimate = .pred_yes) +
+  cal_plot_breaks(truth = default, estimate = .pred_yes, event_level = "second", num_breaks = 5) +
   labs(title = "XGBoost Probability Calibration")
 
 log_reg_cal
 xgb_cal
+```
 
-# The feature importance plots show which variables have the strongest influence on default prediction. 
-# In credit scoring, it's important that these align with domain knowledge. 
-# The calibration plots show how well the predicted probabilities match the actual default rates.
+##  Test Set Evaluation
 
-## Final Evaluation on Test Set
-
-Now let's evaluate our best model (XGBoost) on the held-out test set for an unbiased assessment of its performance.
+The final evaluation employs the optimal model (XGBoost) on the held-out test dataset to provide an unbiased assessment of generalization performance and operational effectiveness.
 
 ```{r}
 #| label: final-evaluation
@@ -497,17 +482,14 @@ ggplot(gains_table, aes(x = pct_accounts, y = lift)) +
   geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
   labs(title = "Lift Chart",
        x = "Percentage of Accounts",
-       y = "Lift") +
-  theme_minimal()
+       y = "Lift") +  theme_minimal()
+```
 
-## Conclusion
-
-In this post, we've demonstrated how to build a credit scoring model using the tidymodels framework. We covered:
-
-1. Creating a realistic credit dataset with domain-specific features
-2. Implementing a comprehensive feature engineering pipeline
-3. Training and tuning both traditional (logistic regression) and modern (XGBoost) models
-4. Evaluating model performance using industry-standard metrics
-5. Creating interpretable visualizations of model results
-
-The tidymodels framework provides a consistent and modular approach to building machine learning models, making it easier to experiment with different algorithms and preprocessing steps while maintaining good statistical practices.
+## Key Takeaways
+  
+- **The tidymodels ecosystem provides a unified approach** to machine learning workflows, ensuring consistency and reproducibility across model development phases
+- **Domain knowledge integration is critical** for effective feature engineering 
+- **Comparative modeling approaches enhance decision-making** by balancing interpretability requirements with predictive performance needs
+- **Systematic hyperparameter optimization improves model performance** while preventing overfitting through cross-validation techniques
+- **Comprehensive evaluation frameworks ensure robust assessment** of model generalization and operational effectiveness
+- **Model interpretability analysis supports regulatory compliance** and business decision-making in financial applications

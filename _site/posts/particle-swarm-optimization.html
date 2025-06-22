@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2023-05-17">
 
-<title>Portfolio Optimization Using Particle Swarm Optimization in R – R’tichoke</title>
+<title>Portfolio Optimization Using PSO – R’tichoke</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -127,11 +127,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">R Installation Guide</span></a>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Get Started</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-get-started">    
+        <li>
+    <a class="dropdown-item" href="../get-started/r-package-management.html">
+ <span class="dropdown-text">Installing Packages</span></a>
+  </li>  
         <li>
     <a class="dropdown-item" href="../get-started/variables.html">
  <span class="dropdown-text">Variables in R</span></a>
@@ -164,23 +172,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
-        <li>
-    <a class="dropdown-item" href="../get-started/r-package-management.html">
- <span class="dropdown-text">Installing Packages</span></a>
-  </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="../installation.html"> 
-<span class="menu-text">R Installation Guide</span></a>
+    <a class="nav-link" href="../webr.html"> 
+<span class="menu-text">WebR Playground</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts.html"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../posts.html"> 
-<span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="https://www.r-bloggers.com/"> 
+<span class="menu-text">R-Bloggers</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -198,10 +206,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#finding-optimal-portfolios-with-particle-swarm-optimization" id="toc-finding-optimal-portfolios-with-particle-swarm-optimization" class="nav-link active" data-scroll-target="#finding-optimal-portfolios-with-particle-swarm-optimization">Finding Optimal Portfolios with Particle Swarm Optimization</a>
-  <ul class="collapse">
-  <li><a href="#required-libraries" id="toc-required-libraries" class="nav-link" data-scroll-target="#required-libraries">Required Libraries</a></li>
-  <li><a href="#data-collection-and-preparation" id="toc-data-collection-and-preparation" class="nav-link" data-scroll-target="#data-collection-and-preparation">Data Collection and Preparation</a>
+  <li><a href="#libraries" id="toc-libraries" class="nav-link active" data-scroll-target="#libraries">Libraries</a></li>
+  <li><a href="#data-collection" id="toc-data-collection" class="nav-link" data-scroll-target="#data-collection">Data Collection</a>
   <ul class="collapse">
   <li><a href="#getting-stock-tickers" id="toc-getting-stock-tickers" class="nav-link" data-scroll-target="#getting-stock-tickers">Getting Stock Tickers</a></li>
   <li><a href="#downloading-historical-price-data" id="toc-downloading-historical-price-data" class="nav-link" data-scroll-target="#downloading-historical-price-data">Downloading Historical Price Data</a></li>
@@ -225,7 +231,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#practical-applications" id="toc-practical-applications" class="nav-link" data-scroll-target="#practical-applications">Practical Applications</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
-  </ul></li>
   </ul>
 </nav>
     </div>
@@ -234,7 +239,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Portfolio Optimization Using Particle Swarm Optimization in R</h1>
+<h1 class="title">Portfolio Optimization Using PSO</h1>
   <div class="quarto-categories">
     <div class="quarto-category">R</div>
     <div class="quarto-category">Finance</div>
@@ -262,15 +267,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="finding-optimal-portfolios-with-particle-swarm-optimization" class="level1">
-<h1>Finding Optimal Portfolios with Particle Swarm Optimization</h1>
-<p>Portfolio optimization is a critical task in investment management, where the goal is to allocate capital across different assets to maximize returns while controlling risk. In this post, we’ll explore how to use Particle Swarm Optimization (PSO) to perform mean-variance portfolio optimization with various constraints.</p>
-<p>PSO is a computational method inspired by the social behavior of bird flocking or fish schooling. It optimizes a problem by having a population of candidate solutions (particles) that move around the search space according to mathematical formulas. Each particle’s movement is influenced by its local best-known position and also guided toward the best-known positions found by other particles in the swarm.</p>
-<p>This approach is particularly valuable for portfolio optimization because: 1. It can handle non-convex and complex constraint functions 2. It doesn’t require derivatives of the objective function 3. It can escape local optima through its stochastic nature</p>
-<p>For additional information on mean-variance optimization and the CAPM model, refer to this <a href="http://www.columbia.edu/~mh2078/FoundationsFE/MeanVariance-CAPM.pdf">paper</a>.</p>
-<section id="required-libraries" class="level2">
-<h2 class="anchored" data-anchor-id="required-libraries">Required Libraries</h2>
-<p>Before we begin, let’s load the R packages we’ll need for this analysis:</p>
+<p>Portfolio optimization represents a critical task in investment management, where the goal involves allocating capital across different assets to maximize returns while controlling risk. This post explores how to use Particle Swarm Optimization (PSO) to perform mean-variance portfolio optimization with various constraints.</p>
+<ol type="1">
+<li><p>For additional information on mean-variance optimization and the CAPM model, refer to this <a href="http://www.columbia.edu/~mh2078/FoundationsFE/MeanVariance-CAPM.pdf">paper</a>.</p></li>
+<li><p>For additional information on particle swarm optimisation, refer to <a href="../posts/building-particle-swarm-optimizer.html">this post</a> on</p></li>
+</ol>
+<section id="libraries" class="level2">
+<h2 class="anchored" data-anchor-id="libraries">Libraries</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pso)       <span class="co"># For PSO implementation (provides psoptim function)</span></span>
@@ -281,12 +284,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly)    <span class="co"># For creating interactive 3D visualizations</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="data-collection-and-preparation" class="level2">
-<h2 class="anchored" data-anchor-id="data-collection-and-preparation">Data Collection and Preparation</h2>
-<p>The first step in portfolio optimization is gathering the necessary data. We’ll need historical price data to calculate returns and risk metrics.</p>
+<section id="data-collection" class="level2">
+<h2 class="anchored" data-anchor-id="data-collection">Data Collection</h2>
+<p>The first step in portfolio optimization involves gathering the necessary data. Historical price data is required to calculate returns and risk metrics.</p>
 <section id="getting-stock-tickers" class="level3">
 <h3 class="anchored" data-anchor-id="getting-stock-tickers">Getting Stock Tickers</h3>
-<p>For this demonstration, we’ll use stocks from the NIFTY50 index, which includes the 50 largest Indian companies by market capitalization:</p>
+<p>This demonstration utilizes stocks from the NIFTY50 index, which includes the 50 largest Indian companies by market capitalization:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read ticker list from NSE (National Stock Exchange of India) website</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ticker_list <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://raw.githubusercontent.com/royr2/datasets/refs/heads/main/ind_nifty50list.csv"</span>)</span>
@@ -305,7 +308,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="downloading-historical-price-data" class="level3">
 <h3 class="anchored" data-anchor-id="downloading-historical-price-data">Downloading Historical Price Data</h3>
-<p>Now we’ll download historical price data for these stocks using the <code>quantmod</code> package, which provides an interface to Yahoo Finance:</p>
+<p>The next step involves downloading historical price data for these stocks using the <code>quantmod</code> package, which provides an interface to Yahoo Finance:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Append ".NS" to tickers for Yahoo Finance format (NS = National Stock Exchange)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>tickers <span class="ot">&lt;-</span> <span class="fu">paste0</span>(ticker_list<span class="sc">$</span>Symbol, <span class="st">".NS"</span>)</span>
@@ -341,7 +344,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Reshape data to wide format with dates as rows and tickers as columns</span></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="co"># This makes it easier to calculate returns across all stocks</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="co"># This format facilitates the calculation of returns across all stocks</span></span>
 <span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>prices_df <span class="ot">&lt;-</span> <span class="fu">pivot_wider</span>(<span class="at">data =</span> ticker_df, <span class="at">id_cols =</span> <span class="st">"date"</span>, <span class="at">names_from =</span> <span class="st">"ticker"</span>, <span class="at">values_from =</span> <span class="st">"close"</span>)</span>
 <span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove rows with missing values to ensure complete data</span></span>
@@ -350,18 +353,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the date range of our data</span></span>
 <span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(prices_df<span class="sc">$</span>date)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "2017-11-17" "2025-04-17"</code></pre>
+<pre><code>[1] "2017-11-17" "2025-06-20"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check dimensions (number of trading days × number of stocks + date column)</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(prices_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1830   49</code></pre>
+<pre><code>[1] 1874   49</code></pre>
 </div>
 </div>
 </section>
 <section id="visualizing-the-data" class="level3">
 <h3 class="anchored" data-anchor-id="visualizing-the-data">Visualizing the Data</h3>
-<p>Before proceeding with analysis, it’s always good practice to visualize the data to check for anomalies and understand the general trends. Let’s visualize the price data for a subset of stocks (focusing on the metals industry):</p>
+<p>Before proceeding with analysis, examining the data through visualization helps identify anomalies and understand general trends. The following visualization displays the price data for a subset of stocks (focusing on the metals industry):</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot closing prices for metal stocks</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>prices_df <span class="sc">%&gt;%</span> </span>
@@ -407,7 +410,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>Closing prices for metal stocks</figcaption>
 </figure>
 </div>
-<p>The visualization shows the price movements of metal stocks over time. We can observe periods of both correlation and divergence between different stocks, highlighting the importance of diversification in portfolio construction.</p>
+<p>The visualization demonstrates the price movements of metal stocks over time. The data reveals periods of both correlation and divergence between different stocks, highlighting the importance of diversification in portfolio construction.</p>
 </section>
 <section id="calculating-returns" class="level3">
 <h3 class="anchored" data-anchor-id="calculating-returns">Calculating Returns</h3>
@@ -427,24 +430,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>returns_df <span class="ot">&lt;-</span> returns_df[<span class="sc">-</span><span class="dv">1</span>,]  </span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Pre-compute average returns and covariance matrix for optimization</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co"># These are key inputs to the mean-variance optimization</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co"># These constitute key inputs to the mean-variance optimization</span></span>
 <span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>mean_returns <span class="ot">&lt;-</span> <span class="fu">sapply</span>(returns_df, mean)  <span class="co"># Expected returns</span></span>
 <span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>cov_mat <span class="ot">&lt;-</span> <span class="fu">cov</span>(returns_df)  <span class="co"># Risk (covariance) matrix</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The mean returns represent our expectations for each asset’s performance, while the covariance matrix captures both the individual volatilities and the relationships between assets. These will be the primary inputs to our optimization process.</p>
+<p>The mean returns represent expectations for each asset’s performance, while the covariance matrix captures both the individual volatilities and the relationships between assets. These serve as the primary inputs to the optimization process.</p>
 </section>
 </section>
 <section id="portfolio-optimization-framework" class="level2">
 <h2 class="anchored" data-anchor-id="portfolio-optimization-framework">Portfolio Optimization Framework</h2>
 <section id="objective-function" class="level3">
 <h3 class="anchored" data-anchor-id="objective-function">Objective Function</h3>
-<p>The core of portfolio optimization is the objective function, which defines what we’re trying to maximize or minimize. In mean-variance optimization, we balance three key components:</p>
+<p>The core of portfolio optimization is the objective function, which defines the optimization target. In mean-variance optimization, the approach balances three key components:</p>
 <ol type="1">
 <li><strong>Expected returns (reward)</strong>: The weighted average of expected returns for each asset</li>
 <li><strong>Portfolio variance (risk)</strong>: A measure of the portfolio’s volatility, calculated using the covariance matrix</li>
 <li><strong>Risk aversion parameter</strong>: Controls the trade-off between risk and return (higher values prioritize risk reduction)</li>
 </ol>
-<p>We’ll also incorporate constraints through penalty terms:</p>
+<p>The implementation also incorporates constraints through penalty terms:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>obj_func <span class="ot">&lt;-</span> <span class="cf">function</span>(wts, </span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">risk_av =</span> <span class="dv">10</span>,  <span class="co"># Risk aversion parameter</span></span>
@@ -465,18 +468,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add penalty for violating the full investment constraint (sum of weights = 1)</span></span>
 <span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># The squared term ensures the penalty increases quadratically with violation size</span></span>
 <span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  obj <span class="ot">&lt;-</span> obj <span class="sc">-</span> lambda1 <span class="sc">*</span> (<span class="fu">sum</span>(wts) <span class="sc">-</span> <span class="dv">1</span>)<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return negative value since PSO minimizes by default, but we want to maximize</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># our objective (higher returns, lower risk)</span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="sc">-</span>obj)</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Return negative value since PSO minimizes by default, but the goal is to maximize</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># the objective (higher returns, lower risk)</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="sc">-</span>obj)</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This objective function implements the classic mean-variance utility with a quadratic penalty for the full investment constraint. The risk aversion parameter allows us to move along the efficient frontier to find portfolios with different risk-return profiles.</p>
 </section>
 </section>
 <section id="two-asset-example" class="level2">
 <h2 class="anchored" data-anchor-id="two-asset-example">Two-Asset Example</h2>
-<p>Before tackling the full portfolio optimization problem, let’s start with a simple two-asset example. This will help us visualize how PSO works and validate our approach:</p>
+<p>Before tackling the full portfolio optimization problem, this section begins with a simple two-asset example. This approach helps visualize how PSO works and validates the methodology:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use only the first two assets for this example</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate their average returns and covariance matrix</span></span>
@@ -569,13 +571,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify that the weights sum to approximately 1 (full investment constraint)</span></span>
 <span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(out<span class="sc">$</span>obj_loc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9973249</code></pre>
+<pre><code>[1] 0.9963105</code></pre>
 </div>
 </div>
-<p>In this implementation, we’re tracking the movement of all particles throughout the optimization process. This will allow us to visualize how the swarm converges toward the optimal solution.</p>
+<p>In this implementation, the tracking of all particle movements throughout the optimization process occurs. This enables visualization of how the swarm converges toward the optimal solution.</p>
 <section id="visualizing-the-optimization-process" class="level3">
 <h3 class="anchored" data-anchor-id="visualizing-the-optimization-process">Visualizing the Optimization Process</h3>
-<p>One of the advantages of starting with a two-asset example is that we can visualize the entire search space and see how the PSO algorithm explores it. Let’s create a 3D visualization of the objective function landscape and the path each particle took during optimization:</p>
+<p>One advantage of starting with a two-asset example is the ability to visualize the entire search space and observe how the PSO algorithm explores it. The following creates a 3D visualization of the objective function landscape and the path each particle took during optimization:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a fine grid of points covering the feasible region (all possible weight combinations)</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>grid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">x =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">by =</span> <span class="fl">0.01</span>),  <span class="co"># First asset weight from 0 to 1</span></span>
@@ -599,15 +601,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>              <span class="at">color =</span> <span class="sc">~</span> iter, <span class="at">inherit =</span> <span class="cn">FALSE</span>, </span>
 <span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>              <span class="at">marker =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>This visualization shows: 1. The objective function landscape as a 3D surface 2. The particles (small dots) exploring the search space 3. How the swarm converges toward the optimal solution over iterations (color gradient)</p>
-<p>The concentration of particles in certain regions shows where the algorithm found promising solutions. The global best solution is where the particles ultimately converge.</p>
+<p>This visualization demonstrates: 1. The objective function landscape as a 3D surface 2. The particles (small dots) exploring the search space 3. How the swarm converges toward the optimal solution over iterations (color gradient)</p>
+<p>The concentration of particles in certain regions indicates where the algorithm found promising solutions. The global best solution represents where the particles ultimately converge.</p>
 </section>
 </section>
 <section id="multi-asset-portfolio-optimization" class="level2">
 <h2 class="anchored" data-anchor-id="multi-asset-portfolio-optimization">Multi-Asset Portfolio Optimization</h2>
-<p>Now that we understand the basic principles, let’s scale up to optimize a portfolio containing all the assets in our dataset. Instead of using our custom PSO implementation, we’ll leverage the more efficient <code>psoptim</code> function from the <code>pso</code> package:</p>
+<p>With the basic principles understood, the analysis now scales up to optimize a portfolio containing all the assets in the dataset. Instead of using the custom PSO implementation, this section leverages the more efficient <code>psoptim</code> function from the <code>pso</code> package:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the number of stocks in our dataset</span></span>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the number of stocks in the dataset</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>n_stocks <span class="ot">&lt;-</span> <span class="fu">ncol</span>(returns_df)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the PSO optimization for the full portfolio</span></span>
@@ -641,24 +643,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate and display the expected return of the optimized portfolio</span></span>
 <span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(<span class="st">"Portfolio returns:"</span>, <span class="fu">round</span>(opt<span class="sc">$</span>par <span class="sc">%*%</span> mean_returns, <span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio returns: 0.00063"</code></pre>
+<pre><code>[1] "Portfolio returns: 0.00065"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate and display the standard deviation (risk) of the optimized portfolio</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(<span class="st">"Portfolio Std dev:"</span>, <span class="fu">round</span>(<span class="fu">sqrt</span>(opt<span class="sc">$</span>par <span class="sc">%*%</span> cov_mat <span class="sc">%*%</span> opt<span class="sc">$</span>par), <span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio Std dev: 0.00888"</code></pre>
+<pre><code>[1] "Portfolio Std dev: 0.00914"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify that the weights sum to approximately 1 (full investment constraint)</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(opt<span class="sc">$</span>par)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9915935</code></pre>
+<pre><code>[1] 0.9923503</code></pre>
 </div>
 </div>
-<p>The optimization has found a portfolio allocation that balances return and risk according to our specified risk aversion parameter. The high risk aversion value (1000) means we’re prioritizing risk reduction over return maximization.</p>
+<p>The optimization has identified a portfolio allocation that balances return and risk according to the specified risk aversion parameter. The high risk aversion value (1000) indicates prioritization of risk reduction over return maximization.</p>
 </section>
 <section id="adding-tracking-error-constraint" class="level2">
 <h2 class="anchored" data-anchor-id="adding-tracking-error-constraint">Adding Tracking Error Constraint</h2>
-<p>One of the advantages of PSO is its flexibility in handling various constraints. Let’s demonstrate this by adding a tracking error constraint, which is common in institutional portfolio management. Tracking error measures how closely a portfolio follows a benchmark:</p>
+<p>One advantage of PSO is its flexibility in handling various constraints. The following demonstrates this by adding a tracking error constraint, which is common in institutional portfolio management. Tracking error measures how closely a portfolio follows a benchmark:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define benchmark portfolio (equally weighted across all stocks)</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>bench_wts <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">/</span>n_stocks, n_stocks)</span>
@@ -723,20 +725,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb20-61"><a href="#cb20-61" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate and display the expected return of the optimized portfolio</span></span>
 <span id="cb20-62"><a href="#cb20-62" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(<span class="st">"Portfolio returns:"</span>, <span class="fu">round</span>(opt<span class="sc">$</span>par <span class="sc">%*%</span> mean_returns, <span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio returns: 0.00076"</code></pre>
+<pre><code>[1] "Portfolio returns: 0.00074"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate and display the standard deviation (risk) of the optimized portfolio</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(<span class="st">"Portfolio Std dev:"</span>, <span class="fu">round</span>(<span class="fu">sqrt</span>(opt<span class="sc">$</span>par <span class="sc">%*%</span> cov_mat <span class="sc">%*%</span> opt<span class="sc">$</span>par), <span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio Std dev: 0.01102"</code></pre>
+<pre><code>[1] "Portfolio Std dev: 0.01109"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify that the weights sum to approximately 1</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(opt<span class="sc">$</span>par)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9944118</code></pre>
+<pre><code>[1] 0.9974361</code></pre>
 </div>
 </div>
-<p>By adding the tracking error constraint, we’ve created a portfolio that not only balances risk and return but also tracks the performance of an equally-weighted benchmark to a specified degree. The <code>lambda2</code> parameter controls how closely we want to track the benchmark - higher values will result in portfolios that more closely resemble the benchmark.</p>
+<p>By adding the tracking error constraint, the result is a portfolio that not only balances risk and return but also tracks the performance of an equally-weighted benchmark to a specified degree. The <code>lambda2</code> parameter controls the closeness of benchmark tracking - higher values result in portfolios that more closely resemble the benchmark.</p>
 </section>
 <section id="advantages-and-limitations-of-pso" class="level2">
 <h2 class="anchored" data-anchor-id="advantages-and-limitations-of-pso">Advantages and Limitations of PSO</h2>
@@ -763,7 +765,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="practical-applications" class="level2">
 <h2 class="anchored" data-anchor-id="practical-applications">Practical Applications</h2>
-<p>PSO-based portfolio optimization is particularly valuable in scenarios where:</p>
+<p>PSO-based portfolio optimization proves particularly valuable in scenarios where:</p>
 <ul>
 <li>Traditional quadratic programming approaches fail due to complex constraints</li>
 <li>The objective function includes non-linear terms like higher moments (skewness, kurtosis)</li>
@@ -773,8 +775,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="conclusion" class="level2">
 <h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>Particle Swarm Optimization provides a powerful and flexible approach to portfolio optimization that can overcome many limitations of traditional methods. It can handle complex objective functions and constraints that might be difficult to solve with classical optimization techniques.</p>
-<p>The approach demonstrated in this post can be extended to include additional constraints such as:</p>
+<p>Particle Swarm Optimization provides a powerful and flexible approach to portfolio optimization that can overcome many limitations of traditional methods. The algorithm can handle complex objective functions and constraints that might be difficult to solve with classical optimization techniques.</p>
+<p>The approach demonstrated in this tutorial can be extended to include additional constraints such as:</p>
 <ul>
 <li>Sector or industry exposure limits</li>
 <li>Maximum position sizes</li>
@@ -782,16 +784,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Risk factor exposures and limits</li>
 <li>Cardinality constraints (limiting the number of assets)</li>
 </ul>
-<p>For more robust results in practice, consider these enhancements:</p>
+<p>For more robust results in practice, practitioners should consider these enhancements:</p>
 <ol type="1">
 <li>Run the algorithm multiple times with different random seeds and average the results</li>
 <li>Implement a hybrid approach that uses PSO for global exploration followed by a local optimizer for refinement</li>
 <li>Add constraints gradually to better understand their impact on the portfolio</li>
 </ol>
-<p>PSO represents just one of many metaheuristic approaches that can be applied to portfolio optimization. Other techniques like genetic algorithms, simulated annealing, or differential evolution might also be worth exploring depending on your specific requirements.</p>
+<p>PSO represents just one of many metaheuristic approaches that can be applied to portfolio optimization. Other techniques like genetic algorithms, simulated annealing, or differential evolution might also be worth exploring depending on specific requirements.</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

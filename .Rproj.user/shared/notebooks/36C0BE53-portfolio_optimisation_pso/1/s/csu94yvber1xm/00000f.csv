@@ -1,0 +1,7 @@
+"0","# Load required packages"
+"0","library(pso)       # For PSO implementation (provides psoptim function)"
+"0","library(ggplot2)   # For data visualization"
+"0","library(dplyr)     # For data manipulation and transformation"
+"0","library(quantmod)  # For downloading financial data"
+"0","library(tidyr)     # For reshaping data (pivot_wider, gather functions)"
+"0","library(plotly)    # For creating interactive 3D visualizations"

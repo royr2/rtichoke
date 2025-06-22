@@ -127,11 +127,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">R Installation Guide</span></a>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Get Started</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-get-started">    
+        <li>
+    <a class="dropdown-item" href="../get-started/r-package-management.html">
+ <span class="dropdown-text">Installing Packages</span></a>
+  </li>  
         <li>
     <a class="dropdown-item" href="../get-started/variables.html">
  <span class="dropdown-text">Variables in R</span></a>
@@ -164,23 +172,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
-        <li>
-    <a class="dropdown-item" href="../get-started/r-package-management.html">
- <span class="dropdown-text">Installing Packages</span></a>
-  </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="../installation.html"> 
-<span class="menu-text">R Installation Guide</span></a>
+    <a class="nav-link" href="../webr.html"> 
+<span class="menu-text">WebR Playground</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts.html"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../posts.html"> 
-<span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="https://www.r-bloggers.com/"> 
+<span class="menu-text">R-Bloggers</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -198,18 +206,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#creating-monotonic-bins-for-credit-risk-modeling" id="toc-creating-monotonic-bins-for-credit-risk-modeling" class="nav-link active" data-scroll-target="#creating-monotonic-bins-for-credit-risk-modeling">Creating Monotonic Bins for Credit Risk Modeling</a>
-  <ul class="collapse">
-  <li><a href="#required-libraries" id="toc-required-libraries" class="nav-link" data-scroll-target="#required-libraries">Required Libraries</a></li>
-  <li><a href="#sample-dataset" id="toc-sample-dataset" class="nav-link" data-scroll-target="#sample-dataset">Sample Dataset</a></li>
-  <li><a href="#creating-a-target-variable" id="toc-creating-a-target-variable" class="nav-link" data-scroll-target="#creating-a-target-variable">Creating a Target Variable</a></li>
-  <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation">Data Preparation</a></li>
-  <li><a href="#analyzing-directional-trends" id="toc-analyzing-directional-trends" class="nav-link" data-scroll-target="#analyzing-directional-trends">Analyzing Directional Trends</a></li>
-  <li><a href="#creating-monotonic-bins-with-xgboost" id="toc-creating-monotonic-bins-with-xgboost" class="nav-link" data-scroll-target="#creating-monotonic-bins-with-xgboost">Creating Monotonic Bins with XGBoost</a></li>
-  <li><a href="#retrieving-split-points-and-creating-bins" id="toc-retrieving-split-points-and-creating-bins" class="nav-link" data-scroll-target="#retrieving-split-points-and-creating-bins">Retrieving Split Points and Creating Bins</a></li>
-  <li><a href="#creating-a-reusable-function" id="toc-creating-a-reusable-function" class="nav-link" data-scroll-target="#creating-a-reusable-function">Creating a Reusable Function</a></li>
-  <li><a href="#example-usage" id="toc-example-usage" class="nav-link" data-scroll-target="#example-usage">Example Usage</a></li>
-  </ul></li>
+  <li><a href="#prerequisites-and-required-libraries" id="toc-prerequisites-and-required-libraries" class="nav-link active" data-scroll-target="#prerequisites-and-required-libraries">Prerequisites and Required Libraries</a></li>
+  <li><a href="#dataset-overview-and-loading" id="toc-dataset-overview-and-loading" class="nav-link" data-scroll-target="#dataset-overview-and-loading">Dataset Overview and Loading</a></li>
+  <li><a href="#creating-a-binary-target-variable" id="toc-creating-a-binary-target-variable" class="nav-link" data-scroll-target="#creating-a-binary-target-variable">Creating a Binary Target Variable</a></li>
+  <li><a href="#data-preprocessing" id="toc-data-preprocessing" class="nav-link" data-scroll-target="#data-preprocessing">Data Preprocessing</a></li>
+  <li><a href="#step-3-exploratory-analysis-of-variable-relationships" id="toc-step-3-exploratory-analysis-of-variable-relationships" class="nav-link" data-scroll-target="#step-3-exploratory-analysis-of-variable-relationships">Step 3: Exploratory Analysis of Variable Relationships</a></li>
+  <li><a href="#implementing-monotonic-binning-with-xgboost" id="toc-implementing-monotonic-binning-with-xgboost" class="nav-link" data-scroll-target="#implementing-monotonic-binning-with-xgboost">Implementing Monotonic Binning with XGBoost</a></li>
+  <li><a href="#extracting-split-points-and-constructing-final-bins" id="toc-extracting-split-points-and-constructing-final-bins" class="nav-link" data-scroll-target="#extracting-split-points-and-constructing-final-bins">Extracting Split Points and Constructing Final Bins</a></li>
+  <li><a href="#generalised-function" id="toc-generalised-function" class="nav-link" data-scroll-target="#generalised-function">Generalised Function</a></li>
   </ul>
 </nav>
     </div>
@@ -246,16 +250,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="creating-monotonic-bins-for-credit-risk-modeling" class="level1">
-<h1>Creating Monotonic Bins for Credit Risk Modeling</h1>
-<p>Monotonic binning is a technique where variable values are grouped into bins such that event rates increase or decrease consistently across these bins. This approach is particularly valuable in credit risk modeling for two key reasons:</p>
+<p>This post focuses on how to implement monotonic binning, a method that groups variable values into bins where event rates demonstrate consistent monotonic behavior. This methodology is essential in credit risk modeling, providing significant advantages in two critical areas:</p>
 <ol type="1">
-<li><strong>Model Stability</strong>: Monotonic relationships add robustness to models, making them less susceptible to overfitting and more reliable when deployed in production</li>
-<li><strong>Interpretability</strong>: Monotonic relationships are easier to explain to stakeholders and regulators, as they ensure consistent and logical relationships between variables and outcomes</li>
+<li><strong>Enhanced Model Stability</strong>: Monotonic relationships strengthen model robustness by reducing overfitting and ensuring reliable performance in production environments</li>
+<li><strong>Improved Interpretability</strong>: Monotonic constraints facilitate clear explanations by maintaining logical, consistent relationships between predictors and outcomes</li>
 </ol>
-<section id="required-libraries" class="level2">
-<h2 class="anchored" data-anchor-id="required-libraries">Required Libraries</h2>
-<p>We’ll use the following R packages for this demonstration:</p>
+<section id="prerequisites-and-required-libraries" class="level2">
+<h2 class="anchored" data-anchor-id="prerequisites-and-required-libraries">Prerequisites and Required Libraries</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(recipes)  <span class="co"># For data preprocessing</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)    <span class="co"># For data manipulation</span></span>
@@ -263,9 +264,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)  <span class="co"># For visualization</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="sample-dataset" class="level2">
-<h2 class="anchored" data-anchor-id="sample-dataset">Sample Dataset</h2>
-<p>For this demonstration, we’ll use a sample from the Lending Club dataset, which contains loan information including whether loans defaulted:</p>
+<section id="dataset-overview-and-loading" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-overview-and-loading">Dataset Overview and Loading</h2>
+<p>This tutorial demonstrates the methodology using a sample from the Lending Club dataset, which provides comprehensive loan information including default indicators.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load sample data from Lending Club dataset</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sample <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://bit.ly/42ypcnJ"</span>)</span>
@@ -277,9 +278,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="creating-a-target-variable" class="level2">
-<h2 class="anchored" data-anchor-id="creating-a-target-variable">Creating a Target Variable</h2>
-<p>First, we need to create a binary target variable that indicates whether a loan defaulted (1) or not (0):</p>
+<section id="creating-a-binary-target-variable" class="level2">
+<h2 class="anchored" data-anchor-id="creating-a-binary-target-variable">Creating a Binary Target Variable</h2>
+<p>The first step involves constructing a binary target variable that clearly identifies loan defaults. This variable will serve as our outcome throughout the binning process:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define loan statuses that represent defaults</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>codes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Charged Off"</span>, <span class="st">"Does not meet the credit policy. Status:Charged Off"</span>)</span>
@@ -289,9 +290,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bad_flag =</span> <span class="fu">ifelse</span>(loan_status <span class="sc">%in%</span> codes, <span class="dv">1</span>, <span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="data-preparation" class="level2">
-<h2 class="anchored" data-anchor-id="data-preparation">Data Preparation</h2>
-<p>Next, we’ll preprocess the data using the <code>recipes</code> package to: 1. Select only numeric variables 2. Impute missing values with median values</p>
+<section id="data-preprocessing" class="level2">
+<h2 class="anchored" data-anchor-id="data-preprocessing">Data Preprocessing</h2>
+<p>Before proceeding, the dataset must be prepared through systematic preprocessing. This step ensures data quality and compatibility with the XGBoost implementation. The process utilizes the <code>recipes</code> package to:</p>
+<ol type="1">
+<li>Filter and retain only numeric variables for analysis</li>
+<li>Apply median imputation to handle missing values appropriately</li>
+</ol>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a recipe for preprocessing</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(bad_flag <span class="sc">~</span> ., <span class="at">data =</span> model_data) <span class="sc">%&gt;%</span></span>
@@ -303,9 +308,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> <span class="fu">bake</span>(rec, <span class="at">new_data =</span> model_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="analyzing-directional-trends" class="level2">
-<h2 class="anchored" data-anchor-id="analyzing-directional-trends">Analyzing Directional Trends</h2>
-<p>Before creating monotonic bins, it’s helpful to visualize the raw relationship between a predictor variable and the target. Let’s examine how the number of credit inquiries in the past 6 months relates to default rates:</p>
+<section id="step-3-exploratory-analysis-of-variable-relationships" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-exploratory-analysis-of-variable-relationships">Step 3: Exploratory Analysis of Variable Relationships</h2>
+<p>It is crucial to examine the raw relationship between predictor variables and the target outcome. This analysis provides insights into underlying data patterns and validates the need for monotonic transformation.</p>
+<p>This example analyzes the relationship between credit inquiries in the past 6 months and default rates:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create dataframe with inquiries and default flag</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">x =</span> model_data<span class="sc">$</span>inq_last_6mths,</span>
@@ -329,11 +335,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Notice that while there’s a general upward trend (more inquiries correlate with higher default rates), the relationship isn’t perfectly monotonic. This is where our binning approach will help.</p>
+<p>While the data exhibits a general upward trend (indicating that increased inquiries correlate with higher default rates), the relationship lacks perfect monotonicity. This validates the necessity of the monotonic binning approach to establish consistent patterns.</p>
 </section>
-<section id="creating-monotonic-bins-with-xgboost" class="level2">
-<h2 class="anchored" data-anchor-id="creating-monotonic-bins-with-xgboost">Creating Monotonic Bins with XGBoost</h2>
-<p>Now we’ll leverage XGBoost’s monotonicity constraints to create bins that have a strictly increasing relationship with default rates. The key parameter is <code>monotone_constraints = 1</code>, which forces the model to create splits that maintain a positive relationship with the target:</p>
+<section id="implementing-monotonic-binning-with-xgboost" class="level2">
+<h2 class="anchored" data-anchor-id="implementing-monotonic-binning-with-xgboost">Implementing Monotonic Binning with XGBoost</h2>
+<p>The implementation uses XGBoost’s monotonicity constraints which enforces the model to generate splits that preserve a monotonic relationship with the target variable:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Train XGBoost model with monotonicity constraint</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>mdl <span class="ot">&lt;-</span> <span class="fu">xgboost</span>(</span>
@@ -352,9 +358,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="retrieving-split-points-and-creating-bins" class="level2">
-<h2 class="anchored" data-anchor-id="retrieving-split-points-and-creating-bins">Retrieving Split Points and Creating Bins</h2>
-<p>After training the model, we can extract the split points that XGBoost identified and use them to create our monotonic bins:</p>
+<section id="extracting-split-points-and-constructing-final-bins" class="level2">
+<h2 class="anchored" data-anchor-id="extracting-split-points-and-constructing-final-bins">Extracting Split Points and Constructing Final Bins</h2>
+<p>Following model training, the process extracts the optimal split points identified by XGBoost and utilizes them to construct the final bin structure:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract split points from the model</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>splits <span class="ot">&lt;-</span> <span class="fu">xgb.model.dt.tree</span>(<span class="at">model =</span> mdl)  </span>
@@ -386,11 +392,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Notice how the default rates now increase monotonically across the bins, making the relationship clearer and more interpretable compared to the raw data we visualized earlier.</p>
+<p>The default rates now demonstrate perfect monotonic behavior across all bins, creating a clearer and more interpretable relationship compared to the raw data.</p>
 </section>
-<section id="creating-a-reusable-function" class="level2">
-<h2 class="anchored" data-anchor-id="creating-a-reusable-function">Creating a Reusable Function</h2>
-<p>To make this process more efficient for multiple variables, let’s create a reusable function that handles the entire binning workflow:</p>
+<section id="generalised-function" class="level2">
+<h2 class="anchored" data-anchor-id="generalised-function">Generalised Function</h2>
+<p>To enable implementation across multiple variables, a reusable function that encapsulates the entire monotonic binning workflow would be very useful here. <strong>Note</strong> the use of ranked correlation to identify the appropriate direction to be used inside the Xgboost call.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>create_bins <span class="ot">&lt;-</span> <span class="cf">function</span>(var, outcome, <span class="at">max_depth =</span> <span class="dv">10</span>, <span class="at">plot =</span> <span class="cn">TRUE</span>){</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Determine relationship direction automatically</span></span>
@@ -431,23 +437,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(cuts)  <span class="co"># Return the bin boundaries</span></span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="example-usage" class="level2">
-<h2 class="anchored" data-anchor-id="example-usage">Example Usage</h2>
-<p>You can use this function to create monotonic bins for any numeric variable by passing the variable and outcome columns:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example: Create monotonic bins for annual income</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>income_bins <span class="ot">&lt;-</span> <span class="fu">create_bins</span>(</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">var =</span> train<span class="sc">$</span>annual_inc,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome =</span> train<span class="sc">$</span>bad_flag,</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_depth =</span> <span class="dv">5</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Example: Create monotonic bins for annual income</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>income_bins <span class="ot">&lt;-</span> <span class="fu">create_bins</span>(</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">var =</span> train<span class="sc">$</span>annual_inc,</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome =</span> train<span class="sc">$</span>bad_flag,</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_depth =</span> <span class="dv">5</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

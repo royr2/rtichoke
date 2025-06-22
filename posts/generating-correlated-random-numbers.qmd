@@ -1,5 +1,5 @@
 ---
-title: "Tutorial: Generating Correlated Random Numbers in R Using Matrix Methods"
+title: "Generating Correlated Random Numbers in R Using Matrix Methods"
 date: "2024-03-19"
 categories: [R, Statistics, Simulation]
 image: "../images/correlated.png"
@@ -12,12 +12,16 @@ execute:
 
 ## Introduction
 
-The generation of random data with specified correlation patterns represents a fundamental requirement in statistical simulation and algorithm testing. This tutorial provides a comprehensive methodology for creating correlated random numbers in R using matrix-based approaches, with particular emphasis on the Cholesky decomposition method. The techniques presented enable the development of realistic synthetic datasets with precisely controlled correlation structures, essential for robust statistical analysis and model validation.
+The generation of random data with specified correlation patterns can be useful in statistical simulation and this tutorial provides a  methodology for creating correlated random numbers in R. The techniques presented enable the development of realistic synthetic datasets with precisely controlled correlation structures, essential for robust statistical analysis and model validation.
 
-## The Cholesky Decomposition Method: A Four-Step Implementation
+## The Cholesky Decomposition Method
 
 ```{r}
 #| label: setup
+
+# Load required packages
+library(ggplot2)
+library(dplyr)
 
 # 1. Define your target correlation matrix
 cor_mat <- matrix(c(1, 0.3, 
@@ -36,11 +40,11 @@ new_random <- old_random %*% chol_mat
 cor(new_random)
 ```
 
-The resulting `new_random` matrix contains values exhibiting approximately the target correlation structure. This technique employs Cholesky decomposition to construct a transformation matrix that induces the desired correlation when applied to uncorrelated input data.
+The resulting `new_random` matrix contains values exhibiting approximately the target correlation structure.
 
-## Critical Implementation Considerations and Common Pitfalls
+## Implementation Considerations
 
-### Input Data Independence Requirement
+###  Independence
 
 The input data must demonstrate statistical independence for the Cholesky method to function correctly. Pre-existing correlations in the input data compromise the method's ability to achieve target correlation structures:
 
@@ -66,15 +70,34 @@ simulate_correlation <- function(input_correlation, target = 0.3) {
 }
 
 # Compare results with different input correlations
-par(mfrow = c(1, 2))
-hist(simulate_correlation(0.8), main = "Starting with Correlated Data",
-     xlim = c(0, 1), col = "salmon")
-hist(simulate_correlation(0.001), main = "Starting with Random Data",     xlim = c(0, 1), col = "lightblue")
+correlated_results <- simulate_correlation(0.8, target = 0.3)
+uncorrelated_results <- simulate_correlation(0.001, target = 0.3)
+
+# Create data frame for ggplot2
+plot_data <- data.frame(
+  correlation = c(correlated_results, uncorrelated_results),
+  input_type = factor(rep(c("Correlated Input (0.8)", "Uncorrelated Input (0.001)"), 
+                         each = length(correlated_results)))
+)
+
+# Create density plot with ggplot2
+ggplot(plot_data, aes(x = correlation, fill = input_type, color = input_type)) +
+  geom_density(alpha = 0.6) +
+  labs(title = "Effect of Input Correlation on Target Correlation Achievement",
+       subtitle = "Target correlation = 0.3",
+       x = "Achieved Correlation",
+       y = "Density",
+       fill = "Input Data Type",
+       color = "Input Data Type") +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  scale_fill_manual(values = c("slateblue", "lightblue")) +
+  scale_color_manual(values = c("darkblue", "darkblue"))
 ```
 
 When input data contains pre-existing correlation patterns, the Cholesky method cannot effectively override these relationships to establish the desired target correlation structure.
 
-### Distribution Consistency Requirement
+### Distribution Consistency
 
 Optimal results require consistent probability distributions across all variables in the transformation:
 
@@ -105,7 +128,7 @@ cat("Same distribution result:", round(cor(new_same)[1,2], 3))
 
 The combination of different probability distributions (such as normal and chi-squared) can result in unexpected correlation patterns following the Cholesky transformation.
 
-### Distribution Property Preservation Challenges
+### Distribution Properties
 
 The Cholesky transformation may fundamentally alter the statistical properties of the original data:
 
@@ -129,7 +152,7 @@ cat("Negative values in result:", sum(new_random < 0), "out of", length(new_rand
 
 The Cholesky transformation can fundamentally modify data characteristics, such as introducing negative values into previously positive-only distributions, thereby altering the fundamental nature of the data.
 
-## Alternative Implementation: The mvtnorm Package Approach
+## Alternate Implementation: `mvtnorm`
 
 For practical applications requiring efficient implementation, the `mvtnorm` package provides a streamlined solution for generating multivariate normal distributions with specified correlation structures:
 
@@ -154,27 +177,7 @@ x <- rmvnorm(n = 1000, mean = means, sigma = sigma)
 round(cor(x), 3)
 ```
 
-## Methodological Selection Criteria
-
-### Cholesky Decomposition Method
-
-**Recommended Applications:**
-- Educational contexts requiring understanding of underlying mathematical principles
-- Non-normal distribution requirements
-- Custom correlation structure development
-- Theoretical research applications
-
-### mvtnorm Package Implementation
-
-**Recommended Applications:**
-- Production environments requiring rapid multivariate normal data generation
-- Scenarios demanding precise control over means and variance parameters
-- High-dimensional variable systems
-- Operational analytical workflows
-
 ## Key Takeaways
-
-This tutorial has demonstrated comprehensive methodologies for generating correlated random numbers in R. The essential insights include:
 
 - **Cholesky decomposition provides a mathematical foundation** for transforming uncorrelated data into correlated structures through matrix operations
 - **Input data independence is critical** for successful correlation induction; pre-existing correlations compromise the transformation effectiveness
@@ -182,5 +185,3 @@ This tutorial has demonstrated comprehensive methodologies for generating correl
 - **The transformation process can alter fundamental data properties**, requiring careful consideration of distributional characteristics
 - **The mvtnorm package offers production-ready solutions** for multivariate normal data generation with specified correlation structures
 - **Method selection depends on specific requirements**: Cholesky for educational and custom applications, mvtnorm for operational efficiency
-
-These techniques form the foundation for advanced statistical simulation, enabling the creation of realistic synthetic datasets essential for robust model validation and algorithm testing across diverse analytical domains.

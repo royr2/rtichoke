@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2023-01-15">
 
-<title>Getting Started with Python using R and reticulate – R’tichoke</title>
+<title>Getting Started with Python using R and Reticulate – R'tichoke</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -127,11 +127,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">R Installation Guide</span></a>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Get Started</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-get-started">    
+        <li>
+    <a class="dropdown-item" href="../get-started/r-package-management.html">
+ <span class="dropdown-text">Installing Packages</span></a>
+  </li>  
         <li>
     <a class="dropdown-item" href="../get-started/variables.html">
  <span class="dropdown-text">Variables in R</span></a>
@@ -164,23 +172,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
-        <li>
-    <a class="dropdown-item" href="../get-started/r-package-management.html">
- <span class="dropdown-text">Installing Packages</span></a>
-  </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="../installation.html"> 
-<span class="menu-text">R Installation Guide</span></a>
+    <a class="nav-link" href="../webr.html"> 
+<span class="menu-text">WebR Playground</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts.html"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../posts.html"> 
-<span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="https://www.r-bloggers.com/"> 
+<span class="menu-text">R-Bloggers</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -198,14 +206,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#quick-setup-in-4-steps" id="toc-quick-setup-in-4-steps" class="nav-link active" data-scroll-target="#quick-setup-in-4-steps">Quick Setup in 4 Steps</a>
-  <ul class="collapse">
-  <li><a href="#install-reticulate" id="toc-install-reticulate" class="nav-link" data-scroll-target="#install-reticulate">1. Install reticulate</a></li>
-  <li><a href="#install-python-via-miniconda" id="toc-install-python-via-miniconda" class="nav-link" data-scroll-target="#install-python-via-miniconda">2. Install Python via Miniconda</a></li>
-  <li><a href="#connect-to-python" id="toc-connect-to-python" class="nav-link" data-scroll-target="#connect-to-python">3. Connect to Python</a></li>
-  <li><a href="#install-python-packages" id="toc-install-python-packages" class="nav-link" data-scroll-target="#install-python-packages">4. Install Python Packages</a></li>
-  </ul></li>
-  <li><a href="#three-ways-to-use-python-in-r" id="toc-three-ways-to-use-python-in-r" class="nav-link" data-scroll-target="#three-ways-to-use-python-in-r">Three Ways to Use Python in R</a>
+  <li><a href="#install-reticulate" id="toc-install-reticulate" class="nav-link active" data-scroll-target="#install-reticulate">Install reticulate</a></li>
+  <li><a href="#install-python-via-miniconda" id="toc-install-python-via-miniconda" class="nav-link" data-scroll-target="#install-python-via-miniconda">Install Python via Miniconda</a></li>
+  <li><a href="#connect-to-python" id="toc-connect-to-python" class="nav-link" data-scroll-target="#connect-to-python">Connect to Python</a></li>
+  <li><a href="#install-python-packages" id="toc-install-python-packages" class="nav-link" data-scroll-target="#install-python-packages">Install Python Packages</a></li>
+  <li><a href="#different-ways-to-use-python-in-r" id="toc-different-ways-to-use-python-in-r" class="nav-link" data-scroll-target="#different-ways-to-use-python-in-r">Different Ways to Use Python in R</a>
   <ul class="collapse">
   <li><a href="#import-python-modules-directly" id="toc-import-python-modules-directly" class="nav-link" data-scroll-target="#import-python-modules-directly">1. Import Python Modules Directly</a></li>
   <li><a href="#write-python-code-in-r-markdown" id="toc-write-python-code-in-r-markdown" class="nav-link" data-scroll-target="#write-python-code-in-r-markdown">2. Write Python Code in R Markdown</a></li>
@@ -214,7 +219,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#real-world-applications" id="toc-real-world-applications" class="nav-link" data-scroll-target="#real-world-applications">Real-World Applications</a>
   <ul class="collapse">
   <li><a href="#data-science-pipeline" id="toc-data-science-pipeline" class="nav-link" data-scroll-target="#data-science-pipeline">Data Science Pipeline</a></li>
-  <li><a href="#when-to-use-each-language" id="toc-when-to-use-each-language" class="nav-link" data-scroll-target="#when-to-use-each-language">When to Use Each Language</a></li>
+  <li><a href="#the-choice-between-r-and-python" id="toc-the-choice-between-r-and-python" class="nav-link" data-scroll-target="#the-choice-between-r-and-python">The Choice Between <code>R</code> and <code>Python</code></a></li>
   </ul></li>
   </ul>
 </nav>
@@ -224,7 +229,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Getting Started with Python using R and reticulate</h1>
+<h1 class="title">Getting Started with Python using R and Reticulate</h1>
   <div class="quarto-categories">
     <div class="quarto-category">R</div>
     <div class="quarto-category">Python</div>
@@ -252,25 +257,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Want to use Python’s powerful libraries without leaving R? The reticulate package gives you the best of both worlds - R’s elegant data handling and visualization with Python’s machine learning and scientific computing tools. This post shows you how to set up and use this powerful bridge between languages.</p>
-<section id="quick-setup-in-4-steps" class="level2">
-<h2 class="anchored" data-anchor-id="quick-setup-in-4-steps">Quick Setup in 4 Steps</h2>
-<section id="install-reticulate" class="level3">
-<h3 class="anchored" data-anchor-id="install-reticulate">1. Install reticulate</h3>
+<p>Want to use Python’s powerful libraries without leaving R? The reticulate package gives you the best of both worlds - R’s elegant data handling and visualization with Python’s machine learning and scientific computing tools. This post dives into how to set up a python environment using RStudio and the <code>reticulate</code> package and use this powerful bridge between languages. Here’s a quick 4-step process to get started.</p>
+<section id="install-reticulate" class="level2">
+<h2 class="anchored" data-anchor-id="install-reticulate">Install reticulate</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"reticulate"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="install-python-via-miniconda" class="level3">
-<h3 class="anchored" data-anchor-id="install-python-via-miniconda">2. Install Python via Miniconda</h3>
+<section id="install-python-via-miniconda" class="level2">
+<h2 class="anchored" data-anchor-id="install-python-via-miniconda">Install Python via Miniconda</h2>
 <p>The easiest approach is to let reticulate handle Python installation for you:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install_miniconda</span>(<span class="at">path =</span> <span class="st">"c:/miniconda"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="connect-to-python" class="level3">
-<h3 class="anchored" data-anchor-id="connect-to-python">3. Connect to Python</h3>
+<section id="connect-to-python" class="level2">
+<h2 class="anchored" data-anchor-id="connect-to-python">Connect to Python</h2>
 <p>Reticulate creates a default environment called <code>r-reticulate</code>. Let’s connect to it:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check available environments</span></span>
@@ -280,16 +283,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">use_condaenv</span>(<span class="st">"r-reticulate"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="install-python-packages" class="level3">
-<h3 class="anchored" data-anchor-id="install-python-packages">4. Install Python Packages</h3>
+<section id="install-python-packages" class="level2">
+<h2 class="anchored" data-anchor-id="install-python-packages">Install Python Packages</h2>
 <p>Now you can install any Python packages you need:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">py_install</span>(<span class="fu">c</span>(<span class="st">"pandas"</span>, <span class="st">"scikit-learn"</span>, <span class="st">"matplotlib"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-</section>
-<section id="three-ways-to-use-python-in-r" class="level2">
-<h2 class="anchored" data-anchor-id="three-ways-to-use-python-in-r">Three Ways to Use Python in R</h2>
+<section id="different-ways-to-use-python-in-r" class="level2">
+<h2 class="anchored" data-anchor-id="different-ways-to-use-python-in-r">Different Ways to Use Python in R</h2>
 <section id="import-python-modules-directly" class="level3">
 <h3 class="anchored" data-anchor-id="import-python-modules-directly">1. Import Python Modules Directly</h3>
 <div class="cell">
@@ -346,7 +348,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="real-world-applications" class="level2">
 <h2 class="anchored" data-anchor-id="real-world-applications">Real-World Applications</h2>
-<p>Here are some powerful ways to combine R and Python in your data science workflow:</p>
+<p>Here are some ways to combine R and Python in your data science workflow:</p>
 <section id="data-science-pipeline" class="level3">
 <h3 class="anchored" data-anchor-id="data-science-pipeline">Data Science Pipeline</h3>
 <div class="cell">
@@ -371,8 +373,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="when-to-use-each-language" class="level3">
-<h3 class="anchored" data-anchor-id="when-to-use-each-language">When to Use Each Language</h3>
+<section id="the-choice-between-r-and-python" class="level3">
+<h3 class="anchored" data-anchor-id="the-choice-between-r-and-python">The Choice Between <code>R</code> and <code>Python</code></h3>
 <p><strong>Use R for:</strong></p>
 <ul>
 <li>Data manipulation with dplyr/data.table</li>
@@ -387,7 +389,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Computer vision</li>
 <li>Advanced machine learning algorithms</li>
 </ul>
-<p>With reticulate, you don’t have to choose - use the best tool for each part of your analysis!</p>
+<p>However, with reticulate, you don’t have to choose! Use the best tool for each part of your analysis!</p>
 
 
 </section>

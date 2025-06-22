@@ -1,0 +1,7 @@
+"0","#| label: setup-training"
+"0",""
+"0","# Set up optimizer (Adam optimizer with learning rate 0.02)"
+"0","optimizer <- optim_adam(model$parameters, lr = 0.02)"
+"0",""
+"0","# Define loss function (Mean Squared Error for regression)"
+"0","loss_fn <- nnf_mse_loss"
