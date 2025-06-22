@@ -1,5 +1,5 @@
 ---
-title: "Understanding Variability in Credit Score Predictions"
+title: "Tutorial: Assessing Credit Score Prediction Reliability Using Bootstrap Resampling"
 date: "2024-11-15"
 categories: [R, Credit Risk Analytics, Bootstrapping]
 image: "../images/score_reliability.png"
@@ -10,11 +10,13 @@ execute:
   eval: true
 ---
 
-Credit scoring models work well in the middle of the score distribution but often become less reliable at the extremes where data is sparse. This post shows how to use bootstrapping to measure prediction variability across different score ranges – helping you identify where your model is most dependable.
+## Introduction
 
-## Why Estimation Variance Matters
+Credit scoring models demonstrate optimal performance within the central regions of the score distribution, yet exhibit diminished reliability at the distribution extremes where data becomes sparse. This tutorial provides a comprehensive methodology for employing bootstrap resampling techniques to quantify prediction variability across different score ranges, thereby enabling practitioners to identify regions where their models demonstrate the highest degree of dependability.
 
-Smaller sample sizes lead to higher variance in estimates, especially for extreme values. While statistics like means remain stable with limited data, tail percentiles (95th, 99th) show much more volatility. This matters for credit scoring, where very high and very low scores represent these unstable tail regions.
+## Theoretical Foundation: Understanding Estimation Variance
+
+Reduced sample sizes inherently result in increased variance in statistical estimates, particularly for extreme values within a distribution. While central tendency measures such as means demonstrate relative stability when estimated from limited data, tail percentiles (95th, 99th) exhibit substantially greater volatility. This phenomenon is of critical importance in credit scoring applications, where extremely high and low scores correspond to these unstable tail regions of the distribution.
 
 ```{r}
 # Number of samples to be drawn from a probability distribution
@@ -31,7 +33,7 @@ std_dev <- 2
 samples <- rnorm(n_samples * repeats, mean = 10)
 
 # Fit into a matrix like object with `n_samples' number of rows 
-# and `repeats` number of columns
+# and `repeats' number of columns
 samples <- matrix(samples, nrow = n_samples, ncol = repeats)
 
 # Compute mean across each column
@@ -68,7 +70,7 @@ legend("topright",
        cex = 0.7)
 ```
 
-The plot shows how uncertainty increases dramatically when estimating extreme values. The distribution for the mean (purple) is much narrower than for the 99th percentile (pink). This directly translates to credit scoring – where very high or low scores have greater uncertainty.
+The visualization demonstrates the substantial increase in uncertainty when estimating extreme values compared to central tendencies. The distribution corresponding to the mean (purple) exhibits considerably narrower dispersion than that of the 99th percentile (pink). This statistical principle directly applies to credit scoring applications, where scores at the extremes of the distribution inherently possess greater uncertainty.
 
 ```{r}
 # Load required packages
@@ -79,6 +81,8 @@ library(ggplot2)
 ```
 
 ## Data Acquisition and Preprocessing
+
+In this tutorial, we will utilize a sample from the Lending Club dataset. Loans classified as "Charged Off" will be designated as defaults. The observed class imbalance represents a typical characteristic of credit portfolios and contributes significantly to prediction challenges at distribution extremes.
 
 ```{r}
 # Load sample data (sample of the lending club data)
@@ -97,11 +101,9 @@ sample[is.na(sample)] <- -1
 table(sample$bad_flag)
 ```
 
-We're using Lending Club data with charged-off loans marked as defaults. The class imbalance shown is typical in credit portfolios and contributes to prediction challenges at distribution extremes.
-
 ## Implementing Bootstrap Resampling Strategy
 
-We'll create 100 bootstrap samples to measure how model predictions vary across the score range. This technique creates multiple simulated datasets to measure prediction uncertainty without collecting additional data.
+This section demonstrates the creation of 100 bootstrap samples to quantify the variation in model predictions across different score ranges. Bootstrap resampling is a statistical technique that generates multiple simulated datasets to measure prediction uncertainty without requiring additional data collection.
 
 ```{r}
 # Create 100 samples
@@ -116,11 +118,11 @@ boot_sample$splits[[1]]
 analysis(boot_sample$splits[[1]]) %>% .[1:5, 1:5]
 ```
 
-Each bootstrap sample contains random draws (with replacement) from our original data, creating slight variations that reveal model sensitivity to different data compositions.
+Each bootstrap sample consists of random draws with replacement from the original dataset, creating controlled variations that effectively reveal model sensitivity to different data compositions.
 
 ## Developing the Predictive Model Framework
 
-We'll use logistic regression – the standard for credit risk models due to its interpretability and regulatory acceptance. Our model includes typical credit variables like loan amount, income, and credit history metrics.
+This tutorial employs logistic regression as the predictive modeling technique. Logistic regression represents the industry standard for credit risk modeling due to its interpretability and regulatory acceptance. The model specification incorporates typical credit variables including loan amount, income, and credit history metrics.
 
 ```{r}
 glm_model <- function(df){
@@ -148,7 +150,7 @@ pred <- glm_model(train)
 range(pred)  # Output is on log odds scale
 ```
 
-The function returns predictions in log-odds, which we'll later convert to a more intuitive credit score scale.
+The function returns predictions in log-odds format, which will subsequently be transformed to a more intuitive credit score scale in later steps.
 
 ## Iterative Model Training and Prediction Collection
 
@@ -183,11 +185,11 @@ boot_preds <- data.frame(pred = boot_preds,
 head(boot_preds)
 ```
 
-We apply our model to each bootstrap sample and collect the predictions, then truncate extreme values (beyond 1st and 99th percentiles) to remove outliers – similar to capping techniques used in production credit models.
+In this step, we apply the logistic regression model to each bootstrap sample and systematically collect the resulting predictions. Subsequently, we truncate extreme values (beyond the 1st and 99th percentiles) to remove outliers—a procedure analogous to capping techniques commonly employed in production credit models.
 
 ## Transforming Predictions to Credit Score Scale
 
-Now we'll convert log-odds to a recognizable credit score using the industry-standard Points to Double Odds (PDO) method. Using parameters similar to real credit systems (PDO=30, Anchor=700), we transform our predictions into intuitive scores where higher numbers indicate lower risk.
+This section demonstrates the conversion of log-odds predictions to a recognizable credit score format using the industry-standard Points to Double Odds (PDO) methodology. By employing parameters consistent with real-world credit systems (PDO=30, Anchor=700), we transform the model predictions into intuitive scores where higher numerical values indicate lower credit risk.
 
 ```{r}
 scaling_func <- function(vec, PDO = 30, OddsAtAnchor = 5, Anchor = 700){
@@ -215,11 +217,9 @@ ggplot(boot_preds, aes(x = scores, color = factor(id))) +
        y = "Density")
 ```
 
-Each gray line shows the score distribution from a different bootstrap sample. Where lines cluster tightly, our predictions are stable; where they diverge, we have higher uncertainty.
-
 ## Quantifying Prediction Uncertainty Across Score Ranges
 
-Now we can directly measure how prediction reliability varies across score ranges by calculating standard deviation within each score bin. This approach quantifies uncertainty at different score levels.
+This section provides a methodology to directly measure prediction reliability variation across different score ranges through the calculation of standard deviation within each score bin. This approach enables precise quantification of uncertainty at different score levels.
 
 ```{r}
 # Create bins using quantiles
@@ -241,20 +241,22 @@ boot_preds %>%
        y = "Standard Deviation")
 ```
 
-As expected, the model's predictions are more reliable within a certain range of values (700-800) whereas there is significant variability in the model's predictions in the lowest and highest score buckets.
+As anticipated, the model's predictions demonstrate enhanced reliability within a specific range of values (700-800), while exhibiting significant variability in the lowest and highest score buckets.
 
-The chart reveals a clear "U-shape" pattern of prediction variability—a common phenomenon in credit risk modeling. The highest uncertainty appears in the extreme score ranges (very high and very low scores), while predictions in the middle range show greater stability. The chart confirms our hypothesis: variability is highest at score extremes and lowest in the middle range (600-800). This directly informs credit policy – scores in the middle range are most reliable, while decisions at the extremes should incorporate additional caution due to higher uncertainty.
+The visualization reveals a characteristic "U-shaped" pattern of prediction variability—a well-documented phenomenon in credit risk modeling. The highest uncertainty manifests in the extreme score ranges (very high and very low scores), while predictions in the middle range demonstrate greater stability. The analysis confirms the initial hypothesis: variability reaches its maximum at score extremes and achieves its minimum in the middle range (600-800). This finding provides direct guidance for credit policy development—scores in the middle range demonstrate the highest reliability, while decisions at the extremes should incorporate additional caution due to elevated uncertainty.
 
-These findings have direct business applications:
+### Practical Business Applications
 
-1. For extremely high scores, add verification steps before auto-approval
-2. For very low scores, consider manual review rather than automatic rejection
+These findings yield direct business applications:
 
-## Advanced Approach: Isolating Training Data Effects
+1. **High Score Management**: For extremely high scores, implement additional verification steps before automated approval
+2. **Low Score Management**: For very low scores, consider manual review procedures rather than automatic rejection
+
+## Advanced Methodology: Isolating Training Data Effects
 
 *Credit: Richard Warnung*
 
-For a more controlled analysis, we can train models on bootstrap samples but evaluate them on the same validation set. This isolates the impact of training data variation:
+For enhanced analytical control, this section presents an alternative approach where models are trained on bootstrap samples while being evaluated on a consistent validation set. This methodology effectively isolates the impact of training data variation on model predictions.
 
 ```{r}
 Vs <- function(boot_split){
@@ -277,7 +279,7 @@ Vs <- function(boot_split){
 }
 ```
 
-This method provides a clearer picture of how variations in training data affect model predictions, which is valuable when evaluating model updates in production.
+This methodology provides enhanced insight into how variations in training data composition affect model predictions, which proves valuable when evaluating model updates in production environments.
 
 ```{r}
 # Create overall training and testing datasets 
@@ -312,3 +314,12 @@ output <- lapply(boot_sample$splits, function(x){
   return(pred)
 })
 ```
+
+## Key Takeaways
+
+- **Prediction reliability varies significantly across score ranges**, with highest uncertainty at distribution extremes
+- **Bootstrap methodology provides a practical framework** for measuring model uncertainty without additional data requirements  
+- **Risk management strategies should be adjusted** based on score reliability, with enhanced verification for extreme scores
+- **The PDO transformation enables intuitive score interpretation** while preserving the underlying risk relationships
+
+These techniques can be applied beyond credit scoring to any prediction problem where understanding model uncertainty is critical for decision-making.

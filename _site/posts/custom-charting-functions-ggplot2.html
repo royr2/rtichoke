@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2024-05-14">
 
-<title>Custom Charting Functions Using ggplot2 – R’tichoke</title>
+<title>Developing Custom Charting Functions with ggplot2 – R'tichoke</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -127,11 +127,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">R Installation Guide</span></a>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Get Started</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-get-started">    
+        <li>
+    <a class="dropdown-item" href="../get-started/r-package-management.html">
+ <span class="dropdown-text">Installing Packages</span></a>
+  </li>  
         <li>
     <a class="dropdown-item" href="../get-started/variables.html">
  <span class="dropdown-text">Variables in R</span></a>
@@ -164,23 +172,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
-        <li>
-    <a class="dropdown-item" href="../get-started/r-package-management.html">
- <span class="dropdown-text">Installing Packages</span></a>
-  </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="../installation.html"> 
-<span class="menu-text">R Installation Guide</span></a>
+    <a class="nav-link" href="../webr.html"> 
+<span class="menu-text">WebR Playground</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts.html"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../posts.html"> 
-<span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="https://www.r-bloggers.com/"> 
+<span class="menu-text">R-Bloggers</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -198,15 +206,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#required-libraries" id="toc-required-libraries" class="nav-link active" data-scroll-target="#required-libraries">Required Libraries</a></li>
-  <li><a href="#sample-dataset" id="toc-sample-dataset" class="nav-link" data-scroll-target="#sample-dataset">Sample Dataset</a></li>
-  <li><a href="#building-a-simple-line-chart-function" id="toc-building-a-simple-line-chart-function" class="nav-link" data-scroll-target="#building-a-simple-line-chart-function">Building a Simple Line Chart Function</a></li>
-  <li><a href="#creating-a-custom-theme" id="toc-creating-a-custom-theme" class="nav-link" data-scroll-target="#creating-a-custom-theme">Creating a Custom Theme</a></li>
-  <li><a href="#enhancing-our-functions" id="toc-enhancing-our-functions" class="nav-link" data-scroll-target="#enhancing-our-functions">Enhancing Our Functions</a></li>
-  <li><a href="#putting-it-all-together" id="toc-putting-it-all-together" class="nav-link" data-scroll-target="#putting-it-all-together">Putting It All Together</a></li>
-  <li><a href="#applying-the-custom-theme-to-other-chart-types" id="toc-applying-the-custom-theme-to-other-chart-types" class="nav-link" data-scroll-target="#applying-the-custom-theme-to-other-chart-types">Applying the Custom Theme to Other Chart Types</a></li>
-  <li><a href="#benefits-of-custom-charting-functions" id="toc-benefits-of-custom-charting-functions" class="nav-link" data-scroll-target="#benefits-of-custom-charting-functions">Benefits of Custom Charting Functions</a></li>
-  <li><a href="#when-to-use-custom-functions-vs.-direct-ggplot2" id="toc-when-to-use-custom-functions-vs.-direct-ggplot2" class="nav-link" data-scroll-target="#when-to-use-custom-functions-vs.-direct-ggplot2">When to Use Custom Functions vs.&nbsp;Direct ggplot2</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#package-dependencies" id="toc-package-dependencies" class="nav-link" data-scroll-target="#package-dependencies">Package Dependencies</a></li>
+  <li><a href="#dataset-acquisition-and-preparation" id="toc-dataset-acquisition-and-preparation" class="nav-link" data-scroll-target="#dataset-acquisition-and-preparation">Dataset Acquisition and Preparation</a></li>
+  <li><a href="#fundamental-line-chart-function-development" id="toc-fundamental-line-chart-function-development" class="nav-link" data-scroll-target="#fundamental-line-chart-function-development">Fundamental Line Chart Function Development</a></li>
+  <li><a href="#custom-theme-development" id="toc-custom-theme-development" class="nav-link" data-scroll-target="#custom-theme-development">Custom Theme Development</a></li>
+  <li><a href="#advanced-function-enhancement" id="toc-advanced-function-enhancement" class="nav-link" data-scroll-target="#advanced-function-enhancement">Advanced Function Enhancement</a></li>
+  <li><a href="#integrated-function-implementation" id="toc-integrated-function-implementation" class="nav-link" data-scroll-target="#integrated-function-implementation">Integrated Function Implementation</a></li>
+  <li><a href="#cross-chart-type-theme-application" id="toc-cross-chart-type-theme-application" class="nav-link" data-scroll-target="#cross-chart-type-theme-application">Cross-Chart Type Theme Application</a></li>
+  <li><a href="#strategic-advantages-of-custom-charting-functions" id="toc-strategic-advantages-of-custom-charting-functions" class="nav-link" data-scroll-target="#strategic-advantages-of-custom-charting-functions">Strategic Advantages of Custom Charting Functions</a></li>
+  <li><a href="#implementation-strategy-custom-functions-vs.-direct-ggplot2" id="toc-implementation-strategy-custom-functions-vs.-direct-ggplot2" class="nav-link" data-scroll-target="#implementation-strategy-custom-functions-vs.-direct-ggplot2">Implementation Strategy: Custom Functions vs.&nbsp;Direct ggplot2</a></li>
   </ul>
 </nav>
     </div>
@@ -215,7 +224,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Custom Charting Functions Using ggplot2</h1>
+<h1 class="title">Developing Custom Charting Functions with ggplot2</h1>
   <div class="quarto-categories">
     <div class="quarto-category">R</div>
     <div class="quarto-category">Data Visualization</div>
@@ -243,9 +252,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>While R has a variety of options for 2D graphics and data visualization, it’s hard to beat <code>ggplot2</code> in terms of features, functionality, and overall visual quality. This post demonstrates how to create customized charting functions for specific chart types using <code>ggplot2</code> as the underlying visualization engine.</p>
-<section id="required-libraries" class="level2">
-<h2 class="anchored" data-anchor-id="required-libraries">Required Libraries</h2>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>While R provides numerous options for two-dimensional graphics and data visualization, <code>ggplot2</code> offers great functionality, features, and visual quality. This tutorial shows how to develop customized charting functions for specific visualization types, utilizing <code>ggplot2</code> as the foundational visualization engine. The approach enables the creation of reusable, standardized visualization components suitable for production environments and analytical workflows.</p>
+</section>
+<section id="package-dependencies" class="level2">
+<h2 class="anchored" data-anchor-id="package-dependencies">Package Dependencies</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
@@ -254,9 +266,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="sample-dataset" class="level2">
-<h2 class="anchored" data-anchor-id="sample-dataset">Sample Dataset</h2>
-<p>For this demonstration, we’ll use a summarized version of the COVID-19 Data Repository hosted by <a href="https://github.com/CSSEGISandData/COVID-19">Johns Hopkins University</a>.</p>
+<section id="dataset-acquisition-and-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-acquisition-and-preparation">Dataset Acquisition and Preparation</h2>
+<p>This tutorial utilizes a summarized version of the COVID-19 Data Repository maintained by <a href="https://github.com/CSSEGISandData/COVID-19">Johns Hopkins University</a> to demonstrate custom charting function development.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load COVID-19 data</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://bit.ly/3G8G63u"</span>)</span>
@@ -273,7 +285,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>[1] "Brazil" "India"  "Mexico" "Russia" "US"    </code></pre>
 </div>
 </div>
-<p>Let’s prepare our data for visualization by creating a 7-day moving average of daily confirmed cases for the top five countries:</p>
+<p>Subsequently, we prepare the dataset for visualization by calculating a 7-day centered moving average of daily confirmed cases for the identified top five countries:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a data frame with the required information</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note that a centered 7-day moving average is used</span></span>
@@ -287,9 +299,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">MA =</span> zoo<span class="sc">::</span><span class="fu">rollapply</span>(count, <span class="at">FUN =</span> mean, <span class="at">width =</span> <span class="dv">7</span>, <span class="at">by =</span> <span class="dv">1</span>, <span class="at">fill =</span> <span class="cn">NA</span>, <span class="at">align =</span> <span class="st">"center"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="building-a-simple-line-chart-function" class="level2">
-<h2 class="anchored" data-anchor-id="building-a-simple-line-chart-function">Building a Simple Line Chart Function</h2>
-<p>Let’s start by creating a basic line chart function. Note the use of <code>aes_string()</code> instead of just <code>aes()</code>. This allows us to supply arguments to <code>ggplot2</code> as strings, making our function more flexible.</p>
+<section id="fundamental-line-chart-function-development" class="level2">
+<h2 class="anchored" data-anchor-id="fundamental-line-chart-function-development">Fundamental Line Chart Function Development</h2>
+<p>The initial implementation demonstrates the creation of a basic line chart function. Note the utilization of <code>aes_string()</code> instead of <code>aes()</code>, which enables the provision of arguments to <code>ggplot2</code> as string parameters, thereby enhancing function flexibility and programmability.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Function definition</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>line_chart <span class="ot">&lt;-</span> <span class="cf">function</span>(df, </span>
@@ -322,9 +334,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="creating-a-custom-theme" class="level2">
-<h2 class="anchored" data-anchor-id="creating-a-custom-theme">Creating a Custom Theme</h2>
-<p>Now that we know how to encapsulate the call to <code>ggplot2</code> in a more intuitive manner, we can create a customized theme for our charts. This is useful since this theme can be applied to any chart.</p>
+<section id="custom-theme-development" class="level2">
+<h2 class="anchored" data-anchor-id="custom-theme-development">Custom Theme Development</h2>
+<p>Having established the methodology for encapsulating <code>ggplot2</code> calls within intuitive function wrappers, we proceed to develop a customized theme framework for our visualizations. This approach ensures consistent styling across all chart types and can be universally applied to any <code>ggplot2</code> object.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>custom_theme <span class="ot">&lt;-</span> <span class="cf">function</span>(plt, </span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">base_size =</span> <span class="dv">11</span>, </span>
@@ -355,9 +367,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="enhancing-our-functions" class="level2">
-<h2 class="anchored" data-anchor-id="enhancing-our-functions">Enhancing Our Functions</h2>
-<p>Let’s add more features to our <code>line_chart()</code> function to make it more versatile:</p>
+<section id="advanced-function-enhancement" class="level2">
+<h2 class="anchored" data-anchor-id="advanced-function-enhancement">Advanced Function Enhancement</h2>
+<p>The following section demonstrates the expansion of the <code>line_chart()</code> function to incorporate additional features and parameters, thereby increasing its versatility and applicability across diverse visualization requirements:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>line_chart <span class="ot">&lt;-</span> <span class="cf">function</span>(df, </span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                       x, y, </span>
@@ -386,7 +398,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">caption =</span> caption)</span>
 <span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>We’ll also enhance our <code>custom_theme()</code> function to handle different axis formatting options:</p>
+<p>Correspondingly, we enhance the <code>custom_theme()</code> function to accommodate diverse axis formatting options and advanced styling parameters:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>custom_theme <span class="ot">&lt;-</span> <span class="cf">function</span>(plt, </span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">palette =</span> <span class="st">"Set1"</span>, </span>
@@ -453,9 +465,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="putting-it-all-together" class="level2">
-<h2 class="anchored" data-anchor-id="putting-it-all-together">Putting It All Together</h2>
-<p>Now let’s see how our enhanced functions work together to create a polished visualization:</p>
+<section id="integrated-function-implementation" class="level2">
+<h2 class="anchored" data-anchor-id="integrated-function-implementation">Integrated Function Implementation</h2>
+<p>The following demonstration illustrates the coordinated application of our enhanced functions to generate a polished, publication-ready visualization:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">line_chart</span>(plotdf,</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">x =</span> <span class="st">"date"</span>, </span>
@@ -478,9 +490,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="applying-the-custom-theme-to-other-chart-types" class="level2">
-<h2 class="anchored" data-anchor-id="applying-the-custom-theme-to-other-chart-types">Applying the Custom Theme to Other Chart Types</h2>
-<p>The beauty of our <code>custom_theme()</code> function is that it can be applied to any <code>ggplot2</code> object. Let’s create a bar chart to demonstrate this flexibility:</p>
+<section id="cross-chart-type-theme-application" class="level2">
+<h2 class="anchored" data-anchor-id="cross-chart-type-theme-application">Cross-Chart Type Theme Application</h2>
+<p>The architectural design of our <code>custom_theme()</code> function enables its universal application to any <code>ggplot2</code> object, regardless of visualization type. The following example demonstrates this flexibility through bar chart implementation:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> plotdf <span class="sc">%&gt;%</span>  </span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">format</span>(date, <span class="st">"%m-%b"</span>)) <span class="sc">%&gt;%</span> </span>
@@ -504,19 +516,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="benefits-of-custom-charting-functions" class="level2">
-<h2 class="anchored" data-anchor-id="benefits-of-custom-charting-functions">Benefits of Custom Charting Functions</h2>
-<p>Creating custom charting functions with ggplot2 offers several advantages:</p>
+<section id="strategic-advantages-of-custom-charting-functions" class="level2">
+<h2 class="anchored" data-anchor-id="strategic-advantages-of-custom-charting-functions">Strategic Advantages of Custom Charting Functions</h2>
+<p>The development of custom charting functions utilizing ggplot2 provides substantial advantages for analytical workflows:</p>
 <ol type="1">
-<li><p><strong>Consistency</strong>: Ensures all charts in your reports or dashboards have a consistent look and feel.</p></li>
-<li><p><strong>Efficiency</strong>: Reduces the amount of code you need to write for commonly used chart types.</p></li>
-<li><p><strong>Maintainability</strong>: Makes it easier to update the style of all charts by modifying a single function.</p></li>
-<li><p><strong>Simplicity</strong>: Abstracts away the complexity of ggplot2 for team members who may not be as familiar with the package.</p></li>
+<li><p><strong>Visual Consistency</strong>: Ensures uniform appearance and styling across all visualizations within reports or analytical dashboards.</p></li>
+<li><p><strong>Development Efficiency</strong>: Significantly reduces code volume required for frequently utilized chart types and configurations.</p></li>
+<li><p><strong>Maintenance Optimization</strong>: Facilitates centralized style updates through single function modifications, propagating changes across all implementations.</p></li>
+<li><p><strong>Accessibility Enhancement</strong>: Abstracts ggplot2 complexity for team members with varying levels of package familiarity, democratizing visualization capabilities.</p></li>
 </ol>
 </section>
-<section id="when-to-use-custom-functions-vs.-direct-ggplot2" class="level2">
-<h2 class="anchored" data-anchor-id="when-to-use-custom-functions-vs.-direct-ggplot2">When to Use Custom Functions vs.&nbsp;Direct ggplot2</h2>
-<p>It’s worth noting that building customized charting functions using <code>ggplot2</code> is most useful when you need to create the same type of chart(s) repeatedly. When doing exploratory work, using <code>ggplot2</code> directly is often easier and more flexible since you can build all kinds of charts (or layer different chart types) within the same pipeline.</p>
+<section id="implementation-strategy-custom-functions-vs.-direct-ggplot2" class="level2">
+<h2 class="anchored" data-anchor-id="implementation-strategy-custom-functions-vs.-direct-ggplot2">Implementation Strategy: Custom Functions vs.&nbsp;Direct ggplot2</h2>
+<p>The development of customized charting functions utilizing <code>ggplot2</code> demonstrates optimal value when creating repetitive visualization types within structured analytical workflows. For exploratory data analysis activities, direct <code>ggplot2</code> implementation often provides superior flexibility, enabling rapid prototyping and layered chart construction within integrated analytical pipelines.</p>
 
 
 </section>

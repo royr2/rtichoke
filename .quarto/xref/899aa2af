@@ -1,1 +1,1 @@
-{"entries":[],"headings":["required-packages","data-preparation","setting-up-bayesian-optimization","running-bayesian-optimization","training-the-final-model","why-bayesian-optimization"]}
+{"entries":[],"headings":["introduction","package-dependencies","data-acquisition-and-initial-processing","bayesian-optimization-framework-implementation","executing-the-optimization-process","final-model-development-and-evaluation","key-advantages-of-bayesian-optimization","practical-considerations","key-takeaways"]}

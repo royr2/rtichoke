@@ -1,5 +1,5 @@
 ---
-title: "Custom Charting Functions Using ggplot2"
+title: "Developing Custom Charting Functions with ggplot2"
 date: "2024-05-14"
 categories: [R, Data Visualization, ggplot2]
 image: "../images/custom_charts.png"
@@ -10,9 +10,11 @@ execute:
   eval: true
 ---
 
-While R has a variety of options for 2D graphics and data visualization, it's hard to beat `ggplot2` in terms of features, functionality, and overall visual quality. This post demonstrates how to create customized charting functions for specific chart types using `ggplot2` as the underlying visualization engine.
+## Introduction
 
-## Required Libraries
+While R provides numerous options for two-dimensional graphics and data visualization, `ggplot2` offers great functionality, features, and visual quality. This tutorial shows how to develop customized charting functions for specific visualization types, utilizing `ggplot2` as the foundational visualization engine. The approach enables the creation of reusable, standardized visualization components suitable for production environments and analytical workflows.
+
+## Package Dependencies
 
 ```{r}
 #| label: setup
@@ -26,9 +28,9 @@ library(scales)
 library(stringr)
 ```
 
-## Sample Dataset
+## Dataset Acquisition and Preparation
 
-For this demonstration, we'll use a summarized version of the COVID-19 Data Repository hosted by [Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19).
+This tutorial utilizes a summarized version of the COVID-19 Data Repository maintained by [Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19) to demonstrate custom charting function development.
 
 ```{r}
 #| label: data-load
@@ -46,7 +48,7 @@ top_countries <- df %>%
 print(top_countries)
 ```
 
-Let's prepare our data for visualization by creating a 7-day moving average of daily confirmed cases for the top five countries:
+Subsequently, we prepare the dataset for visualization by calculating a 7-day centered moving average of daily confirmed cases for the identified top five countries:
 
 ```{r}
 #| label: data-prep
@@ -64,9 +66,9 @@ plotdf <- df %>%
   mutate(MA = zoo::rollapply(count, FUN = mean, width = 7, by = 1, fill = NA, align = "center"))
 ```
 
-## Building a Simple Line Chart Function
+## Fundamental Line Chart Function Development
 
-Let's start by creating a basic line chart function. Note the use of `aes_string()` instead of just `aes()`. This allows us to supply arguments to `ggplot2` as strings, making our function more flexible.
+The initial implementation demonstrates the creation of a basic line chart function. Note the utilization of `aes_string()` instead of `aes()`, which enables the provision of arguments to `ggplot2` as string parameters, thereby enhancing function flexibility and programmability.
 
 ```{r}
 #| label: line-chart-basic
@@ -95,9 +97,9 @@ line_chart(plotdf,
            line_width = 1.2)
 ```
 
-## Creating a Custom Theme
+## Custom Theme Development
 
-Now that we know how to encapsulate the call to `ggplot2` in a more intuitive manner, we can create a customized theme for our charts. This is useful since this theme can be applied to any chart.
+Having established the methodology for encapsulating `ggplot2` calls within intuitive function wrappers, we proceed to develop a customized theme framework for our visualizations. This approach ensures consistent styling across all chart types and can be universally applied to any `ggplot2` object.
 
 ```{r}
 #| label: custom-theme-basic
@@ -124,9 +126,9 @@ custom_theme <- function(plt,
 line_chart(plotdf, "date", "MA", "country") %>% custom_theme()
 ```
 
-## Enhancing Our Functions
+## Advanced Function Enhancement
 
-Let's add more features to our `line_chart()` function to make it more versatile:
+The following section demonstrates the expansion of the `line_chart()` function to incorporate additional features and parameters, thereby increasing its versatility and applicability across diverse visualization requirements:
 
 ```{r}
 #| label: line-chart-enhanced
@@ -159,7 +161,7 @@ line_chart <- function(df,
 }
 ```
 
-We'll also enhance our `custom_theme()` function to handle different axis formatting options:
+Correspondingly, we enhance the `custom_theme()` function to accommodate diverse axis formatting options and advanced styling parameters:
 
 ```{r}
 #| label: custom-theme-enhanced
@@ -229,9 +231,9 @@ custom_theme <- function(plt,
 }
 ```
 
-## Putting It All Together
+## Integrated Function Implementation
 
-Now let's see how our enhanced functions work together to create a polished visualization:
+The following demonstration illustrates the coordinated application of our enhanced functions to generate a polished, publication-ready visualization:
 
 ```{r}
 #| label: final-line-chart
@@ -250,9 +252,9 @@ line_chart(plotdf,
                y_axis_scale = 0.001)
 ```
 
-## Applying the Custom Theme to Other Chart Types
+## Cross-Chart Type Theme Application
 
-The beauty of our `custom_theme()` function is that it can be applied to any `ggplot2` object. Let's create a bar chart to demonstrate this flexibility:
+The architectural design of our `custom_theme()` function enables its universal application to any `ggplot2` object, regardless of visualization type. The following example demonstrates this flexibility through bar chart implementation:
 
 ```{r}
 #| label: bar-chart
@@ -272,18 +274,18 @@ custom_theme(p,
              y_axis_scale = 0.001)
 ```
 
-## Benefits of Custom Charting Functions
+## Strategic Advantages of Custom Charting Functions
 
-Creating custom charting functions with ggplot2 offers several advantages:
+The development of custom charting functions utilizing ggplot2 provides substantial advantages for analytical workflows:
 
-1. **Consistency**: Ensures all charts in your reports or dashboards have a consistent look and feel.
+1. **Visual Consistency**: Ensures uniform appearance and styling across all visualizations within reports or analytical dashboards.
 
-2. **Efficiency**: Reduces the amount of code you need to write for commonly used chart types.
+2. **Development Efficiency**: Significantly reduces code volume required for frequently utilized chart types and configurations.
 
-3. **Maintainability**: Makes it easier to update the style of all charts by modifying a single function.
+3. **Maintenance Optimization**: Facilitates centralized style updates through single function modifications, propagating changes across all implementations.
 
-4. **Simplicity**: Abstracts away the complexity of ggplot2 for team members who may not be as familiar with the package.
+4. **Accessibility Enhancement**: Abstracts ggplot2 complexity for team members with varying levels of package familiarity, democratizing visualization capabilities.
 
-## When to Use Custom Functions vs. Direct ggplot2
+## Implementation Strategy: Custom Functions vs. Direct ggplot2
 
-It's worth noting that building customized charting functions using `ggplot2` is most useful when you need to create the same type of chart(s) repeatedly. When doing exploratory work, using `ggplot2` directly is often easier and more flexible since you can build all kinds of charts (or layer different chart types) within the same pipeline.
+The development of customized charting functions utilizing `ggplot2` demonstrates optimal value when creating repetitive visualization types within structured analytical workflows. For exploratory data analysis activities, direct `ggplot2` implementation often provides superior flexibility, enabling rapid prototyping and layered chart construction within integrated analytical pipelines.

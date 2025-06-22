@@ -1,5 +1,5 @@
 ---
-title: "Building a Particle Swarm Optimizer from Scratch in R"
+title: "Implementing Particle Swarm Optimization from Scratch in R"
 date: "2024-07-22"
 categories: [R, Optimization, Visualization]
 image: "../images/pso_anim.gif"
@@ -10,9 +10,11 @@ execute:
   eval: true
 ---
 
-Nature-inspired algorithms can solve complex optimization problems with surprising efficiency. This post shows you how to build a Particle Swarm Optimizer (PSO) from scratch in R – mimicking how birds flock or fish school to efficiently search for food.
+## Introduction
 
-## Required Libraries
+Nature-inspired optimization algorithms demonstrate remarkable efficiency in solving complex optimization problems. This post provides a  implementation of Particle Swarm Optimization (PSO) from fundamental principles in R. The methodology presented enables efficient exploration of complex solution spaces through coordinated swarm intelligence.
+
+## Package Dependencies
 
 ```{r}
 # Load required packages
@@ -22,9 +24,9 @@ library(gganimate) # For animations
 library(metR)      # For geom_arrow
 ```
 
-## The Challenge: A Complex Optimization Surface
+## Optimization Test Function: Ackley's Function
 
-We'll test our optimizer on Ackley's function – a challenging benchmark with many local minima that can trap optimization algorithms:
+This tutorial employs Ackley's function as the optimization benchmark—a challenging multimodal function characterized by numerous local minima that frequently entrap conventional optimization algorithms:
 
 ```{r}
 obj_func <- function(x, y){
@@ -49,30 +51,31 @@ contour_plot <- ggplot(grid, aes(x = Var1, y = Var2)) +
 contour_plot
 ```
 
-## How PSO Works
+## Theoretical Foundation of Particle Swarm Optimization
 
-PSO mimics how birds find food by combining individual memory with social information:
+PSO emulates the collective foraging behavior of biological swarms through the integration of individual memory with social information sharing:
 
-1. Scatter random "particles" across the search space
-2. Each particle remembers its personal best position
-3. The swarm shares information about the global best position
-4. Particles adjust their movement based on both personal and swarm knowledge
+1. **Initialization**: Random distribution of particles across the search space
+2. **Memory Mechanism**: Each particle maintains a record of its personal best position
+3. **Information Sharing**: The swarm collectively maintains knowledge of the global best position
+4. **Movement Dynamics**: Particles adjust their trajectories based on both personal experience and collective knowledge
 
-The movement equation balances three forces:
+The velocity update equation represents a balance of three fundamental forces:
 
 $$v_{new} = w \cdot v_{current} + c_1 \cdot r_1 \cdot (p_{best} - p_{current}) + c_2 \cdot r_2 \cdot (g_{best} - p_{current})$$
 
 Where:
-- `w`: Inertia weight (momentum)
-- `c1`: Personal influence (memory)
-- `c2`: Social influence (cooperation)
-- `r1,r2`: Random values adding exploration
 
-## Building PSO Step by Step
+- `w`: Inertia (momentum preservation)
+- `c1`: Personal influence (individual memory)
+- `c2`: Social influence (collective cooperation)
+- `r1,r2`: Stochastic components
 
-### Step 1: Initialize the Swarm
+## Sample Implementation
 
-First, we create a random swarm of particles and place them across our search space:
+### Swarm Initialization
+
+The initial phase involves creating a randomized swarm of particles and distributing them across the defined search space:
 
 ```{r}
 # Set parameters
@@ -95,9 +98,9 @@ contour_plot +
   labs(title = "Initial Particle Positions")
 ```
 
-### Step 2: Track Best Positions and Initialize Velocities
+### Global Best Position and Velocity Initialization
 
-Next, we track each particle's personal best position and the swarm's global best position:
+Next, we need to track each particle's personal best position and the swarm's global best position, while initializing velocity vectors:
 
 ```{r}
 # Initialize random velocities
@@ -125,13 +128,12 @@ contour_plot +
                    xend = x + 0.5*cos(angle*pi/180), 
                    yend = y + 0.5*sin(angle*pi/180)), 
                arrow = arrow(length = unit(0.1, "cm")), 
-               color = "blue") + 
-  labs(title = "Forces Acting on Particles")
+               color = "blue") +   labs(title = "Forces Acting on Particles")
 ```
 
-### Step 3: Update Particle Positions
+### Position Update Mechanism
 
-Now we update each particle's position based on its velocity and the forces acting on it:
+The position update process implements the core PSO algorithm, calculating new velocities based on the fundamental equation and updating particle positions accordingly:
 
 ```{r}
 # Calculate new velocities using PSO equation
@@ -173,9 +175,9 @@ contour_plot +
   labs(title = "Particles After First Update")
 ```
 
-## Complete PSO Implementation
+## Full Implementation
 
-Now let's package everything into a reusable function:
+The following implementation encapsulates the complete PSO algorithm within a reusable function framework:
 
 ```{r}
 pso_optim <- function(obj_func,      # Function to minimize
@@ -237,7 +239,7 @@ pso_optim <- function(obj_func,      # Function to minimize
 }
 ```
 
-Let's test our optimizer on the Ackley function:
+The following code snippet applies the PSO algorithm to the Ackley function:
 
 ```{r}
 # Run the PSO algorithm
@@ -253,9 +255,9 @@ out <- pso_optim(obj_func,
 out$obj_loc
 ```
 
-## Visualizing the Swarm in Action
+## Visualising Swarm Behavior
 
-The real beauty of PSO is watching the particles converge on the solution:
+The optimization process can be effectively visualized through animation, demonstrating the collective convergence behavior of the particle swarm:
 
 ```{r}
 #| eval: false 
@@ -270,33 +272,35 @@ ggplot(out$X) +
 
 ![](../images/pso_anim.gif)
 
-## Fine-Tuning Your Swarm
+## Parameter Optimization and Algorithm Tuning
 
-The PSO algorithm's behavior can be dramatically altered by adjusting three key parameters:
+The PSO algorithm's performance characteristics can be substantially modified through systematic adjustment of three parameters:
 
 1. **Inertia Weight (w)**
-   - High values (>0.8): Particles maintain momentum and explore widely
-   - Low values (<0.4): Particles slow down and focus on refining solutions
+   - High values (>0.8): Particles maintain substantial momentum, aiding extensive exploration
+   - Low values (<0.4): Particles exhibit reduced momentum, facilitating solution refinement
 
 2. **Personal Learning Rate (c1)**
-   - High values: Particles favor their own discoveries
-   - Low values: Particles ignore their history
+   - High values: Particles prioritize individual discoveries and historical performance
+   - Low values: Particles demonstrate reduced reliance on personal experience
 
 3. **Social Learning Rate (c2)**
-   - High values: Particles rush toward the global best
-   - Low values: Particles explore independently
+   - High values: Particles demonstrate strong attraction toward the global optimum
+   - Low values: Particles maintain greater independence in exploration
 
-Common parameter combinations:
-- Exploration focus: High w (0.9), balanced c1/c2 (0.5/0.5)
-- Exploitation focus: Low w (0.4), higher c2 than c1 (0.1/0.7)
+## Implementation Considerations
 
-## Enhancing Your PSO Implementation
+- **Boundary Constraint Implementation**: Enforce particle confinement within valid solution regions
+- **Adaptive Parameter Strategies**: Implement dynamic parameter adjustment during optimization execution
+- **Convergence-Based Termination**: Establish sophisticated stopping criteria based on solution convergence
+- **High-Dimensional Extension**: Adapt the algorithm for complex, multi-dimensional optimization problems
 
-For real-world applications, consider these improvements:
+> The R package [`pso`](https://cran.r-project.org/web/packages/pso/index.html) provides a comprehensive, production-ready implementation suitable for industrial applications.
 
-- Add boundary constraints to keep particles within valid regions
-- Implement adaptive parameters that change during optimization
-- Add convergence-based stopping criteria
-- Extend to higher dimensions for more complex problems
+## Key Takeaways
 
-The R package [`pso`](https://cran.r-project.org/web/packages/pso/index.html) offers a production-ready implementation! 
+- **PSO successfully emulates biological swarm intelligence** through mathematical modeling of collective behavior patterns
+- **The velocity update equation balances three critical forces**: inertia, personal experience, and social influence
+- **Parameter tuning significantly affects algorithm performance**, with distinct configurations optimizing exploration versus exploitation
+- **The algorithm scales effectively to high-dimensional problems** while maintaining computational efficiency
+- **Production implementations require boundary constraints and adaptive parameters** for robust performance
