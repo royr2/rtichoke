@@ -173,6 +173,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/parallel-computing-in-r.html">
+ <span class="dropdown-text">Parallel Computing in R</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item">
@@ -207,13 +211,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#loops-and-apply-functions-in-r" id="toc-loops-and-apply-functions-in-r" class="nav-link active" data-scroll-target="#loops-and-apply-functions-in-r">Loops and Apply Functions in R</a>
-  <ul class="collapse">
-  <li><a href="#for-loops" id="toc-for-loops" class="nav-link" data-scroll-target="#for-loops">For Loops</a></li>
+  <li><a href="#for-loops" id="toc-for-loops" class="nav-link active" data-scroll-target="#for-loops">For Loops</a></li>
   <li><a href="#while-loops" id="toc-while-loops" class="nav-link" data-scroll-target="#while-loops">While Loops</a></li>
   <li><a href="#repeat-loops" id="toc-repeat-loops" class="nav-link" data-scroll-target="#repeat-loops">Repeat Loops</a></li>
   <li><a href="#control-statements" id="toc-control-statements" class="nav-link" data-scroll-target="#control-statements">Control Statements</a></li>
-  </ul></li>
   <li><a href="#apply-functions" id="toc-apply-functions" class="nav-link" data-scroll-target="#apply-functions">Apply Functions</a>
   <ul class="collapse">
   <li><a href="#apply---for-matrices-and-arrays" id="toc-apply---for-matrices-and-arrays" class="nav-link" data-scroll-target="#apply---for-matrices-and-arrays"><code>apply()</code> - For matrices and arrays</a></li>
@@ -263,8 +264,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="loops-and-apply-functions-in-r" class="level2">
-<h2 class="anchored" data-anchor-id="loops-and-apply-functions-in-r">Loops and Apply Functions in R</h2>
 <p>R offers several methods to perform repetitive tasks through loops and the more efficient apply family of functions.</p>
 <section id="for-loops" class="level3">
 <h3 class="anchored" data-anchor-id="for-loops">For Loops</h3>
@@ -353,7 +352,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 [1] "Odd number: 9"</code></pre>
 </div>
 </div>
-</section>
 </section>
 <section id="apply-functions" class="level2">
 <h2 class="anchored" data-anchor-id="apply-functions">Apply Functions</h2>
@@ -559,7 +557,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/moonlit-malasada-924ab5\.netlify\.app");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

@@ -173,6 +173,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/parallel-computing-in-r.html">
+ <span class="dropdown-text">Parallel Computing in R</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item">
@@ -207,15 +211,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction-to-dplyr" id="toc-introduction-to-dplyr" class="nav-link active" data-scroll-target="#introduction-to-dplyr">Introduction to dplyr</a>
-  <ul class="collapse">
-  <li><a href="#getting-started-with-dplyr" id="toc-getting-started-with-dplyr" class="nav-link" data-scroll-target="#getting-started-with-dplyr">Getting Started with dplyr</a></li>
+  <li><a href="#getting-started-with-dplyr" id="toc-getting-started-with-dplyr" class="nav-link active" data-scroll-target="#getting-started-with-dplyr">Getting Started with dplyr</a></li>
   <li><a href="#the-main-dplyr-verbs" id="toc-the-main-dplyr-verbs" class="nav-link" data-scroll-target="#the-main-dplyr-verbs">The Main dplyr Verbs</a></li>
   <li><a href="#the-pipe-operator" id="toc-the-pipe-operator" class="nav-link" data-scroll-target="#the-pipe-operator">The Pipe Operator (<code>%&gt;%</code>)</a></li>
   <li><a href="#more-useful-dplyr-functions" id="toc-more-useful-dplyr-functions" class="nav-link" data-scroll-target="#more-useful-dplyr-functions">More Useful dplyr Functions</a></li>
   <li><a href="#combining-multiple-operations" id="toc-combining-multiple-operations" class="nav-link" data-scroll-target="#combining-multiple-operations">Combining Multiple Operations</a></li>
   <li><a href="#working-with-joins" id="toc-working-with-joins" class="nav-link" data-scroll-target="#working-with-joins">Working with Joins</a></li>
-  </ul></li>
   </ul>
 </nav>
     </div>
@@ -256,8 +257,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="introduction-to-dplyr" class="level2">
-<h2 class="anchored" data-anchor-id="introduction-to-dplyr">Introduction to dplyr</h2>
 <p>The <code>dplyr</code> package is part of the tidyverse and provides a grammar for data manipulation in R. It makes data transformation tasks more intuitive and readable.</p>
 <section id="getting-started-with-dplyr" class="level3">
 <h3 class="anchored" data-anchor-id="getting-started-with-dplyr">Getting Started with dplyr</h3>
@@ -1002,7 +1001,6 @@ Honda Civic    30.4   4 75.7 52 4.93 1.615 18.52  1  1    4    2</code></pre>
 
 
 </section>
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1095,7 +1093,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/moonlit-malasada-924ab5\.netlify\.app");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

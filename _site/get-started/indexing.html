@@ -173,6 +173,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/parallel-computing-in-r.html">
+ <span class="dropdown-text">Parallel Computing in R</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item">
@@ -207,16 +211,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#indexing-arrays-in-r" id="toc-indexing-arrays-in-r" class="nav-link active" data-scroll-target="#indexing-arrays-in-r">Indexing Arrays in R</a>
-  <ul class="collapse">
-  <li><a href="#vector-indexing" id="toc-vector-indexing" class="nav-link" data-scroll-target="#vector-indexing">Vector Indexing</a></li>
+  <li><a href="#vector-indexing" id="toc-vector-indexing" class="nav-link active" data-scroll-target="#vector-indexing">Vector Indexing</a></li>
   <li><a href="#logical-indexing" id="toc-logical-indexing" class="nav-link" data-scroll-target="#logical-indexing">Logical Indexing</a></li>
   <li><a href="#matrix-indexing" id="toc-matrix-indexing" class="nav-link" data-scroll-target="#matrix-indexing">Matrix Indexing</a></li>
   <li><a href="#array-indexing" id="toc-array-indexing" class="nav-link" data-scroll-target="#array-indexing">Array Indexing</a></li>
   <li><a href="#data-frame-indexing" id="toc-data-frame-indexing" class="nav-link" data-scroll-target="#data-frame-indexing">Data Frame Indexing</a></li>
   <li><a href="#list-indexing" id="toc-list-indexing" class="nav-link" data-scroll-target="#list-indexing">List Indexing</a></li>
   <li><a href="#advanced-indexing-techniques" id="toc-advanced-indexing-techniques" class="nav-link" data-scroll-target="#advanced-indexing-techniques">Advanced Indexing Techniques</a></li>
-  </ul></li>
   </ul>
 </nav>
     </div>
@@ -257,8 +258,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="indexing-arrays-in-r" class="level2">
-<h2 class="anchored" data-anchor-id="indexing-arrays-in-r">Indexing Arrays in R</h2>
 <p>R provides flexible ways to access and manipulate elements in data structures like vectors, matrices, and arrays.</p>
 <section id="vector-indexing" class="level3">
 <h3 class="anchored" data-anchor-id="vector-indexing">Vector Indexing</h3>
@@ -525,7 +524,6 @@ $matrix
 
 
 </section>
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -618,7 +616,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/moonlit-malasada-924ab5\.netlify\.app");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

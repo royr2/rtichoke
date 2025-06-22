@@ -173,6 +173,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/parallel-computing-in-r.html">
+ <span class="dropdown-text">Parallel Computing in R</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item">
@@ -207,9 +211,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction-to-ggplot2-graphics" id="toc-introduction-to-ggplot2-graphics" class="nav-link active" data-scroll-target="#introduction-to-ggplot2-graphics">Introduction to ggplot2 Graphics</a>
-  <ul class="collapse">
-  <li><a href="#getting-started-with-ggplot2" id="toc-getting-started-with-ggplot2" class="nav-link" data-scroll-target="#getting-started-with-ggplot2">Getting Started with ggplot2</a></li>
+  <li><a href="#getting-started-with-ggplot2" id="toc-getting-started-with-ggplot2" class="nav-link active" data-scroll-target="#getting-started-with-ggplot2">Getting Started with ggplot2</a></li>
   <li><a href="#the-grammar-of-graphics" id="toc-the-grammar-of-graphics" class="nav-link" data-scroll-target="#the-grammar-of-graphics">The Grammar of Graphics</a></li>
   <li><a href="#basic-plot-structure" id="toc-basic-plot-structure" class="nav-link" data-scroll-target="#basic-plot-structure">Basic Plot Structure</a></li>
   <li><a href="#common-geometries-geoms" id="toc-common-geometries-geoms" class="nav-link" data-scroll-target="#common-geometries-geoms">Common Geometries (geoms)</a></li>
@@ -221,7 +223,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#custom-theme-elements" id="toc-custom-theme-elements" class="nav-link" data-scroll-target="#custom-theme-elements">Custom Theme Elements</a></li>
   <li><a href="#combining-multiple-plots" id="toc-combining-multiple-plots" class="nav-link" data-scroll-target="#combining-multiple-plots">Combining Multiple Plots</a></li>
   <li><a href="#saving-ggplot2-plots" id="toc-saving-ggplot2-plots" class="nav-link" data-scroll-target="#saving-ggplot2-plots">Saving ggplot2 Plots</a></li>
-  </ul></li>
   </ul>
 </nav>
     </div>
@@ -262,8 +263,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="introduction-to-ggplot2-graphics" class="level2">
-<h2 class="anchored" data-anchor-id="introduction-to-ggplot2-graphics">Introduction to ggplot2 Graphics</h2>
 <p>The <code>ggplot2</code> package, part of the tidyverse, implements the Grammar of Graphics to create elegant and complex plots with consistent syntax. It is one of the most popular visualization packages in R.</p>
 <section id="getting-started-with-ggplot2" class="level3">
 <h3 class="anchored" data-anchor-id="getting-started-with-ggplot2">Getting Started with ggplot2</h3>
@@ -701,7 +700,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 </section>
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -794,7 +792,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/moonlit-malasada-924ab5\.netlify\.app");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
