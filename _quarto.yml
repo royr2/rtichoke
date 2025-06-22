@@ -31,6 +31,8 @@ website:
           text: Base Graphics          
         - href: get-started/ggplot2.qmd
           text: ggplot2 Graphics
+        - href: get-started/parallel-computing-in-r.qmd
+          text: Parallel Computing in R
       - href: webr.qmd
         text: WebR Playground
       - text: Blog

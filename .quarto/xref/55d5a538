@@ -1,1 +1,1 @@
-{"entries":[],"headings":[]}
+{"entries":[],"headings":["packages","detecting-available-cpu-cores","the-basics","method-1-using-parlapply-works-on-all-systems","method-2-using-mclapply-unixmac-only","the-foreach-package-a-more-intuitive-approach","combining-results-with-foreach","matrix-operations","performance-comparison","visualizing-results","practical-implementation","best-practices"]}
