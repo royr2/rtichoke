@@ -11,8 +11,6 @@ execute:
   eval: true
 ---
 
-## Indexing Arrays in R
-
 R provides flexible ways to access and manipulate elements in data structures like vectors, matrices, and arrays.
 
 ### Vector Indexing

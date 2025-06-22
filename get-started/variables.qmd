@@ -11,8 +11,6 @@ execute:
   eval: true
 ---
 
-## Creating Variables in R
-
 Variables in R store data that can be referenced and manipulated throughout code. The following demonstrates how to create and work with variables:
 
 ### Basic Assignment

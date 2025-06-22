@@ -11,8 +11,6 @@ execute:
   eval: true
 ---
 
-## Loops and Apply Functions in R
-
 R offers several methods to perform repetitive tasks through loops and the more efficient apply family of functions.
 
 ### For Loops

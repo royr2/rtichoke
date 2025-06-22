@@ -10,8 +10,6 @@ execute:
   eval: true
 ---
 
-# Data Manipulation with dplyr
-
 The `dplyr` package is part of the tidyverse and provides a grammar for data manipulation in R. This post demonstrates essential data wrangling techniques using built-in datasets.
 
 ## Setup

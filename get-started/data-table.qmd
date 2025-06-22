@@ -11,8 +11,6 @@ execute:
   eval: true
 ---
 
-## Introduction to data.table
-
 The `data.table` package is a high-performance extension of R's `data.frame` that provides concise syntax for data manipulation. It is particularly efficient for large datasets.
 
 ### Getting Started with data.table

@@ -110,7 +110,3 @@ install.packages("shiny")      # Interactive web applications
   ```bash
   sudo apt install libcurl4-openssl-dev libssl-dev libxml2-dev
   ```
-
-## Next Steps
-
-With R and RStudio installed, proceed to [Introduction to Analytics with R](/posts/intro-to-r-analytics.qmd) to begin learning.

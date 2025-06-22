@@ -11,8 +11,6 @@ execute:
   eval: true
 ---
 
-## Introduction to dplyr
-
 The `dplyr` package is part of the tidyverse and provides a grammar for data manipulation in R. It makes data transformation tasks more intuitive and readable.
 
 ### Getting Started with dplyr

@@ -11,8 +11,6 @@ execute:
   eval: true
 ---
 
-## Introduction to ggplot2 Graphics
-
 The `ggplot2` package, part of the tidyverse, implements the Grammar of Graphics to create elegant and complex plots with consistent syntax. It is one of the most popular visualization packages in R.
 
 ### Getting Started with ggplot2

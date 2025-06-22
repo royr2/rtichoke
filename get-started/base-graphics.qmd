@@ -11,8 +11,6 @@ execute:
   eval: true
 ---
 
-## Introduction to Base Graphics in R
-
 R comes with a built-in graphics system known as "base graphics." These functions provide a straightforward way to create plots without requiring additional packages.
 
 ### Basic Plot Types
