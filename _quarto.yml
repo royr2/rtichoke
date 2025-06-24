@@ -3,6 +3,7 @@ project:
 
 website:
   title: "R'tichoke"
+  site-url: "https://rtichoke.netlify.app"
   navbar:
     background: primary
     search: true

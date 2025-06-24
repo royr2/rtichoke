@@ -295,15 +295,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare coefficient of variation</span></span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(sample_means)<span class="sc">/</span><span class="fu">mean</span>(sample_means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01066065</code></pre>
+<pre><code>[1] 0.0100664</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(sample_75_quantile)<span class="sc">/</span><span class="fu">mean</span>(sample_75_quantile)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01284219</code></pre>
+<pre><code>[1] 0.01270263</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(sample_95_quantile)<span class="sc">/</span><span class="fu">mean</span>(sample_75_quantile)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01930166</code></pre>
+<pre><code>[1] 0.01888391</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the distributions</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>combined_vec <span class="ot">&lt;-</span> <span class="fu">c</span>(sample_means, sample_75_quantile, sample_95_quantile, sample_99_quantile)</span>
@@ -378,25 +378,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 3 × 2
   splits               id          
   &lt;list&gt;               &lt;chr&gt;       
-1 &lt;split [10000/3687]&gt; Bootstrap001
-2 &lt;split [10000/3685]&gt; Bootstrap002
-3 &lt;split [10000/3708]&gt; Bootstrap003</code></pre>
+1 &lt;split [10000/3700]&gt; Bootstrap001
+2 &lt;split [10000/3630]&gt; Bootstrap002
+3 &lt;split [10000/3639]&gt; Bootstrap003</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Each row represents a separate bootstrapped sample with an analysis set and assessment set</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>boot_sample<span class="sc">$</span>splits[[<span class="dv">1</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;Analysis/Assess/Total&gt;
-&lt;10000/3687/10000&gt;</code></pre>
+&lt;10000/3700/10000&gt;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the first 5 rows and 5 columns of the first sample</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">analysis</span>(boot_sample<span class="sc">$</span>splits[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> .[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     V1        id member_id loan_amnt funded_amnt
-1 84100 132076701        -1      5000        5000
-2 50645   8608023        -1     14000       14000
-3 85403 129369618        -1     24000       24000
-4 51995   6939230        -1      6000        6000
-5  6032 141964884        -1      5000        5000</code></pre>
+1 70066 143521620        -1     18000       18000
+2 74725 143608122        -1     15000       15000
+3 64235 122327224        -1     10000       10000
+4 26743  70312012        -1     35000       35000
+5 80520  68407752        -1     11000       11000</code></pre>
 </div>
 </div>
 <p>Each bootstrap sample consists of random draws with replacement from the original dataset, creating controlled variations that effectively reveal model sensitivity to different data compositions.</p>
@@ -429,7 +429,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Check output</span></span>
 <span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(pred)  <span class="co"># Output is on log odds scale</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -12.9580782   0.9594826</code></pre>
+<pre><code>[1] -30.25449   1.57891</code></pre>
 </div>
 </div>
 <p>The function returns predictions in log-odds format, which will subsequently be transformed to a more intuitive credit score scale in later steps.</p>
@@ -450,7 +450,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>boot_preds <span class="ot">&lt;-</span> <span class="fu">do.call</span>(c, output)</span>
 <span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(boot_preds)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -131.960420    7.180581</code></pre>
+<pre><code>[1] -130.406408    4.125475</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get outliers</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>q_high <span class="ot">&lt;-</span> <span class="fu">quantile</span>(boot_preds, <span class="fl">0.99</span>)</span>
@@ -463,7 +463,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(boot_preds)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -5.0380956 -0.2176088</code></pre>
+<pre><code>[1] -5.0603991 -0.2283903</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to a data frame</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>boot_preds <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">pred =</span> boot_preds, </span>
@@ -471,12 +471,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(boot_preds)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       pred id
-1 -1.853830  1
-2 -2.345015  1
-3 -1.430748  1
-4 -2.312299  1
-5 -1.712506  1
-6 -1.101160  1</code></pre>
+1 -1.460522  1
+2 -1.644074  1
+3 -3.123883  1
+4 -4.236837  1
+5 -3.197778  1
+6 -3.123942  1</code></pre>
 </div>
 </div>
 <p>In this step, we apply the logistic regression model to each bootstrap sample and systematically collect the resulting predictions. Subsequently, we truncate extreme values (beyond the 1st and 99th percentiles) to remove outliers—a procedure analogous to capping techniques commonly employed in production credit models.</p>
@@ -721,7 +721,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/moonlit-malasada-924ab5\.netlify\.app");
+      var filterRegex = new RegExp("https:\/\/rtichoke\.netlify\.app");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

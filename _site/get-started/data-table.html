@@ -814,14 +814,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(dt_large[, .(<span class="at">mean_x =</span> <span class="fu">mean</span>(x)), <span class="at">by =</span> y])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-   0.05    0.03    0.02 </code></pre>
+   0.08    0.05    0.02 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare with equivalent dplyr operation (if dplyr is installed)</span></span>
 <span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>df_large <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(dt_large)</span>
 <span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(dplyr<span class="sc">::</span><span class="fu">summarise</span>(dplyr<span class="sc">::</span><span class="fu">group_by</span>(df_large, y), <span class="at">mean_x =</span> <span class="fu">mean</span>(x)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-   0.18    0.03    0.20 </code></pre>
+   0.15    0.03    0.20 </code></pre>
 </div>
 </div>
 <p>data.table is particularly valuable when working with large datasets due to its efficient memory usage and optimized C implementation.</p>
@@ -920,7 +920,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/moonlit-malasada-924ab5\.netlify\.app");
+      var filterRegex = new RegExp("https:\/\/rtichoke\.netlify\.app");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

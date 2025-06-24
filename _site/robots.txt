@@ -1,1 +1,1 @@
-Sitemap: https://moonlit-malasada-924ab5.netlify.app/sitemap.xml
+Sitemap: https://rtichoke.netlify.app/sitemap.xml

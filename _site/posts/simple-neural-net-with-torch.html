@@ -289,13 +289,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">as.numeric</span>(y<span class="sc">$</span><span class="fu">squeeze</span>())</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>             x          y
-1  0.196439013  3.0960894
-2 -1.425725937 -2.3177149
-3  0.910384119  4.8918929
-4 -0.232266411  1.4088905
-5 -0.268673807  0.9713775
-6  0.006964483  2.3886244</code></pre>
+<pre><code>            x         y
+1 -0.02329975  1.861628
+2  1.92341769  7.555232
+3  0.11041667  2.613283
+4 -2.55959392 -5.931758
+5  0.36482519  3.099005
+6  0.97125226  4.551073</code></pre>
 </div>
 </div>
 </section>
@@ -483,10 +483,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(performance_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                   Metric      Value
-1      Mean Squared Error 0.07149047
-2 Root Mean Squared Error 0.26737702
-3     Mean Absolute Error 0.21254823
-4               R-squared 0.99080313</code></pre>
+1      Mean Squared Error 0.09061213
+2 Root Mean Squared Error 0.30101848
+3     Mean Absolute Error 0.23722124
+4               R-squared 0.99000990</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare with true relationship (y = 3x + 2)</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate predictions on a grid for comparison</span></span>
@@ -565,7 +565,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Bias value:"</span>, layer2_bias, <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Bias value: 0.4443707 1.079916 -0.4165982 0.1215674 0.2644976 0.01709418 -0.4878989 1.520551 </code></pre>
+<pre><code>Bias value: 0.701076 -0.8832566 -1.28852 0.4193589 0.8179439 -0.4608558 0.6640872 0.2222885 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Display first layer weights and biases</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"First layer weights:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -575,14 +575,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">round</span>(layer1_weight, <span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        [,1]
-[1,]  0.1900
-[2,]  0.5403
-[3,]  1.0284
-[4,]  0.3823
-[5,] -1.8089
-[6,]  1.3698
-[7,] -0.0015
-[8,]  0.9134</code></pre>
+[1,]  1.2292
+[2,] -2.0338
+[3,]  0.3231
+[4,]  1.4845
+[5,]  1.2861
+[6,] -0.0174
+[7,]  0.1889
+[8,] -0.5916</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">First layer biases:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -591,7 +591,7 @@ First layer biases:</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">round</span>(layer2_bias, <span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1]  0.4444  1.0799 -0.4166  0.1216  0.2645  0.0171 -0.4879  1.5206</code></pre>
+<pre><code>[1]  0.7011 -0.8833 -1.2885  0.4194  0.8179 -0.4609  0.6641  0.2223</code></pre>
 </div>
 </div>
 </section>
@@ -801,7 +801,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/moonlit-malasada-924ab5\.netlify\.app");
+      var filterRegex = new RegExp("https:\/\/rtichoke\.netlify\.app");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

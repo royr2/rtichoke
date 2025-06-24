@@ -520,11 +520,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Epoch 1 - Train Loss: 0.7551, Val Loss: 0.7167, Val Acc: 0.479
-Epoch 25 - Train Loss: 0.3409, Val Loss: 0.3475, Val Acc: 0.671
-Epoch 50 - Train Loss: 0.2225, Val Loss: 0.2307, Val Acc: 0.821
-Epoch 75 - Train Loss: 0.0926, Val Loss: 0.0971, Val Acc: 0.979
-Epoch 100 - Train Loss: 0.0517, Val Loss: 0.0657, Val Acc: 0.971</code></pre>
+<pre><code>Epoch 1 - Train Loss: 0.7958, Val Loss: 0.7369, Val Acc: 0.493
+Epoch 25 - Train Loss: 0.3267, Val Loss: 0.3035, Val Acc: 0.821
+Epoch 50 - Train Loss: 0.1548, Val Loss: 0.1350, Val Acc: 0.971
+Epoch 75 - Train Loss: 0.0599, Val Loss: 0.0479, Val Acc: 0.993
+Epoch 100 - Train Loss: 0.0381, Val Loss: 0.0356, Val Acc: 1.000</code></pre>
 </div>
 </div>
 </section>
@@ -585,12 +585,12 @@ Epoch 100 - Train Loss: 0.0517, Val Loss: 0.0657, Val Acc: 0.971</code></pre>
 <span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(performance_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>            Task          Metric   Value
-1     Regression Test Loss (MSE)  0.0522
-2     Regression            RMSE  0.2284
-3     Regression       R-squared  0.9357
-4 Classification Test Loss (BCE)  0.0704
-5 Classification        Accuracy 96.6700
-6 Classification             AUC 99.8200</code></pre>
+1     Regression Test Loss (MSE)  0.0533
+2     Regression            RMSE  0.2308
+3     Regression       R-squared  0.9449
+4 Classification Test Loss (BCE)  0.0492
+5 Classification        Accuracy 98.0000
+6 Classification             AUC 99.9400</code></pre>
 </div>
 </div>
 </section>
@@ -803,7 +803,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/moonlit-malasada-924ab5\.netlify\.app");
+      var filterRegex = new RegExp("https:\/\/rtichoke\.netlify\.app");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
