@@ -1,5 +1,5 @@
 ---
-title: "Tutorial: Assessing Credit Score Prediction Reliability Using Bootstrap Resampling"
+title: "Assessing Credit Score Prediction Reliability Using Bootstrap Resampling"
 date: "2024-11-15"
 categories: [R, Credit Risk Analytics, Bootstrapping]
 image: "../images/score_reliability.png"

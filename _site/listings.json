@@ -2,6 +2,7 @@
   {
     "listing": "/posts.html",
     "items": [
+      "/posts/quarto_live.html",
       "/posts/multi-task-learning-with-torch.html",
       "/posts/simple-neural-net-with-torch.html",
       "/posts/assessing-score-reliability.html",
