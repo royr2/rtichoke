@@ -175,5 +175,8 @@
   },
   "posts/portfolio_optimisation_pso.qmd": {
     "portfolio_optimisation_pso.html": "75d1a33d"
+  },
+  "posts/quarto_live.qmd": {
+    "quarto_live.html": "90251c20"
   }
 }

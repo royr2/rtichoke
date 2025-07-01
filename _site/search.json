@@ -373,77 +373,77 @@
   {
     "objectID": "posts/assessing-score-reliability.html",
     "href": "posts/assessing-score-reliability.html",
-    "title": "Tutorial: Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
+    "title": "Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
     "section": "",
     "text": "Credit scoring models demonstrate optimal performance within the central regions of the score distribution, yet exhibit diminished reliability at the distribution extremes where data becomes sparse. This tutorial provides a comprehensive methodology for employing bootstrap resampling techniques to quantify prediction variability across different score ranges, thereby enabling practitioners to identify regions where their models demonstrate the highest degree of dependability."
   },
   {
     "objectID": "posts/assessing-score-reliability.html#introduction",
     "href": "posts/assessing-score-reliability.html#introduction",
-    "title": "Tutorial: Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
+    "title": "Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
     "section": "",
     "text": "Credit scoring models demonstrate optimal performance within the central regions of the score distribution, yet exhibit diminished reliability at the distribution extremes where data becomes sparse. This tutorial provides a comprehensive methodology for employing bootstrap resampling techniques to quantify prediction variability across different score ranges, thereby enabling practitioners to identify regions where their models demonstrate the highest degree of dependability."
   },
   {
     "objectID": "posts/assessing-score-reliability.html#theoretical-foundation-understanding-estimation-variance",
     "href": "posts/assessing-score-reliability.html#theoretical-foundation-understanding-estimation-variance",
-    "title": "Tutorial: Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
+    "title": "Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
     "section": "Theoretical Foundation: Understanding Estimation Variance",
-    "text": "Theoretical Foundation: Understanding Estimation Variance\nReduced sample sizes inherently result in increased variance in statistical estimates, particularly for extreme values within a distribution. While central tendency measures such as means demonstrate relative stability when estimated from limited data, tail percentiles (95th, 99th) exhibit substantially greater volatility. This phenomenon is of critical importance in credit scoring applications, where extremely high and low scores correspond to these unstable tail regions of the distribution.\n\n# Number of samples to be drawn from a probability distribution\nn_samples &lt;- 1000\n\n# Number of times, sampling should be repeated\nrepeats &lt;- 100\n\n# Mean and std-dev for a standard normal distribution\nmu &lt;- 5\nstd_dev &lt;- 2\n\n# Sample\nsamples &lt;- rnorm(n_samples * repeats, mean = 10)\n\n# Fit into a matrix like object with `n_samples' number of rows \n# and `repeats' number of columns\nsamples &lt;- matrix(samples, nrow = n_samples, ncol = repeats)\n\n# Compute mean across each column\nsample_means &lt;- apply(samples, 1, mean)\n\n# Similarly, compute 75% and 95% quantile across each column\nsample_75_quantile &lt;- apply(samples, 1, quantile, p = 0.75)\nsample_95_quantile &lt;- apply(samples, 1, quantile, p = 0.95)\nsample_99_quantile &lt;- apply(samples, 1, quantile, p = 0.99)\n\n# Compare coefficient of variation\nsd(sample_means)/mean(sample_means)\n\n[1] 0.0100664\n\nsd(sample_75_quantile)/mean(sample_75_quantile)\n\n[1] 0.01270263\n\nsd(sample_95_quantile)/mean(sample_75_quantile)\n\n[1] 0.01888391\n\n# Plot the distributions\ncombined_vec &lt;- c(sample_means, sample_75_quantile, sample_95_quantile, sample_99_quantile)\n\nplot(density(sample_means), \n     col = \"#6F69AC\", \n     lwd = 3, \n     main = \"Estimating the mean vs tail quantiles\", \n     xlab = \"\", \n     xlim = c(min(combined_vec), max(combined_vec)))\n\nlines(density(sample_75_quantile), col = \"#95DAC1\", lwd = 3)\nlines(density(sample_95_quantile), col = \"#FFEBA1\", lwd = 3)\nlines(density(sample_99_quantile), col = \"#FD6F96\", lwd = 3)\ngrid()\n\nlegend(\"topright\", \n       fill = c(\"#6F69AC\", \"#95DAC1\", \"#FFEBA1\", \"#FD6F96\"), \n       legend = c(\"Mean\", \"75% Quantile\", \"95% Quantile\", \"99% Quantile\"), \n       cex = 0.7)\n\n\n\n\n\n\n\n\nThe visualization demonstrates the substantial increase in uncertainty when estimating extreme values compared to central tendencies. The distribution corresponding to the mean (purple) exhibits considerably narrower dispersion than that of the 99th percentile (pink). This statistical principle directly applies to credit scoring applications, where scores at the extremes of the distribution inherently possess greater uncertainty.\n\n# Load required packages\nlibrary(dplyr)\nlibrary(magrittr)\nlibrary(rsample)\nlibrary(ggplot2)"
+    "text": "Theoretical Foundation: Understanding Estimation Variance\nReduced sample sizes inherently result in increased variance in statistical estimates, particularly for extreme values within a distribution. While central tendency measures such as means demonstrate relative stability when estimated from limited data, tail percentiles (95th, 99th) exhibit substantially greater volatility. This phenomenon is of critical importance in credit scoring applications, where extremely high and low scores correspond to these unstable tail regions of the distribution.\n\n# Number of samples to be drawn from a probability distribution\nn_samples &lt;- 1000\n\n# Number of times, sampling should be repeated\nrepeats &lt;- 100\n\n# Mean and std-dev for a standard normal distribution\nmu &lt;- 5\nstd_dev &lt;- 2\n\n# Sample\nsamples &lt;- rnorm(n_samples * repeats, mean = 10)\n\n# Fit into a matrix like object with `n_samples' number of rows \n# and `repeats' number of columns\nsamples &lt;- matrix(samples, nrow = n_samples, ncol = repeats)\n\n# Compute mean across each column\nsample_means &lt;- apply(samples, 1, mean)\n\n# Similarly, compute 75% and 95% quantile across each column\nsample_75_quantile &lt;- apply(samples, 1, quantile, p = 0.75)\nsample_95_quantile &lt;- apply(samples, 1, quantile, p = 0.95)\nsample_99_quantile &lt;- apply(samples, 1, quantile, p = 0.99)\n\n# Compare coefficient of variation\nsd(sample_means)/mean(sample_means)\n\n[1] 0.01004047\n\nsd(sample_75_quantile)/mean(sample_75_quantile)\n\n[1] 0.01244002\n\nsd(sample_95_quantile)/mean(sample_75_quantile)\n\n[1] 0.01911104\n\n# Plot the distributions\ncombined_vec &lt;- c(sample_means, sample_75_quantile, sample_95_quantile, sample_99_quantile)\n\nplot(density(sample_means), \n     col = \"#6F69AC\", \n     lwd = 3, \n     main = \"Estimating the mean vs tail quantiles\", \n     xlab = \"\", \n     xlim = c(min(combined_vec), max(combined_vec)))\n\nlines(density(sample_75_quantile), col = \"#95DAC1\", lwd = 3)\nlines(density(sample_95_quantile), col = \"#FFEBA1\", lwd = 3)\nlines(density(sample_99_quantile), col = \"#FD6F96\", lwd = 3)\ngrid()\n\nlegend(\"topright\", \n       fill = c(\"#6F69AC\", \"#95DAC1\", \"#FFEBA1\", \"#FD6F96\"), \n       legend = c(\"Mean\", \"75% Quantile\", \"95% Quantile\", \"99% Quantile\"), \n       cex = 0.7)\n\n\n\n\n\n\n\n\nThe visualization demonstrates the substantial increase in uncertainty when estimating extreme values compared to central tendencies. The distribution corresponding to the mean (purple) exhibits considerably narrower dispersion than that of the 99th percentile (pink). This statistical principle directly applies to credit scoring applications, where scores at the extremes of the distribution inherently possess greater uncertainty.\n\n# Load required packages\nlibrary(dplyr)\nlibrary(magrittr)\nlibrary(rsample)\nlibrary(ggplot2)"
   },
   {
     "objectID": "posts/assessing-score-reliability.html#data-acquisition-and-preprocessing",
     "href": "posts/assessing-score-reliability.html#data-acquisition-and-preprocessing",
-    "title": "Tutorial: Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
+    "title": "Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
     "section": "Data Acquisition and Preprocessing",
     "text": "Data Acquisition and Preprocessing\nIn this tutorial, we will utilize a sample from the Lending Club dataset. Loans classified as “Charged Off” will be designated as defaults. The observed class imbalance represents a typical characteristic of credit portfolios and contributes significantly to prediction challenges at distribution extremes.\n\n# Load sample data (sample of the lending club data)\nsample &lt;- read.csv(\"http://bit.ly/42ypcnJ\")\n\n# Mark which loan status will be tagged as default\ncodes &lt;- c(\"Charged Off\", \"Does not meet the credit policy. Status:Charged Off\")\n\n# Apply above codes and create target\nsample %&lt;&gt;% mutate(bad_flag = ifelse(loan_status %in% codes, 1, 0))\n\n# Replace missing values with a default value\nsample[is.na(sample)] &lt;- -1\n\n# Get summary tally\ntable(sample$bad_flag)\n\n\n   0    1 \n8838 1162"
   },
   {
     "objectID": "posts/assessing-score-reliability.html#implementing-bootstrap-resampling-strategy",
     "href": "posts/assessing-score-reliability.html#implementing-bootstrap-resampling-strategy",
-    "title": "Tutorial: Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
+    "title": "Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
     "section": "Implementing Bootstrap Resampling Strategy",
-    "text": "Implementing Bootstrap Resampling Strategy\nThis section demonstrates the creation of 100 bootstrap samples to quantify the variation in model predictions across different score ranges. Bootstrap resampling is a statistical technique that generates multiple simulated datasets to measure prediction uncertainty without requiring additional data collection.\n\n# Create 100 samples\nboot_sample &lt;- bootstraps(data = sample, times = 100)\n\nhead(boot_sample, 3)\n\n# A tibble: 3 × 2\n  splits               id          \n  &lt;list&gt;               &lt;chr&gt;       \n1 &lt;split [10000/3700]&gt; Bootstrap001\n2 &lt;split [10000/3630]&gt; Bootstrap002\n3 &lt;split [10000/3639]&gt; Bootstrap003\n\n# Each row represents a separate bootstrapped sample with an analysis set and assessment set\nboot_sample$splits[[1]]\n\n&lt;Analysis/Assess/Total&gt;\n&lt;10000/3700/10000&gt;\n\n# Show the first 5 rows and 5 columns of the first sample\nanalysis(boot_sample$splits[[1]]) %&gt;% .[1:5, 1:5]\n\n     V1        id member_id loan_amnt funded_amnt\n1 70066 143521620        -1     18000       18000\n2 74725 143608122        -1     15000       15000\n3 64235 122327224        -1     10000       10000\n4 26743  70312012        -1     35000       35000\n5 80520  68407752        -1     11000       11000\n\n\nEach bootstrap sample consists of random draws with replacement from the original dataset, creating controlled variations that effectively reveal model sensitivity to different data compositions."
+    "text": "Implementing Bootstrap Resampling Strategy\nThis section demonstrates the creation of 100 bootstrap samples to quantify the variation in model predictions across different score ranges. Bootstrap resampling is a statistical technique that generates multiple simulated datasets to measure prediction uncertainty without requiring additional data collection.\n\n# Create 100 samples\nboot_sample &lt;- bootstraps(data = sample, times = 100)\n\nhead(boot_sample, 3)\n\n# A tibble: 3 × 2\n  splits               id          \n  &lt;list&gt;               &lt;chr&gt;       \n1 &lt;split [10000/3718]&gt; Bootstrap001\n2 &lt;split [10000/3658]&gt; Bootstrap002\n3 &lt;split [10000/3697]&gt; Bootstrap003\n\n# Each row represents a separate bootstrapped sample with an analysis set and assessment set\nboot_sample$splits[[1]]\n\n&lt;Analysis/Assess/Total&gt;\n&lt;10000/3718/10000&gt;\n\n# Show the first 5 rows and 5 columns of the first sample\nanalysis(boot_sample$splits[[1]]) %&gt;% .[1:5, 1:5]\n\n     V1        id member_id loan_amnt funded_amnt\n1 70286 112910315        -1     14800       14800\n2 73512  53934393        -1     12000       12000\n3 78110 140608051        -1     25600       25600\n4 81086  35156431        -1     12000       12000\n5 45439 133471050        -1      9600        9600\n\n\nEach bootstrap sample consists of random draws with replacement from the original dataset, creating controlled variations that effectively reveal model sensitivity to different data compositions."
   },
   {
     "objectID": "posts/assessing-score-reliability.html#developing-the-predictive-model-framework",
     "href": "posts/assessing-score-reliability.html#developing-the-predictive-model-framework",
-    "title": "Tutorial: Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
+    "title": "Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
     "section": "Developing the Predictive Model Framework",
-    "text": "Developing the Predictive Model Framework\nThis tutorial employs logistic regression as the predictive modeling technique. Logistic regression represents the industry standard for credit risk modeling due to its interpretability and regulatory acceptance. The model specification incorporates typical credit variables including loan amount, income, and credit history metrics.\n\nglm_model &lt;- function(df){\n  \n  # Fit a simple model with a set specification\n  mdl &lt;- glm(bad_flag ~\n               loan_amnt + funded_amnt + annual_inc + delinq_2yrs +\n               inq_last_6mths + mths_since_last_delinq + fico_range_low +\n               mths_since_last_record + revol_util + total_pymnt,\n             family = \"binomial\",\n             data = df)\n  \n  # Return fitted values\n  return(predict(mdl))\n}\n\n# Test the function\n# Retrieve a data frame\ntrain &lt;- analysis(boot_sample$splits[[1]])\n\n# Predict\npred &lt;- glm_model(train)\n\n# Check output\nrange(pred)  # Output is on log odds scale\n\n[1] -30.25449   1.57891\n\n\nThe function returns predictions in log-odds format, which will subsequently be transformed to a more intuitive credit score scale in later steps."
+    "text": "Developing the Predictive Model Framework\nThis tutorial employs logistic regression as the predictive modeling technique. Logistic regression represents the industry standard for credit risk modeling due to its interpretability and regulatory acceptance. The model specification incorporates typical credit variables including loan amount, income, and credit history metrics.\n\nglm_model &lt;- function(df){\n  \n  # Fit a simple model with a set specification\n  mdl &lt;- glm(bad_flag ~\n               loan_amnt + funded_amnt + annual_inc + delinq_2yrs +\n               inq_last_6mths + mths_since_last_delinq + fico_range_low +\n               mths_since_last_record + revol_util + total_pymnt,\n             family = \"binomial\",\n             data = df)\n  \n  # Return fitted values\n  return(predict(mdl))\n}\n\n# Test the function\n# Retrieve a data frame\ntrain &lt;- analysis(boot_sample$splits[[1]])\n\n# Predict\npred &lt;- glm_model(train)\n\n# Check output\nrange(pred)  # Output is on log odds scale\n\n[1] -90.628589   1.188593\n\n\nThe function returns predictions in log-odds format, which will subsequently be transformed to a more intuitive credit score scale in later steps."
   },
   {
     "objectID": "posts/assessing-score-reliability.html#iterative-model-training-and-prediction-collection",
     "href": "posts/assessing-score-reliability.html#iterative-model-training-and-prediction-collection",
-    "title": "Tutorial: Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
+    "title": "Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
     "section": "Iterative Model Training and Prediction Collection",
-    "text": "Iterative Model Training and Prediction Collection\n\n# First apply the glm fitting function to each of the sample\n# Note the use of lapply\noutput &lt;- lapply(boot_sample$splits, function(x){\n  train &lt;- analysis(x)\n  pred &lt;- glm_model(train)\n\n  return(pred)\n})\n\n# Collate all predictions into a vector \nboot_preds &lt;- do.call(c, output)\nrange(boot_preds)\n\n[1] -130.406408    4.125475\n\n# Get outliers\nq_high &lt;- quantile(boot_preds, 0.99)\nq_low &lt;- quantile(boot_preds, 0.01)\n\n# Truncate the overall distribution to within the lower 1% and upper 1% quantiles\n# Doing this since it creates issues later on when scaling the output\nboot_preds[boot_preds &gt; q_high] &lt;- q_high\nboot_preds[boot_preds &lt; q_low] &lt;- q_low\n\nrange(boot_preds)\n\n[1] -5.0603991 -0.2283903\n\n# Convert to a data frame\nboot_preds &lt;- data.frame(pred = boot_preds, \n                         id = rep(1:length(boot_sample$splits), each = nrow(sample)))\nhead(boot_preds)\n\n       pred id\n1 -1.460522  1\n2 -1.644074  1\n3 -3.123883  1\n4 -4.236837  1\n5 -3.197778  1\n6 -3.123942  1\n\n\nIn this step, we apply the logistic regression model to each bootstrap sample and systematically collect the resulting predictions. Subsequently, we truncate extreme values (beyond the 1st and 99th percentiles) to remove outliers—a procedure analogous to capping techniques commonly employed in production credit models."
+    "text": "Iterative Model Training and Prediction Collection\n\n# First apply the glm fitting function to each of the sample\n# Note the use of lapply\noutput &lt;- lapply(boot_sample$splits, function(x){\n  train &lt;- analysis(x)\n  pred &lt;- glm_model(train)\n\n  return(pred)\n})\n\n# Collate all predictions into a vector \nboot_preds &lt;- do.call(c, output)\nrange(boot_preds)\n\n[1] -131.523384    7.214532\n\n# Get outliers\nq_high &lt;- quantile(boot_preds, 0.99)\nq_low &lt;- quantile(boot_preds, 0.01)\n\n# Truncate the overall distribution to within the lower 1% and upper 1% quantiles\n# Doing this since it creates issues later on when scaling the output\nboot_preds[boot_preds &gt; q_high] &lt;- q_high\nboot_preds[boot_preds &lt; q_low] &lt;- q_low\n\nrange(boot_preds)\n\n[1] -5.0732427 -0.2253617\n\n# Convert to a data frame\nboot_preds &lt;- data.frame(pred = boot_preds, \n                         id = rep(1:length(boot_sample$splits), each = nrow(sample)))\nhead(boot_preds)\n\n       pred id\n1 -2.994542  1\n2 -2.329774  1\n3 -1.048926  1\n4 -2.509596  1\n5 -1.887268  1\n6 -3.137645  1\n\n\nIn this step, we apply the logistic regression model to each bootstrap sample and systematically collect the resulting predictions. Subsequently, we truncate extreme values (beyond the 1st and 99th percentiles) to remove outliers—a procedure analogous to capping techniques commonly employed in production credit models."
   },
   {
     "objectID": "posts/assessing-score-reliability.html#transforming-predictions-to-credit-score-scale",
     "href": "posts/assessing-score-reliability.html#transforming-predictions-to-credit-score-scale",
-    "title": "Tutorial: Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
+    "title": "Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
     "section": "Transforming Predictions to Credit Score Scale",
     "text": "Transforming Predictions to Credit Score Scale\nThis section demonstrates the conversion of log-odds predictions to a recognizable credit score format using the industry-standard Points to Double Odds (PDO) methodology. By employing parameters consistent with real-world credit systems (PDO=30, Anchor=700), we transform the model predictions into intuitive scores where higher numerical values indicate lower credit risk.\n\nscaling_func &lt;- function(vec, PDO = 30, OddsAtAnchor = 5, Anchor = 700){\n  beta &lt;- PDO / log(2)\n  alpha &lt;- Anchor - PDO * OddsAtAnchor\n  \n  # Simple linear scaling of the log odds\n  scr &lt;- alpha - beta * vec  \n  \n  # Round off\n  return(round(scr, 0))\n}\n\nboot_preds$scores &lt;- scaling_func(boot_preds$pred, 30, 2, 700)\n\n# Chart the distribution of predictions across all the samples\nggplot(boot_preds, aes(x = scores, color = factor(id))) + \n  geom_density() + \n  theme_minimal() + \n  theme(legend.position = \"none\") + \n  scale_color_grey() + \n  labs(title = \"Predictions from bootstrapped samples\", \n       subtitle = \"Density function\", \n       x = \"Predictions (Log odds)\", \n       y = \"Density\")"
   },
   {
     "objectID": "posts/assessing-score-reliability.html#quantifying-prediction-uncertainty-across-score-ranges",
     "href": "posts/assessing-score-reliability.html#quantifying-prediction-uncertainty-across-score-ranges",
-    "title": "Tutorial: Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
+    "title": "Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
     "section": "Quantifying Prediction Uncertainty Across Score Ranges",
     "text": "Quantifying Prediction Uncertainty Across Score Ranges\nThis section provides a methodology to directly measure prediction reliability variation across different score ranges through the calculation of standard deviation within each score bin. This approach enables precise quantification of uncertainty at different score levels.\n\n# Create bins using quantiles\nbreaks &lt;- quantile(boot_preds$scores, probs = seq(0, 1, length.out = 20))\nboot_preds$bins &lt;- cut(boot_preds$scores, breaks = unique(breaks), include.lowest = T, right = T)\n\n# Chart standard deviation of model predictions across each score bin\nboot_preds %&gt;%\n  group_by(bins) %&gt;%\n  summarise(std_dev = sd(scores)) %&gt;%\n  ggplot(aes(x = bins, y = std_dev)) +\n  geom_col(color = \"black\", fill = \"#90AACB\") +\n  theme_minimal() + \n  theme(axis.text.x = element_text(angle = 90)) + \n  theme(legend.position = \"none\") + \n  labs(title = \"Variability in model predictions across samples\", \n       subtitle = \"(measured using standard deviation)\", \n       x = \"Score Range\", \n       y = \"Standard Deviation\")\n\n\n\n\n\n\n\n\nAs anticipated, the model’s predictions demonstrate enhanced reliability within a specific range of values (700-800), while exhibiting significant variability in the lowest and highest score buckets.\nThe visualization reveals a characteristic “U-shaped” pattern of prediction variability—a well-documented phenomenon in credit risk modeling. The highest uncertainty manifests in the extreme score ranges (very high and very low scores), while predictions in the middle range demonstrate greater stability. The analysis confirms the initial hypothesis: variability reaches its maximum at score extremes and achieves its minimum in the middle range (600-800). This finding provides direct guidance for credit policy development—scores in the middle range demonstrate the highest reliability, while decisions at the extremes should incorporate additional caution due to elevated uncertainty.\n\nPractical Business Applications\nThese findings yield direct business applications:\n\nHigh Score Management: For extremely high scores, implement additional verification steps before automated approval\nLow Score Management: For very low scores, consider manual review procedures rather than automatic rejection"
   },
   {
     "objectID": "posts/assessing-score-reliability.html#advanced-methodology-isolating-training-data-effects",
     "href": "posts/assessing-score-reliability.html#advanced-methodology-isolating-training-data-effects",
-    "title": "Tutorial: Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
+    "title": "Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
     "section": "Advanced Methodology: Isolating Training Data Effects",
     "text": "Advanced Methodology: Isolating Training Data Effects\nCredit: Richard Warnung\nFor enhanced analytical control, this section presents an alternative approach where models are trained on bootstrap samples while being evaluated on a consistent validation set. This methodology effectively isolates the impact of training data variation on model predictions.\n\nVs &lt;- function(boot_split){\n  # Train model on the bootstrapped data\n  train &lt;- analysis(boot_split)\n  \n  # Fit model\n  mdl &lt;- glm(bad_flag ~\n               loan_amnt + funded_amnt + annual_inc + delinq_2yrs +\n               inq_last_6mths + mths_since_last_delinq + fico_range_low +\n               mths_since_last_record + revol_util + total_pymnt,\n             family = \"binomial\",\n             data = train)\n  \n  # Apply to a common validation set\n  validate_preds &lt;- predict(mdl, newdata = validate_set)\n  \n  # Return predictions\n  return(validate_preds)\n}\n\nThis methodology provides enhanced insight into how variations in training data composition affect model predictions, which proves valuable when evaluating model updates in production environments.\n\n# Create overall training and testing datasets \nid &lt;- sample(1:nrow(sample), size = nrow(sample)*0.8, replace = F)\n\ntrain_data &lt;- sample[id,]\ntest_data &lt;- sample[-id,]\n\n# Bootstrapped samples are now pulled only from the overall training dataset\nboot_sample &lt;- bootstraps(data = train_data, times = 80)\n\n# Using the same function from before but predicting on the same test dataset\nglm_model &lt;- function(train, test){\n  \n  mdl &lt;- glm(bad_flag ~\n               loan_amnt + funded_amnt + annual_inc + delinq_2yrs +\n               inq_last_6mths + mths_since_last_delinq + fico_range_low +\n               mths_since_last_record + revol_util + total_pymnt,\n             family = \"binomial\",\n             data = train)\n  \n  # Return fitted values on the test dataset\n  return(predict(mdl, newdata = test))\n}\n\n# Apply the glm fitting function to each of the sample\n# But predict on the same test dataset\noutput &lt;- lapply(boot_sample$splits, function(x){\n  train &lt;- analysis(x)\n  pred &lt;- glm_model(train, test_data)\n\n  return(pred)\n})"
   },
   {
     "objectID": "posts/assessing-score-reliability.html#key-takeaways",
     "href": "posts/assessing-score-reliability.html#key-takeaways",
-    "title": "Tutorial: Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
+    "title": "Assessing Credit Score Prediction Reliability Using Bootstrap Resampling",
     "section": "Key Takeaways",
     "text": "Key Takeaways\n\nPrediction reliability varies significantly across score ranges, with highest uncertainty at distribution extremes\nBootstrap methodology provides a practical framework for measuring model uncertainty without additional data requirements\n\nRisk management strategies should be adjusted based on score reliability, with enhanced verification for extreme scores\nThe PDO transformation enables intuitive score interpretation while preserving the underlying risk relationships\n\nThese techniques can be applied beyond credit scoring to any prediction problem where understanding model uncertainty is critical for decision-making."
   },
@@ -1243,6 +1243,489 @@
     "href": "posts.html",
     "title": "R'tichoke",
     "section": "",
-    "text": "Multi-Task Learning with torch in R\n\n\n\n\n\n\nR\n\n\nDeep Learning\n\n\ntorch\n\n\nMulti-Task Learning\n\n\n\n\n\n\n\n\n\nMay 11, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nBuilding a Simple Neural Network in R with torch\n\n\n\n\n\n\nR\n\n\nDeep Learning\n\n\ntorch\n\n\n\n\n\n\n\n\n\nDec 5, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nTutorial: Assessing Credit Score Prediction Reliability Using Bootstrap Resampling\n\n\n\n\n\n\nR\n\n\nCredit Risk Analytics\n\n\nBootstrapping\n\n\n\n\n\n\n\n\n\nNov 15, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nBuilding Models in R with tidymodels\n\n\n\n\n\n\nR\n\n\nMachine Learning\n\n\ntidymodels\n\n\n\n\n\n\n\n\n\nOct 12, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nOptimizing XGBoost Hyperparameters Using Bayesian Optimization in R\n\n\n\n\n\n\nR\n\n\nAnalytics\n\n\nMachine Learning\n\n\n\n\n\n\n\n\n\nSep 18, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nImplementing Particle Swarm Optimization from Scratch in R\n\n\n\n\n\n\nR\n\n\nOptimization\n\n\nVisualization\n\n\n\n\n\n\n\n\n\nJul 22, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nDeveloping Custom Charting Functions with ggplot2\n\n\n\n\n\n\nR\n\n\nData Visualization\n\n\nggplot2\n\n\n\n\n\n\n\n\n\nMay 14, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nGenerating Correlated Random Numbers in R Using Matrix Methods\n\n\n\n\n\n\nR\n\n\nStatistics\n\n\nSimulation\n\n\n\n\n\n\n\n\n\nMar 19, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nEvaluating Binary Classification Models Using Gains Tables\n\n\n\n\n\n\nR\n\n\nCredit Risk Analytics\n\n\nModel Evaluation\n\n\n\n\n\n\n\n\n\nJan 28, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nPortfolio Optimization Using PSO\n\n\n\n\n\n\nR\n\n\nFinance\n\n\nOptimization\n\n\n\n\n\n\n\n\n\nMay 17, 2023\n\n\n\n\n\n\n\n\n\n\n\n\nIntroduction to R for Analytics\n\n\n\n\n\n\nR\n\n\nAnalytics\n\n\nIntroduction\n\n\n\n\n\n\n\n\n\nMar 22, 2023\n\n\n\n\n\n\n\n\n\n\n\n\nMonotonic Binning Using XGBoost\n\n\n\n\n\n\nR\n\n\nCredit Risk Analytics\n\n\nXGBoost\n\n\n\n\n\n\n\n\n\nJan 19, 2023\n\n\n\n\n\n\n\n\n\n\n\n\nGetting Started with Python using R and Reticulate\n\n\n\n\n\n\nR\n\n\nPython\n\n\nreticulate\n\n\n\n\n\n\n\n\n\nJan 15, 2023\n\n\n\n\n\n\nNo matching items"
+    "text": "Visualizing Neural Networks - powered by Quarto Live!\n\n\n\nR\n\nQuarto\n\nNeural Networks\n\nWebR\n\nVisualization\n\n\n\n\n\n\n\n\n\nJun 30, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nMulti-Task Learning with torch in R\n\n\n\nR\n\nDeep Learning\n\ntorch\n\nMulti-Task Learning\n\n\n\n\n\n\n\n\n\nMay 11, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nBuilding a Simple Neural Network in R with torch\n\n\n\nR\n\nDeep Learning\n\ntorch\n\n\n\n\n\n\n\n\n\nDec 5, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nAssessing Credit Score Prediction Reliability Using Bootstrap Resampling\n\n\n\nR\n\nCredit Risk Analytics\n\nBootstrapping\n\n\n\n\n\n\n\n\n\nNov 15, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nBuilding Models in R with tidymodels\n\n\n\nR\n\nMachine Learning\n\ntidymodels\n\n\n\n\n\n\n\n\n\nOct 12, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nOptimizing XGBoost Hyperparameters Using Bayesian Optimization in R\n\n\n\nR\n\nAnalytics\n\nMachine Learning\n\n\n\n\n\n\n\n\n\nSep 18, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nImplementing Particle Swarm Optimization from Scratch in R\n\n\n\nR\n\nOptimization\n\nVisualization\n\n\n\n\n\n\n\n\n\nJul 22, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nDeveloping Custom Charting Functions with ggplot2\n\n\n\nR\n\nData Visualization\n\nggplot2\n\n\n\n\n\n\n\n\n\nMay 14, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nGenerating Correlated Random Numbers in R Using Matrix Methods\n\n\n\nR\n\nStatistics\n\nSimulation\n\n\n\n\n\n\n\n\n\nMar 19, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nEvaluating Binary Classification Models Using Gains Tables\n\n\n\nR\n\nCredit Risk Analytics\n\nModel Evaluation\n\n\n\n\n\n\n\n\n\nJan 28, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nPortfolio Optimization Using PSO\n\n\n\nR\n\nFinance\n\nOptimization\n\n\n\n\n\n\n\n\n\nMay 17, 2023\n\n\n\n\n\n\n\n\n\n\n\n\nIntroduction to R for Analytics\n\n\n\nR\n\nAnalytics\n\nIntroduction\n\n\n\n\n\n\n\n\n\nMar 22, 2023\n\n\n\n\n\n\n\n\n\n\n\n\nMonotonic Binning Using XGBoost\n\n\n\nR\n\nCredit Risk Analytics\n\nXGBoost\n\n\n\n\n\n\n\n\n\nJan 19, 2023\n\n\n\n\n\n\n\n\n\n\n\n\nGetting Started with Python using R and Reticulate\n\n\n\nR\n\nPython\n\nreticulate\n\n\n\n\n\n\n\n\n\nJan 15, 2023\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/quarto_live.html",
+    "href": "posts/quarto_live.html",
+    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "section": "",
+    "text": "Neural networks represent complex mathematical models through interconnected nodes and layers. Visualizing these structures helps understand model architecture, data flow, and decision patterns. This post demonstrates how to create interactive neural network visualizations in R using packages that work seamlessly with Quarto Live!\nCheck out: Quarto Live for more details."
+  },
+  {
+    "objectID": "posts/quarto_live.html#what-is-quarto-live",
+    "href": "posts/quarto_live.html#what-is-quarto-live",
+    "title": "Getting Started with Quarto Live - Interactive R Documents",
+    "section": "",
+    "text": "Quarto Live enables users to create interactive documents where R code can be executed directly in web browsers without requiring any local R installation. Powered by WebR, Quarto Live transforms static documents into dynamic, executable content that can be modified and run in real-time."
+  },
+  {
+    "objectID": "posts/quarto_live.html#lets-dive-in-interactive-data-exploration",
+    "href": "posts/quarto_live.html#lets-dive-in-interactive-data-exploration",
+    "title": "Interactive R Documents in Your Browser",
+    "section": "Let’s Dive In: Interactive Data Exploration",
+    "text": "Let’s Dive In: Interactive Data Exploration\nWe’ll explore a real dataset about car specifications and create interactive visualizations that readers can customize. Try modifying any of the code blocks below!\n\nLoading Our Data\n\n\n\n\n\n\n\n\n\n\nInteractive Scatter Plot\nTry this: Change the variables on the x and y axes, or modify the point size and colors!\n\n\n\n\n\n\n\n\n\n\nDynamic Filtering and Analysis\nYour turn: Adjust the horsepower threshold and price range to see how it affects the filtered results!\n\n\n\n\n\n\n\n\n\n\nInteractive Statistical Simulation\nLet’s demonstrate the Central Limit Theorem with an interactive simulation. Modify the sample size and see how it affects the distribution!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#why-use-interactive-documents",
+    "href": "posts/quarto_live.html#why-use-interactive-documents",
+    "title": "Interactive R Documents in Your Browser",
+    "section": "Why Use Interactive Documents?",
+    "text": "Why Use Interactive Documents?\nInstead of showing static code and results, Quarto Live lets your readers:\n\nExperiment with your analysis in real-time\nModify parameters to see different outcomes\n\nLearn by doing rather than just reading\nExplore data without needing to set up R"
+  },
+  {
+    "objectID": "posts/quarto_live.html#getting-started-a-simple-example",
+    "href": "posts/quarto_live.html#getting-started-a-simple-example",
+    "title": "Interactive R Documents in Your Browser",
+    "section": "Getting Started: A Simple Example",
+    "text": "Getting Started: A Simple Example\nLet’s start with basic data exploration. Try changing the values in the code below!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#interactive-data-visualization",
+    "href": "posts/quarto_live.html#interactive-data-visualization",
+    "title": "Interactive R Documents in Your Browser",
+    "section": "Interactive Data Visualization",
+    "text": "Interactive Data Visualization\nNow let’s create a chart. Try modifying the chart type, colors, or data!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#data-analysis-you-can-modify",
+    "href": "posts/quarto_live.html#data-analysis-you-can-modify",
+    "title": "Interactive R Documents in Your Browser",
+    "section": "Data Analysis You Can Modify",
+    "text": "Data Analysis You Can Modify\nLet’s perform some analysis. Change the filter conditions to explore different insights!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#interactive-statistical-analysis",
+    "href": "posts/quarto_live.html#interactive-statistical-analysis",
+    "title": "Interactive R Documents in Your Browser",
+    "section": "Interactive Statistical Analysis",
+    "text": "Interactive Statistical Analysis\nTry modifying the sample size or distribution parameters:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#your-turn-to-explore",
+    "href": "posts/quarto_live.html#your-turn-to-explore",
+    "title": "Interactive R Documents in Your Browser",
+    "section": "Your Turn to Explore!",
+    "text": "Your Turn to Explore!\nHere’s a blank code chunk for you to experiment with. Try creating your own analysis!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#how-to-create-your-own-interactive-document",
+    "href": "posts/quarto_live.html#how-to-create-your-own-interactive-document",
+    "title": "Interactive R Documents in Your Browser",
+    "section": "How to Create Your Own Interactive Document",
+    "text": "How to Create Your Own Interactive Document\nTo create your own Quarto Live document:\n\n1. Set up the YAML header:\nformat: live-html\nengine: knitr\n\n\n2. Include the extension:\n&lt; include _extensions/r-wasm/live/_knitr.qmd &gt;\n\n\n3. Use webr code chunks:\n\n::: {.cell}\n```{webr}\n# Your interactive R code here\n```\n:::"
+  },
+  {
+    "objectID": "posts/quarto_live.html#tips-for-effective-interactive-documents",
+    "href": "posts/quarto_live.html#tips-for-effective-interactive-documents",
+    "title": "Interactive R Documents in Your Browser",
+    "section": "Tips for Effective Interactive Documents",
+    "text": "Tips for Effective Interactive Documents\nFor Content Creators: - Start with simple examples and build complexity gradually - Provide clear instructions on what users should try modifying - Use realistic, interesting datasets that engage your audience - Include “playground” sections for free experimentation\nFor Readers: - Don’t be afraid to break things - you can always refresh! - Try modifying one thing at a time to understand the impact - Experiment with different values, functions, and approaches - Use the code as a starting point for your own analysis"
+  },
+  {
+    "objectID": "posts/quarto_live.html#the-power-of-interactive-learning",
+    "href": "posts/quarto_live.html#the-power-of-interactive-learning",
+    "title": "Interactive R Documents in Your Browser",
+    "section": "The Power of Interactive Learning",
+    "text": "The Power of Interactive Learning\nQuarto Live transforms static documents into dynamic learning experiences. Whether you’re teaching statistics, demonstrating data analysis techniques, or sharing research findings, interactive documents help your audience truly understand and engage with your content.\nReady to get started? Try modifying any of the code examples above, or create your own interactive Quarto document!\n\nInteractive documents make data science more accessible and engaging. Start experimenting and see how Quarto Live can enhance your data storytelling!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#interactive-learning",
+    "href": "posts/quarto_live.html#interactive-learning",
+    "title": "Interactive R Documents in Your Browser",
+    "section": "Interactive Learning",
+    "text": "Interactive Learning\nQuarto Live transforms static documents into dynamic learning experiences. When either teaching statistics, demonstrating data analysis techniques, or sharing research findings, interactive documents help the audience truly understand and engage with content."
+  },
+  {
+    "objectID": "posts/quarto_live.html#what-is-statistical-analysis",
+    "href": "posts/quarto_live.html#what-is-statistical-analysis",
+    "title": "Interactive Introduction to Statistical Analysis in R",
+    "section": "",
+    "text": "Statistical analysis helps us understand data, make predictions, and draw meaningful conclusions from observations. This interactive guide will teach you fundamental statistical concepts using R - and you can modify and run all the code directly in your browser!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#why-learn-statistics-interactively",
+    "href": "posts/quarto_live.html#why-learn-statistics-interactively",
+    "title": "Interactive Introduction to Statistical Analysis in R",
+    "section": "Why Learn Statistics Interactively?",
+    "text": "Why Learn Statistics Interactively?\nTraditional statistics textbooks show you formulas and static examples. Here you can:\n\nExperiment with real data and see immediate results\nModify parameters to understand how they affect outcomes\n\nVisualize concepts to build intuitive understanding\nTest hypotheses and see statistical tests in action"
+  },
+  {
+    "objectID": "posts/quarto_live.html#dataset-student-performance-study",
+    "href": "posts/quarto_live.html#dataset-student-performance-study",
+    "title": "Interactive Introduction to Statistical Analysis in R",
+    "section": "Dataset: Student Performance Study",
+    "text": "Dataset: Student Performance Study\nLet’s create a realistic dataset to explore throughout our statistical journey:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#descriptive-statistics",
+    "href": "posts/quarto_live.html#descriptive-statistics",
+    "title": "Interactive Introduction to Statistical Analysis in R",
+    "section": "1. Descriptive Statistics",
+    "text": "1. Descriptive Statistics\nLet’s start with basic descriptive statistics. Try changing the variable to explore different aspects!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#probability-distributions",
+    "href": "posts/quarto_live.html#probability-distributions",
+    "title": "Interactive Introduction to Statistical Analysis in R",
+    "section": "2. Probability Distributions",
+    "text": "2. Probability Distributions\nLet’s explore different probability distributions. Modify the parameters to see how they change!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#one-sample-t-test",
+    "href": "posts/quarto_live.html#one-sample-t-test",
+    "title": "Interactive Introduction to Statistical Analysis in R",
+    "section": "3. One-Sample t-Test",
+    "text": "3. One-Sample t-Test\nLet’s test if the average final score differs from a hypothesized value. Try changing the hypothesized mean!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#two-sample-t-test",
+    "href": "posts/quarto_live.html#two-sample-t-test",
+    "title": "Interactive Introduction to Statistical Analysis in R",
+    "section": "4. Two-Sample t-Test",
+    "text": "4. Two-Sample t-Test\nCompare final scores between two study methods. Try different method combinations!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#anova---comparing-multiple-groups",
+    "href": "posts/quarto_live.html#anova---comparing-multiple-groups",
+    "title": "Interactive Introduction to Statistical Analysis in R",
+    "section": "5. ANOVA - Comparing Multiple Groups",
+    "text": "5. ANOVA - Comparing Multiple Groups\nTest if there are differences across all three study methods using Analysis of Variance:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#correlation-and-regression-analysis",
+    "href": "posts/quarto_live.html#correlation-and-regression-analysis",
+    "title": "Interactive Introduction to Statistical Analysis in R",
+    "section": "6. Correlation and Regression Analysis",
+    "text": "6. Correlation and Regression Analysis\nExplore relationships between variables. Try different variable combinations!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#chi-square-test-for-independence",
+    "href": "posts/quarto_live.html#chi-square-test-for-independence",
+    "title": "Interactive Introduction to Statistical Analysis in R",
+    "section": "7. Chi-Square Test for Independence",
+    "text": "7. Chi-Square Test for Independence\nTest if there’s a relationship between categorical variables:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#your-statistical-playground",
+    "href": "posts/quarto_live.html#your-statistical-playground",
+    "title": "Interactive Introduction to Statistical Analysis in R",
+    "section": "8. Your Statistical Playground",
+    "text": "8. Your Statistical Playground\nPractice what you’ve learned! Try these challenges or create your own analysis:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#key-statistical-concepts-covered",
+    "href": "posts/quarto_live.html#key-statistical-concepts-covered",
+    "title": "Interactive Introduction to Statistical Analysis in R",
+    "section": "Key Statistical Concepts Covered",
+    "text": "Key Statistical Concepts Covered\nThrough this interactive journey, you’ve explored:\n\nDescriptive Statistics\n\nCentral tendency (mean, median, mode)\nVariability (standard deviation, variance, range)\nDistribution shape and outliers\n\n\n\nProbability Distributions\n\nNormal, t, Chi-square, and F distributions\nHow parameters affect distribution shape\nCritical values and probability calculations\n\n\n\nHypothesis Testing\n\nNull and alternative hypotheses\np-values and significance levels\nType I and Type II errors\nEffect sizes and practical significance\n\n\n\nStatistical Tests\n\nOne-sample t-test: Test population mean\nTwo-sample t-test: Compare two groups\nANOVA: Compare multiple groups\nChi-square test: Test independence of categorical variables\nCorrelation: Measure linear relationships\n\n\n\nRegression Analysis\n\nSimple linear regression\nR-squared and model fit\nPrediction and inference"
+  },
+  {
+    "objectID": "posts/quarto_live.html#best-practices-in-statistical-analysis",
+    "href": "posts/quarto_live.html#best-practices-in-statistical-analysis",
+    "title": "Interactive Introduction to Statistical Analysis in R",
+    "section": "Best Practices in Statistical Analysis",
+    "text": "Best Practices in Statistical Analysis\nAlways remember: - 📊 Visualize your data first - plots reveal patterns and outliers - 🎯 Check assumptions - different tests have different requirements - 📈 Consider effect size - statistical significance ≠ practical importance - 🔍 Interpret in context - numbers alone don’t tell the whole story - 🚫 Correlation ≠ causation - be careful about causal claims"
+  },
+  {
+    "objectID": "posts/quarto_live.html#next-steps-in-your-statistical-journey",
+    "href": "posts/quarto_live.html#next-steps-in-your-statistical-journey",
+    "title": "Interactive Introduction to Statistical Analysis in R",
+    "section": "Next Steps in Your Statistical Journey",
+    "text": "Next Steps in Your Statistical Journey\nReady to dive deeper? Consider exploring: - Advanced ANOVA (two-way, repeated measures) - Non-parametric tests (when data doesn’t meet assumptions) - Multiple regression (several predictors) - MANOVA (multiple dependent variables) - Bayesian statistics (different approach to inference) - Machine learning (predictive modeling)\n\nStatistics is the art of learning from data. Keep experimenting, questioning, and discovering insights hidden in numbers!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#setting-up-a-quarto-live-document",
+    "href": "posts/quarto_live.html#setting-up-a-quarto-live-document",
+    "title": "Getting Started with Quarto Live - Interactive R Documents",
+    "section": "Setting Up a Quarto Live Document",
+    "text": "Setting Up a Quarto Live Document\n\nBasic YAML Configuration\nTo create a Quarto Live document, start a new quarto document and configure the YAML header like so:\nformat: live-html\nengine: knitr\n\n\nIncluding Required Extensions\nEvery Quarto Live document requires the WebR extension. After installing Quarto live using the instructions here: This can be done using the line below:\n`{{&lt; include _extensions/r-wasm/live/_knitr.qmd &gt;}}`\n\n\nSpecifying Package Dependencies\nWhen the document requires specific R packages, users can pre-load them by adding a webr section to the YAML header:\nwebr:\n  packages:\n    - dplyr\n    - ggplot2\n    - tidyr"
+  },
+  {
+    "objectID": "posts/quarto_live.html#creating-interactive-code-blocks",
+    "href": "posts/quarto_live.html#creating-interactive-code-blocks",
+    "title": "Getting Started with Quarto Live - Interactive R Documents",
+    "section": "Creating Interactive Code Blocks",
+    "text": "Creating Interactive Code Blocks\n\nBasic WebR Syntax\nInteractive R code blocks use the {webr} engine instead of the standard {r}. Here’s a simple example:\n\n\n\n\n\n\n\n\nReaders can modify any part of this code and execute it by clicking the run button.\n\n\nWorking with Data\nUsers can create and manipulate datasets directly within the interactive environment:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#installing-additional-packages",
+    "href": "posts/quarto_live.html#installing-additional-packages",
+    "title": "Getting Started with Quarto Live - Interactive R Documents",
+    "section": "Installing Additional Packages",
+    "text": "Installing Additional Packages\n\nMethod 1: Pre-loading in YAML Header\nThe most efficient approach involves specifying packages in the YAML header before the document loads:\nwebr:\n  packages:\n    - packagename1\n    - packagename2\n\n\nMethod 2: Installing Packages Within Code Blocks\nUsers can install packages directly within WebR code blocks using the webr::install() function:\n\n\n\n\n\n\n\n\n\n\nMethod 3: Installing from Other Repositories\nFor packages not available on CRAN, users can specify different repositories:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#creating-interactive-visualizations",
+    "href": "posts/quarto_live.html#creating-interactive-visualizations",
+    "title": "Getting Started with Quarto Live - Interactive R Documents",
+    "section": "Creating Interactive Visualizations",
+    "text": "Creating Interactive Visualizations\n\nBasic Plotting\nUsers can create various types of plots that readers can modify:\n\n\n\n\n\n\n\n\n\n\nUsing ggplot2\nFor more sophisticated visualizations, users can employ ggplot2:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#data-analysis-examples",
+    "href": "posts/quarto_live.html#data-analysis-examples",
+    "title": "Getting Started with Quarto Live - Interactive R Documents",
+    "section": "Data Analysis Examples",
+    "text": "Data Analysis Examples\n\nDescriptive Statistics\nUsers can perform interactive data analysis that readers can modify:\n\n\n\n\n\n\n\n\n\n\nInteractive Filtering\nReaders can modify filter conditions to explore different data subsets:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#advanced-features",
+    "href": "posts/quarto_live.html#advanced-features",
+    "title": "Getting Started with Quarto Live - Interactive R Documents",
+    "section": "Advanced Features",
+    "text": "Advanced Features\n\nWorking with External Data\nUsers can demonstrate data import techniques (limited to accessible URLs):\n\n\n\n\n\n\n\n\n\n\nCreating Interactive Functions\nUsers can define functions that readers can modify and test:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#best-practices-for-quarto-live-documents",
+    "href": "posts/quarto_live.html#best-practices-for-quarto-live-documents",
+    "title": "Getting Started with Quarto Live - Interactive R Documents",
+    "section": "Best Practices for Quarto Live Documents",
+    "text": "Best Practices for Quarto Live Documents\n\nCode Organization\n\nStructure code blocks logically, building complexity gradually\nInclude clear comments explaining what each section does\nProvide default values that produce meaningful results\n\n\n\nUser Guidance\n\nUse markdown text to explain what readers should try modifying\nInclude specific suggestions for parameter changes\nHighlight which parts of the code are safe to experiment with\n\n\n\nPerformance Considerations\n\nKeep datasets reasonably sized (WebR runs in the browser)\nAvoid computationally intensive operations\nTest code blocks to ensure they run efficiently"
+  },
+  {
+    "objectID": "posts/quarto_live.html#package-limitations-in-webr",
+    "href": "posts/quarto_live.html#package-limitations-in-webr",
+    "title": "Getting Started with Quarto Live - Interactive R Documents",
+    "section": "Package Limitations in WebR",
+    "text": "Package Limitations in WebR\n\nAvailable Packages\nNot all R packages work in the WebR environment. Commonly available packages include:\n\nBase R packages\ndplyr, tidyr, ggplot2\nStatistical packages like broom, modelr\nMany CRAN packages with pure R implementations\n\n\n\nUnavailable Features\nSome limitations users should be aware of:\n\nPackages requiring compiled code may not work\nFile system access is restricted\nNetwork access is limited\nSome graphics devices are not supported"
+  },
+  {
+    "objectID": "posts/quarto_live.html#testing-package-availability",
+    "href": "posts/quarto_live.html#testing-package-availability",
+    "title": "Getting Started with Quarto Live - Interactive R Documents",
+    "section": "Testing Package Availability",
+    "text": "Testing Package Availability\nUsers can check if specific packages are available:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#troubleshooting-common-issues",
+    "href": "posts/quarto_live.html#troubleshooting-common-issues",
+    "title": "Getting Started with Quarto Live - Interactive R Documents",
+    "section": "Troubleshooting Common Issues",
+    "text": "Troubleshooting Common Issues\n\nPackage Installation Problems\nWhen packages fail to install, users should:\n\nCheck if the package is available in WebR\nVerify the package name spelling\nTry installing dependencies separately\nUse alternative packages with similar functionality\n\n\n\nCode Execution Issues\nCommon problems and solutions:\n\nLong-running code: Break complex operations into smaller chunks\nMemory errors: Reduce dataset sizes or simplify operations\nDisplay issues: Use print() explicitly for complex objects"
+  },
+  {
+    "objectID": "posts/quarto_live.html#creating-your-first-interactive-document",
+    "href": "posts/quarto_live.html#creating-your-first-interactive-document",
+    "title": "Getting Started with Quarto Live - Interactive R Documents",
+    "section": "Creating Your First Interactive Document",
+    "text": "Creating Your First Interactive Document\nTo create a new Quarto Live document:\n\nCreate a new .qmd file\nSet up the YAML header with format: live-html\nInclude the WebR extension\nAdd interactive code blocks using {webr}\nTest the document by rendering it\nShare the resulting HTML file\n\nThe resulting document will be a self-contained HTML file that readers can open in any modern web browser to interact with the R code without needing R installed locally."
+  },
+  {
+    "objectID": "posts/quarto_live.html#visualizing-neural-networks-with-quarto-live",
+    "href": "posts/quarto_live.html#visualizing-neural-networks-with-quarto-live",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "",
+    "text": "Quarto Live allows users to create interactive documents where R code can be executed directly in the browser. This makes it easy to build and visualize neural networks without installing R locally. In this post, readers will learn how to create, train, and visualize simple neural networks using Quarto Live and the neuralnet package."
+  },
+  {
+    "objectID": "posts/quarto_live.html#setting-up-the-document",
+    "href": "posts/quarto_live.html#setting-up-the-document",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "Setting Up the Document",
+    "text": "Setting Up the Document\nTo get started, the YAML header should include the live-html format and the required packages. The WebR extension must also be included for interactive code blocks."
+  },
+  {
+    "objectID": "posts/quarto_live.html#creating-a-simple-neural-network",
+    "href": "posts/quarto_live.html#creating-a-simple-neural-network",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "Creating a Simple Neural Network",
+    "text": "Creating a Simple Neural Network\nReaders can use the {webr} engine to create and visualize a neural network. Here is a basic example that demonstrates how to fit a neural network to the classic XOR problem:\n\n\n\n\n\n\n\n\nReaders can modify the number of hidden neurons or the dataset to see how the network changes."
+  },
+  {
+    "objectID": "posts/quarto_live.html#visualizing-neural-network-predictions",
+    "href": "posts/quarto_live.html#visualizing-neural-network-predictions",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "Visualizing Neural Network Predictions",
+    "text": "Visualizing Neural Network Predictions\nThe following code block shows how to visualize the predictions of a trained neural network on a grid of input values:\n\n\n\n\n\n\n\n\nReaders can change the grid resolution or try different datasets to see how the neural network responds."
+  },
+  {
+    "objectID": "posts/quarto_live.html#customizing-neural-network-architectures",
+    "href": "posts/quarto_live.html#customizing-neural-network-architectures",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "Customizing Neural Network Architectures",
+    "text": "Customizing Neural Network Architectures\nUsers can experiment with different architectures by changing the number of hidden layers and neurons. For example:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#tips-for-interactive-neural-network-visualizations",
+    "href": "posts/quarto_live.html#tips-for-interactive-neural-network-visualizations",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "Tips for Interactive Neural Network Visualizations",
+    "text": "Tips for Interactive Neural Network Visualizations\n\nUse small datasets for quick training and visualization\nAdjust the number of neurons and layers to see how the network learns\nVisualize both the network structure and its predictions\nUse comments to guide readers on what to modify"
+  },
+  {
+    "objectID": "posts/quarto_live.html#limitations",
+    "href": "posts/quarto_live.html#limitations",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "Limitations",
+    "text": "Limitations\n\nThe WebR environment supports only certain R packages. The neuralnet package works for basic neural network tasks, but advanced deep learning packages may not be available.\nLarge datasets or complex networks may run slowly in the browser."
+  },
+  {
+    "objectID": "posts/quarto_live.html#learn-more",
+    "href": "posts/quarto_live.html#learn-more",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "Learn More",
+    "text": "Learn More\nFor more information on Quarto Live and interactive R documents, see the Quarto Live documentation."
+  },
+  {
+    "objectID": "posts/quarto_live.html#welcome-to-neural-networks---no-installation-required",
+    "href": "posts/quarto_live.html#welcome-to-neural-networks---no-installation-required",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "",
+    "text": "Have you ever wondered how artificial intelligence “thinks”? Neural networks are the building blocks of modern AI, and now you can explore them without installing anything on your computer! Quarto Live brings the power of R programming directly to your web browser, making it incredibly easy for beginners to dive into the fascinating world of neural networks.\nIn this interactive tutorial, you’ll discover how to: - Build your first neural network in just a few lines of code - See how these “digital brains” learn patterns in data - Create beautiful visualizations that show exactly how neural networks work - Experiment with different network designs and watch them adapt\nThe best part? Everything runs in your browser - no complex software setup required!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#getting-started---its-easier-than-you-think",
+    "href": "posts/quarto_live.html#getting-started---its-easier-than-you-think",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "Getting Started - It’s Easier Than You Think!",
+    "text": "Getting Started - It’s Easier Than You Think!\nDon’t worry about complicated setup procedures. The document is already configured with everything you need. Just look for the code blocks below and click the “Run” button to see the magic happen. You can even modify the code and run it again to see how your changes affect the results!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#your-first-neural-network---solving-a-classic-puzzle",
+    "href": "posts/quarto_live.html#your-first-neural-network---solving-a-classic-puzzle",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "Your First Neural Network - Solving a Classic Puzzle",
+    "text": "Your First Neural Network - Solving a Classic Puzzle\nLet’s start with something fun! We’ll teach a neural network to solve the XOR puzzle - a classic problem that shows how these digital brains can learn complex patterns. Don’t worry about understanding every detail at first; just run the code and see what happens!\nWhat is XOR? It’s like an exclusive “or” - the output is 1 when inputs are different, and 0 when they’re the same. Humans find this pattern easy, but it stumped early AI for years!\n\n\n\n\n\n\n\n\nTry this: Change the hidden = 2 to hidden = 3 or hidden = 5 and see how the network structure changes! More neurons = more learning power (but also more complexity)."
+  },
+  {
+    "objectID": "posts/quarto_live.html#see-your-neural-network-in-action",
+    "href": "posts/quarto_live.html#see-your-neural-network-in-action",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "See Your Neural Network in Action!",
+    "text": "See Your Neural Network in Action!\nNow for the really cool part - let’s see what our trained neural network “thinks” about different inputs. We’ll create a colorful map showing how confident the network is about its predictions across all possible input combinations.\n\n\n\n\n\n\n\n\nAmazing, right? The network learned to create distinct regions! Try changing the grid resolution by modifying length.out = 50 to length.out = 20 or length.out = 100 to see more or less detail."
+  },
+  {
+    "objectID": "posts/quarto_live.html#building-bigger-brains---multiple-hidden-layers",
+    "href": "posts/quarto_live.html#building-bigger-brains---multiple-hidden-layers",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "Building Bigger Brains - Multiple Hidden Layers",
+    "text": "Building Bigger Brains - Multiple Hidden Layers\nReady to level up? Let’s create a more sophisticated neural network with multiple layers of neurons. Think of it like adding more “thinking layers” to your digital brain!\n\n\n\n\n\n\n\n\nExperiment time! Try different architectures: - hidden = c(4, 3, 2) for a 3-layer network - hidden = c(5) for a single wide layer\n- hidden = c(2, 4, 2) for a diamond-shaped network\nWhich architecture works best for this problem?"
+  },
+  {
+    "objectID": "posts/quarto_live.html#pro-tips-for-neural-network-exploration",
+    "href": "posts/quarto_live.html#pro-tips-for-neural-network-exploration",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "Pro Tips for Neural Network Exploration",
+    "text": "Pro Tips for Neural Network Exploration\nFor Beginners: - Start small! Begin with 1-2 hidden neurons and gradually increase - Don’t worry if you don’t understand all the math - focus on experimenting and observing patterns - The colored visualizations tell the story - blue and red regions show how the network divides the input space - Click “Run” on each code block and see what happens before moving to the next section\nFor the Curious: - Try creating your own simple datasets and see how the network adapts - Experiment with different numbers of training examples - Compare how quickly simple vs. complex networks learn\nRemember: Neural networks learn by example, just like humans. The more (good) examples you give them, the better they get!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#what-youve-accomplished",
+    "href": "posts/quarto_live.html#what-youve-accomplished",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "What You’ve Accomplished",
+    "text": "What You’ve Accomplished\nCongratulations! You’ve just: ✅ Built your first neural network from scratch\n✅ Visualized how artificial intelligence “sees” patterns\n✅ Experimented with different network architectures\n✅ Created beautiful visualizations of AI decision-making\nAnd you did it all without installing a single piece of software!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#troubleshooting-limitations",
+    "href": "posts/quarto_live.html#troubleshooting-limitations",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "Troubleshooting & Limitations",
+    "text": "Troubleshooting & Limitations\nIf something doesn’t work: - Make sure to run code blocks in order (some depend on previous blocks) - If you get an error, try refreshing the page and starting over - The neuralnet package works great for learning, but advanced deep learning tools aren’t available in the browser yet\nPerformance notes: - Keep datasets small (under 1000 rows) for best performance - Complex networks with many layers might run slowly - This is perfect for learning and experimenting, but not for production AI systems"
+  },
+  {
+    "objectID": "posts/quarto_live.html#ready-to-dive-deeper",
+    "href": "posts/quarto_live.html#ready-to-dive-deeper",
+    "title": "Visualizing Neural Networks with Quarto Live",
+    "section": "Ready to Dive Deeper?",
+    "text": "Ready to Dive Deeper?\nThis interactive tutorial is just the beginning of your neural network journey! You’ve learned the fundamentals using a simple, browser-based environment that makes AI accessible to everyone.\nNext Steps: - Try creating your own datasets and see how networks adapt - Explore other machine learning algorithms in R - Share this page with friends - they can learn too without any setup!\nWant to Learn More About Quarto Live?\nQuarto Live makes R programming accessible to everyone by running code directly in web browsers. It’s perfect for education, sharing analyses, and making data science more inclusive.\nFor complete installation instructions and advanced features, visit the official Quarto Live documentation.\n\nHappy coding, and welcome to the fascinating world of neural networks! 🧠✨"
+  },
+  {
+    "objectID": "posts/quarto_live.html#introduction",
+    "href": "posts/quarto_live.html#introduction",
+    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "section": "",
+    "text": "Neural networks represent complex mathematical models through interconnected nodes and layers. Visualizing these structures helps understand model architecture, data flow, and decision patterns. This post demonstrates how to create interactive neural network visualizations in R using packages that work seamlessly with Quarto Live!\nCheck out: Quarto Live for more details."
+  },
+  {
+    "objectID": "posts/quarto_live.html#basic-neural-network-structure",
+    "href": "posts/quarto_live.html#basic-neural-network-structure",
+    "title": "Visualizing Neural Networks in R - powered by Quarto Live",
+    "section": "Basic Neural Network Structure",
+    "text": "Basic Neural Network Structure\nNeural networks consist of three main components: input layers, hidden layers, and output layers. Each connection between nodes has an associated weight that determines the strength of the signal transmission."
+  },
+  {
+    "objectID": "posts/quarto_live.html#creating-your-first-neural-network",
+    "href": "posts/quarto_live.html#creating-your-first-neural-network",
+    "title": "Visualizing Neural Networks in R - powered by Quarto Live",
+    "section": "Creating Your First Neural Network",
+    "text": "Creating Your First Neural Network\nThe neuralnet package provides straightforward functions for building and visualizing neural networks. Users can experiment with different architectures by modifying the hidden layer configuration."
+  },
+  {
+    "objectID": "posts/quarto_live.html#interactive-network-architecture",
+    "href": "posts/quarto_live.html#interactive-network-architecture",
+    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "section": "Interactive Network Architecture",
+    "text": "Interactive Network Architecture\nUsers can modify the network structure and observe how architecture changes affect the visualization. Different hidden layer configurations create varying levels of complexity."
+  },
+  {
+    "objectID": "posts/quarto_live.html#advanced-visualization-with-custom-styling",
+    "href": "posts/quarto_live.html#advanced-visualization-with-custom-styling",
+    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "section": "Advanced Visualization with Custom Styling",
+    "text": "Advanced Visualization with Custom Styling\nEnhanced visualizations provide better insights into network behavior. Custom plotting functions allow for more detailed analysis of weights and connections."
+  },
+  {
+    "objectID": "posts/quarto_live.html#performance-analysis",
+    "href": "posts/quarto_live.html#performance-analysis",
+    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "section": "Performance Analysis",
+    "text": "Performance Analysis\nUnderstanding how network architecture affects performance helps in model selection. Users can compare different configurations and their accuracy metrics."
+  },
+  {
+    "objectID": "posts/quarto_live.html#interactive-parameter-tuning",
+    "href": "posts/quarto_live.html#interactive-parameter-tuning",
+    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "section": "Interactive Parameter Tuning",
+    "text": "Interactive Parameter Tuning\nReal-time parameter modification demonstrates how different settings affect network behavior. Users can explore various configurations and observe immediate changes."
+  },
+  {
+    "objectID": "posts/quarto_live.html#weight-distribution-analysis",
+    "href": "posts/quarto_live.html#weight-distribution-analysis",
+    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "section": "Weight Distribution Analysis",
+    "text": "Weight Distribution Analysis\nAnalyzing weight distributions provides insights into network learning patterns. Visualizing weight histograms reveals how the network processes information."
+  },
+  {
+    "objectID": "posts/quarto_live.html#decision-boundary-visualization",
+    "href": "posts/quarto_live.html#decision-boundary-visualization",
+    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "section": "Decision Boundary Visualization",
+    "text": "Decision Boundary Visualization\nUnderstanding how neural networks make decisions becomes clearer through boundary visualization. This approach shows how the network separates different classes in the input space."
+  },
+  {
+    "objectID": "posts/quarto_live.html#comparative-analysis",
+    "href": "posts/quarto_live.html#comparative-analysis",
+    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "section": "Comparative Analysis",
+    "text": "Comparative Analysis\nComparing multiple network architectures side-by-side reveals the impact of complexity on decision making. Users can evaluate trade-offs between model complexity and performance."
+  },
+  {
+    "objectID": "posts/quarto_live.html#conclusion",
+    "href": "posts/quarto_live.html#conclusion",
+    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "section": "Conclusion",
+    "text": "Conclusion\nInteractive neural network visualization transforms complex mathematical concepts into accessible learning experiences. Quarto Live enables real-time experimentation, allowing users to understand how architectural choices affect model behavior.\nKey takeaways from this exploration:\n\nNetwork architecture significantly impacts decision boundaries\nWeight distributions reveal learning patterns\nInteractive visualization enhances understanding\nReal-time parameter tuning accelerates learning\n\nUsers can continue experimenting with different configurations, datasets, and visualization approaches to deepen their understanding of neural network behavior. The combination of R’s analytical capabilities and Quarto Live’s interactivity creates powerful educational tools for machine learning concepts."
+  },
+  {
+    "objectID": "posts/quarto_live.html#try-your-own-experiments",
+    "href": "posts/quarto_live.html#try-your-own-experiments",
+    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "section": "Try Your Own Experiments",
+    "text": "Try Your Own Experiments\nUse the code blocks above to experiment with:\n\nDifferent architectures: Modify hidden layer configurations\nVarious datasets: Create new input patterns\nParameter tuning: Adjust learning thresholds and step limits\nVisualization styles: Customize colors and layouts\n\nThe interactive nature of this document encourages exploration and discovery, making neural network concepts more intuitive and engaging."
+  },
+  {
+    "objectID": "posts/quarto_live.html#sample-data",
+    "href": "posts/quarto_live.html#sample-data",
+    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "section": "Sample Data",
+    "text": "Sample Data"
+  },
+  {
+    "objectID": "posts/quarto_live.html#creating-a-basic-neural-network",
+    "href": "posts/quarto_live.html#creating-a-basic-neural-network",
+    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "section": "Creating A Basic Neural Network",
+    "text": "Creating A Basic Neural Network\nThe neuralnet package provides straightforward functions for building and visualizing neural networks. Feel free to experiment with different architectures by modifying the hidden layer configuration!"
   }
 ]

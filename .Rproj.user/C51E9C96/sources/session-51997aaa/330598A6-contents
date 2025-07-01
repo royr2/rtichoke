@@ -1,0 +1,29 @@
+# Load required libraries
+pacman::p_load(neuralnet, ggplot2, dplyr)
+
+# Create sample dataset for demonstration
+sample_data <- data.frame(
+  x1 = runif(100, 0, 1),
+  x2 = runif(100, 0, 1)
+)
+
+# Create target variable with some pattern
+sample_data$y <- with(sample_data, 
+                      ifelse(x1 + x2 + rnorm(100, 0, 0.1) > 1, 1, 0))
+
+# Display first few rows
+head(sample_data)
+
+# Train a simple neural network
+# Try changing the hidden parameter: c(3), c(5), c(3,2), etc.
+nn_model <- neuralnet(
+  y ~ x1 + x2, 
+  data = sample_data,
+  hidden = c(2, 3), ## Try c(3, 3)! 
+)
+
+# Basic visualization
+plot(nn_model)
+
+print(plot(nn_model))
+dev.off()

@@ -1,3 +1,0 @@
-"0",""
-"0","hist(log(training(validation_split)$income), "
-"0","     main = ""Log Income Distribution"", xlab = ""Log Income"")"
