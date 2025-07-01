@@ -1,0 +1,14 @@
+"0","# Build a neural network with 3 nodes in the hidden layer
+nn_model <- neuralnet(
+  formula = y ~ x1 + x2,  # Predict y using x1 and x2
+  data = sample_data,     # The training dataset
+  hidden = c(3),          # One hidden layer with 3 neurons
+  linear.output = FALSE,  # Use sigmoid activation (for classification)
+  threshold = 0.01        # Convergence threshold
+)
+
+# Visualize the network
+plot(nn_model, rep = ""best"")"
+"2","'webr' is not recognized as an internal or external command,
+operable program or batch file.
+"

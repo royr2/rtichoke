@@ -1,8 +1,8 @@
 ---
 title: "Explore Neural Networks Interactively with Quarto Live!"
-date: "2025-07-01"
+date: "2025-06-30"
 categories: [R, Quarto, Neural Networks, WebR, Visualization]
-image: "../images/quarto.png"
+image: "../images/nn.png"
 execute:
   echo: true
 warning: false
@@ -33,7 +33,7 @@ Quarto Live combines [Quarto](https://quarto.org/) with [WebR](https://docs.r-wa
 - No installation requirements
 - Easy sharing of interactive documents
 
-The following code blocks are fully interactive. Feel free to modify parameters and execute the code! 
+The following code blocks are fully interactive. Feel free to modify parep = "best")rameters and execute the code! 
 
 ## Creating a Simple Dataset
 
@@ -143,9 +143,29 @@ plot(nn_deep, rep = "best")
 2. `hidden = c(3, 3)` for a balanced two-layer network 
 3. Experiment with `hidden = c(2, 2, 2)` for a deep, narrow network
 
+## Enhanced Neural Network Visualization
+
+Custom visualization parameters improve the interpretability of neural network diagrams:
+
+```{webr}
+# Create an enhanced visualization with custom colors
+plot(nn_deep, 
+     rep = "best",
+     col.entry.synapse = "blue",      # Input connections
+     col.entry = "black",             # Input nodes
+     col.hidden = "lightblue",        # Hidden nodes
+     col.hidden.synapse = "red",      # Connections between hidden layers
+     col.out = "lightgreen",          # Output node
+     col.out.synapse = "darkgreen",   # Connections to output
+     dimension = 6,                   # Plot size
+     show.weights = TRUE)             # Display weight values
+
+title("Enhanced Neural Network Visualization", col.main = "purple")
+```
+
 ### Visualizing the Decision Boundary
 
-Since the sample problem is setup as a classification problem with only 2 input parameters, the decision boundary can  be visualised:
+Since the sample problem is setup as a classification problem with only 2 input parameters, the decision boundary can also be visualised:
 
 ```{webr}
 # Create a grid for visualizing the decision space
@@ -160,17 +180,14 @@ grid_data$prediction <- ifelse(predictions > 0.5, 1, 0)
 
 # Create the decision boundary visualization
 ggplot() +
-
   # Color-coded decision regions
   geom_tile(data = grid_data, 
            aes(x = x1, y = x2, fill = factor(prediction)), 
            alpha = 0.3) +
-
   # Original data points
   geom_point(data = sample_data, 
             aes(x = x1, y = x2, color = factor(y)),
             size = 3) +
-  
   # Legend and color specifications
   scale_fill_manual(values = c("0" = "skyblue", "1" = "salmon"), 
                     name = "Predicted Class") +
@@ -214,3 +231,5 @@ The following resources provide further information about Quarto Live and neural
 - [Quarto Live Documentation](https://r-wasm.github.io/quarto-live) - Comprehensive guide to Quarto Live features
 - [WebR Documentation](https://docs.r-wasm.org/webr/latest/) - Technical details about the WebR project
 - [Quarto Documentation](https://quarto.org/) - Complete information about the Quarto publishing system
+
+The combination of R's analytical capabilities and Quarto Live's interactivity creates a powerful educational platform for learning complex concepts such as neural networks in an intuitive, hands-on manner.

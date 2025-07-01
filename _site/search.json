@@ -1243,21 +1243,21 @@
     "href": "posts.html",
     "title": "R'tichoke",
     "section": "",
-    "text": "Visualizing Neural Networks - powered by Quarto Live!\n\n\n\nR\n\nQuarto\n\nNeural Networks\n\nWebR\n\nVisualization\n\n\n\n\n\n\n\n\n\nJun 30, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nMulti-Task Learning with torch in R\n\n\n\nR\n\nDeep Learning\n\ntorch\n\nMulti-Task Learning\n\n\n\n\n\n\n\n\n\nMay 11, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nBuilding a Simple Neural Network in R with torch\n\n\n\nR\n\nDeep Learning\n\ntorch\n\n\n\n\n\n\n\n\n\nDec 5, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nAssessing Credit Score Prediction Reliability Using Bootstrap Resampling\n\n\n\nR\n\nCredit Risk Analytics\n\nBootstrapping\n\n\n\n\n\n\n\n\n\nNov 15, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nBuilding Models in R with tidymodels\n\n\n\nR\n\nMachine Learning\n\ntidymodels\n\n\n\n\n\n\n\n\n\nOct 12, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nOptimizing XGBoost Hyperparameters Using Bayesian Optimization in R\n\n\n\nR\n\nAnalytics\n\nMachine Learning\n\n\n\n\n\n\n\n\n\nSep 18, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nImplementing Particle Swarm Optimization from Scratch in R\n\n\n\nR\n\nOptimization\n\nVisualization\n\n\n\n\n\n\n\n\n\nJul 22, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nDeveloping Custom Charting Functions with ggplot2\n\n\n\nR\n\nData Visualization\n\nggplot2\n\n\n\n\n\n\n\n\n\nMay 14, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nGenerating Correlated Random Numbers in R Using Matrix Methods\n\n\n\nR\n\nStatistics\n\nSimulation\n\n\n\n\n\n\n\n\n\nMar 19, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nEvaluating Binary Classification Models Using Gains Tables\n\n\n\nR\n\nCredit Risk Analytics\n\nModel Evaluation\n\n\n\n\n\n\n\n\n\nJan 28, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nPortfolio Optimization Using PSO\n\n\n\nR\n\nFinance\n\nOptimization\n\n\n\n\n\n\n\n\n\nMay 17, 2023\n\n\n\n\n\n\n\n\n\n\n\n\nIntroduction to R for Analytics\n\n\n\nR\n\nAnalytics\n\nIntroduction\n\n\n\n\n\n\n\n\n\nMar 22, 2023\n\n\n\n\n\n\n\n\n\n\n\n\nMonotonic Binning Using XGBoost\n\n\n\nR\n\nCredit Risk Analytics\n\nXGBoost\n\n\n\n\n\n\n\n\n\nJan 19, 2023\n\n\n\n\n\n\n\n\n\n\n\n\nGetting Started with Python using R and Reticulate\n\n\n\nR\n\nPython\n\nreticulate\n\n\n\n\n\n\n\n\n\nJan 15, 2023\n\n\n\n\n\nNo matching items"
+    "text": "Explore Neural Networks Interactively with Quarto Live!\n\n\n\n\n\n\nR\n\n\nQuarto\n\n\nNeural Networks\n\n\nWebR\n\n\nVisualization\n\n\n\n\n\n\n\n\n\nJul 1, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nMulti-Task Learning with torch in R\n\n\n\n\n\n\nR\n\n\nDeep Learning\n\n\ntorch\n\n\nMulti-Task Learning\n\n\n\n\n\n\n\n\n\nMay 11, 2025\n\n\n\n\n\n\n\n\n\n\n\n\nBuilding a Simple Neural Network in R with torch\n\n\n\n\n\n\nR\n\n\nDeep Learning\n\n\ntorch\n\n\n\n\n\n\n\n\n\nDec 5, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nAssessing Credit Score Prediction Reliability Using Bootstrap Resampling\n\n\n\n\n\n\nR\n\n\nCredit Risk Analytics\n\n\nBootstrapping\n\n\n\n\n\n\n\n\n\nNov 15, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nBuilding Models in R with tidymodels\n\n\n\n\n\n\nR\n\n\nMachine Learning\n\n\ntidymodels\n\n\n\n\n\n\n\n\n\nOct 12, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nOptimizing XGBoost Hyperparameters Using Bayesian Optimization in R\n\n\n\n\n\n\nR\n\n\nAnalytics\n\n\nMachine Learning\n\n\n\n\n\n\n\n\n\nSep 18, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nImplementing Particle Swarm Optimization from Scratch in R\n\n\n\n\n\n\nR\n\n\nOptimization\n\n\nVisualization\n\n\n\n\n\n\n\n\n\nJul 22, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nDeveloping Custom Charting Functions with ggplot2\n\n\n\n\n\n\nR\n\n\nData Visualization\n\n\nggplot2\n\n\n\n\n\n\n\n\n\nMay 14, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nGenerating Correlated Random Numbers in R Using Matrix Methods\n\n\n\n\n\n\nR\n\n\nStatistics\n\n\nSimulation\n\n\n\n\n\n\n\n\n\nMar 19, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nEvaluating Binary Classification Models Using Gains Tables\n\n\n\n\n\n\nR\n\n\nCredit Risk Analytics\n\n\nModel Evaluation\n\n\n\n\n\n\n\n\n\nJan 28, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nPortfolio Optimization Using PSO\n\n\n\n\n\n\nR\n\n\nFinance\n\n\nOptimization\n\n\n\n\n\n\n\n\n\nMay 17, 2023\n\n\n\n\n\n\n\n\n\n\n\n\nIntroduction to R for Analytics\n\n\n\n\n\n\nR\n\n\nAnalytics\n\n\nIntroduction\n\n\n\n\n\n\n\n\n\nMar 22, 2023\n\n\n\n\n\n\n\n\n\n\n\n\nMonotonic Binning Using XGBoost\n\n\n\n\n\n\nR\n\n\nCredit Risk Analytics\n\n\nXGBoost\n\n\n\n\n\n\n\n\n\nJan 19, 2023\n\n\n\n\n\n\n\n\n\n\n\n\nGetting Started with Python using R and Reticulate\n\n\n\n\n\n\nR\n\n\nPython\n\n\nreticulate\n\n\n\n\n\n\n\n\n\nJan 15, 2023\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/quarto_live.html",
     "href": "posts/quarto_live.html",
-    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
     "section": "",
-    "text": "Neural networks represent complex mathematical models through interconnected nodes and layers. Visualizing these structures helps understand model architecture, data flow, and decision patterns. This post demonstrates how to create interactive neural network visualizations in R using packages that work seamlessly with Quarto Live!\nCheck out: Quarto Live for more details."
+    "text": "Quarto Live combines Quarto with WebR to enable interactive R code execution directly in the browser allowing for:\n\nRunning R code directly in the web browser\nInstant feedback when modifying code examples\nNo installation requirements\nEasy sharing of interactive documents\n\nThe following code blocks are fully interactive. Feel free to modify parameters and execute the code!"
   },
   {
     "objectID": "posts/quarto_live.html#what-is-quarto-live",
     "href": "posts/quarto_live.html#what-is-quarto-live",
-    "title": "Getting Started with Quarto Live - Interactive R Documents",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
     "section": "",
-    "text": "Quarto Live enables users to create interactive documents where R code can be executed directly in web browsers without requiring any local R installation. Powered by WebR, Quarto Live transforms static documents into dynamic, executable content that can be modified and run in real-time."
+    "text": "Quarto Live combines Quarto with WebR to enable interactive R code execution directly in the browser allowing for:\n\nRunning R code directly in the web browser\nInstant feedback when modifying code examples\nNo installation requirements\nEasy sharing of interactive documents\n\nThe following code blocks are fully interactive. Feel free to modify parameters and execute the code!"
   },
   {
     "objectID": "posts/quarto_live.html#lets-dive-in-interactive-data-exploration",
@@ -1633,9 +1633,9 @@
   {
     "objectID": "posts/quarto_live.html#introduction",
     "href": "posts/quarto_live.html#introduction",
-    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
     "section": "",
-    "text": "Neural networks represent complex mathematical models through interconnected nodes and layers. Visualizing these structures helps understand model architecture, data flow, and decision patterns. This post demonstrates how to create interactive neural network visualizations in R using packages that work seamlessly with Quarto Live!\nCheck out: Quarto Live for more details."
+    "text": "This post explores how Quarto Live and WebR can be used to build and visualize neural networks directly in the browser without installing any additonal software."
   },
   {
     "objectID": "posts/quarto_live.html#basic-neural-network-structure",
@@ -1654,42 +1654,42 @@
   {
     "objectID": "posts/quarto_live.html#interactive-network-architecture",
     "href": "posts/quarto_live.html#interactive-network-architecture",
-    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "title": "Get to Know Neural Networks Interactively with Quarto Live!",
     "section": "Interactive Network Architecture",
     "text": "Interactive Network Architecture\nUsers can modify the network structure and observe how architecture changes affect the visualization. Different hidden layer configurations create varying levels of complexity."
   },
   {
     "objectID": "posts/quarto_live.html#advanced-visualization-with-custom-styling",
     "href": "posts/quarto_live.html#advanced-visualization-with-custom-styling",
-    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "title": "Get to Know Neural Networks Interactively with Quarto Live!",
     "section": "Advanced Visualization with Custom Styling",
     "text": "Advanced Visualization with Custom Styling\nEnhanced visualizations provide better insights into network behavior. Custom plotting functions allow for more detailed analysis of weights and connections."
   },
   {
     "objectID": "posts/quarto_live.html#performance-analysis",
     "href": "posts/quarto_live.html#performance-analysis",
-    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "title": "Get to Know Neural Networks Interactively with Quarto Live!",
     "section": "Performance Analysis",
     "text": "Performance Analysis\nUnderstanding how network architecture affects performance helps in model selection. Users can compare different configurations and their accuracy metrics."
   },
   {
     "objectID": "posts/quarto_live.html#interactive-parameter-tuning",
     "href": "posts/quarto_live.html#interactive-parameter-tuning",
-    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
     "section": "Interactive Parameter Tuning",
     "text": "Interactive Parameter Tuning\nReal-time parameter modification demonstrates how different settings affect network behavior. Users can explore various configurations and observe immediate changes."
   },
   {
     "objectID": "posts/quarto_live.html#weight-distribution-analysis",
     "href": "posts/quarto_live.html#weight-distribution-analysis",
-    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "title": "Get to Know Neural Networks Interactively with Quarto Live!",
     "section": "Weight Distribution Analysis",
     "text": "Weight Distribution Analysis\nAnalyzing weight distributions provides insights into network learning patterns. Visualizing weight histograms reveals how the network processes information."
   },
   {
     "objectID": "posts/quarto_live.html#decision-boundary-visualization",
     "href": "posts/quarto_live.html#decision-boundary-visualization",
-    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "title": "Get to Know Neural Networks Interactively with Quarto Live!",
     "section": "Decision Boundary Visualization",
     "text": "Decision Boundary Visualization\nUnderstanding how neural networks make decisions becomes clearer through boundary visualization. This approach shows how the network separates different classes in the input space."
   },
@@ -1703,29 +1703,148 @@
   {
     "objectID": "posts/quarto_live.html#conclusion",
     "href": "posts/quarto_live.html#conclusion",
-    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "title": "Get to Know Neural Networks Interactively with Quarto Live!",
     "section": "Conclusion",
     "text": "Conclusion\nInteractive neural network visualization transforms complex mathematical concepts into accessible learning experiences. Quarto Live enables real-time experimentation, allowing users to understand how architectural choices affect model behavior.\nKey takeaways from this exploration:\n\nNetwork architecture significantly impacts decision boundaries\nWeight distributions reveal learning patterns\nInteractive visualization enhances understanding\nReal-time parameter tuning accelerates learning\n\nUsers can continue experimenting with different configurations, datasets, and visualization approaches to deepen their understanding of neural network behavior. The combination of R’s analytical capabilities and Quarto Live’s interactivity creates powerful educational tools for machine learning concepts."
   },
   {
     "objectID": "posts/quarto_live.html#try-your-own-experiments",
     "href": "posts/quarto_live.html#try-your-own-experiments",
-    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "title": "Get to Know Neural Networks Interactively with Quarto Live!",
     "section": "Try Your Own Experiments",
     "text": "Try Your Own Experiments\nUse the code blocks above to experiment with:\n\nDifferent architectures: Modify hidden layer configurations\nVarious datasets: Create new input patterns\nParameter tuning: Adjust learning thresholds and step limits\nVisualization styles: Customize colors and layouts\n\nThe interactive nature of this document encourages exploration and discovery, making neural network concepts more intuitive and engaging."
   },
   {
     "objectID": "posts/quarto_live.html#sample-data",
     "href": "posts/quarto_live.html#sample-data",
-    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "title": "Get to Know Neural Networks Interactively with Quarto Live!",
     "section": "Sample Data",
     "text": "Sample Data"
   },
   {
     "objectID": "posts/quarto_live.html#creating-a-basic-neural-network",
     "href": "posts/quarto_live.html#creating-a-basic-neural-network",
-    "title": "Visualizing Neural Networks - powered by Quarto Live!",
+    "title": "Get to Know Neural Networks Interactively with Quarto Live!",
     "section": "Creating A Basic Neural Network",
     "text": "Creating A Basic Neural Network\nThe neuralnet package provides straightforward functions for building and visualizing neural networks. Feel free to experiment with different architectures by modifying the hidden layer configuration!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#creating-a-simple-dataset",
+    "href": "posts/quarto_live.html#creating-a-simple-dataset",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Creating a Simple Dataset",
+    "text": "Creating a Simple Dataset\nThe first step is to create a dataset for training the neural network:\n\n\n\n\n\n\n\n\nTry this:\n\nModify the set.seed() value to generate different random data\nChange the sample size from 100 to a different value\nAdd a third feature variable to the dataset"
+  },
+  {
+    "objectID": "posts/quarto_live.html#understanding-neural-networks",
+    "href": "posts/quarto_live.html#understanding-neural-networks",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Understanding Neural Networks",
+    "text": "Understanding Neural Networks\nNeural networks are computational models inspired by the human brain. A basic neural network consists of:\n\nInput layer: The data features (x1 and x2 in this example)\nHidden layers: The intermediate processing layers where learning occurs\nOutput layer: The final prediction layer (the y value)"
+  },
+  {
+    "objectID": "posts/quarto_live.html#building-your-first-neural-network",
+    "href": "posts/quarto_live.html#building-your-first-neural-network",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Building Your First Neural Network",
+    "text": "Building Your First Neural Network\nLet’s create a simple neural network with the neuralnet package:\n\n\n\n\n\n\n\n\nWhat’s happening? The neural network is: 1. Taking our inputs (x1, x2) 2. Processing them through 3 hidden neurons 3. Producing an output prediction 4. The black lines show connections, with thickness representing weight strength 5. The numbers show the actual weight values"
+  },
+  {
+    "objectID": "posts/quarto_live.html#experiment-with-different-architectures",
+    "href": "posts/quarto_live.html#experiment-with-different-architectures",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Experiment with Different Architectures",
+    "text": "Experiment with Different Architectures\nOne of the benefits of Quarto Live is the ability to modify and re-run code instantly. Try these experiments:\n\n\n\n\n\n\n\n\n\nAdding More Layers\nNeural networks can have multiple hidden layers. Each layer allows the network to learn more complex patterns:\n\n\n\n\n\n\n\n\n\n\nInteractive Learning Tip\nTry This: Change the hidden parameter in the code above to: 1. c(8) for a wide, single-layer network 2. c(3, 3) for a balanced two-layer network 3. c(2, 2, 2) for a deep, narrow network\nWhich architecture looks most interesting to you? How does the visualization change?"
+  },
+  {
+    "objectID": "posts/quarto_live.html#beautiful-neural-network-visualization",
+    "href": "posts/quarto_live.html#beautiful-neural-network-visualization",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Beautiful Neural Network Visualization",
+    "text": "Beautiful Neural Network Visualization\nLet’s make our neural network visualization more colorful and informative with some custom styling:\n\n\n\n\n\n\n\n\n\nVisualizing the Decision Boundary\nLet’s see how our neural network separates the data points by creating a decision boundary plot:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#what-youve-learned",
+    "href": "posts/quarto_live.html#what-youve-learned",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "What You’ve Learned",
+    "text": "What You’ve Learned\nCongratulations! In this interactive tutorial, you’ve:\n\nExperienced Quarto Live - seen how it lets you run R code directly in your browser\nCreated your first neural network - built a simple classifier with the neuralnet package\nVisualized neural network architecture - seen how nodes and connections form the network\nExperimented with different configurations - modified parameters and seen immediate results\nExplored decision boundaries - visualized how neural networks separate data classes\n\nThe power of Quarto Live is that you can modify any of the code blocks above and immediately see the results. Try changing parameters, colors, or even creating new visualizations!"
+  },
+  {
+    "objectID": "posts/quarto_live.html#next-steps",
+    "href": "posts/quarto_live.html#next-steps",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Next Steps",
+    "text": "Next Steps\nNow that you’ve gotten a taste of neural networks with Quarto Live, you might want to:\n\nExperiment more - try different network architectures or create your own datasets\nLearn more about neural networks - explore activation functions, training algorithms, and regularization\nCreate your own Quarto Live document - build interactive tutorials on topics you’re passionate about"
+  },
+  {
+    "objectID": "posts/quarto_live.html#resources",
+    "href": "posts/quarto_live.html#resources",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Resources",
+    "text": "Resources\nTo learn more about Quarto Live and create your own interactive documents:\n\nQuarto Live Documentation - Official documentation and examples\nWebR Documentation - Learn about the WebR project that powers Quarto Live\nQuarto Documentation - The publishing system behind Quarto Live\n\nBy combining the power of R for data analysis with the interactivity of Quarto Live, you can create engaging, educational content that helps others learn complex topics like neural networks in an intuitive, hands-on way."
+  },
+  {
+    "objectID": "posts/quarto_live.html#simple-performance-check",
+    "href": "posts/quarto_live.html#simple-performance-check",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Simple Performance Check",
+    "text": "Simple Performance Check\nLet’s check how well our neural network performs on some test data:\n\n\n\n\n\n\n\n\n   col.hidden.synapse = \"red\",\n   col.out = \"lightgreen\",\n   col.out.synapse = \"darkgreen\",\n   fontsize = 12,\n   dimension = 6,\n   show.weights = TRUE)\ntitle(main = title, cex.main = 1.2) }"
+  },
+  {
+    "objectID": "posts/quarto_live.html#building-a-basic-neural-network",
+    "href": "posts/quarto_live.html#building-a-basic-neural-network",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Building a Basic Neural Network",
+    "text": "Building a Basic Neural Network\n\n\n\n\n\n\n\n\nKey components:\n\nInput nodes (x1, x2) feed data into the network\nThree hidden neurons process the inputs\nAn output neuron produces the prediction\nBlack lines represent connections, with thickness indicating weight strength\nNumbers show the actual weight values assigned to each connection"
+  },
+  {
+    "objectID": "posts/quarto_live.html#experimenting-with-different-architectures",
+    "href": "posts/quarto_live.html#experimenting-with-different-architectures",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Experimenting with Different Architectures",
+    "text": "Experimenting with Different Architectures\nTry modifying the hidden parameter and re-running the code snippet!\n\n\n\n\n\n\n\n\n\nAdding Multiple Layers\nNeural networks with multiple hidden layers can learn more complex patterns.\n\n\n\n\n\n\n\n\nFeel free to test the following variations:\n\nhidden = c(8) for a wide, single-layer network\nhidden = c(3, 3) for a balanced two-layer network\nExperiment with hidden = c(2, 2, 2) for a deep, narrow network\n\n\n\nVisualizing the Decision Boundary\nSince the sample problem is setup as a classification problem with only 2 input parameters, the decision boundary can be visualised:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#enhanced-neural-network-visualization",
+    "href": "posts/quarto_live.html#enhanced-neural-network-visualization",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Enhanced Neural Network Visualization",
+    "text": "Enhanced Neural Network Visualization\nCustom visualization parameters improve the interpretability of neural network diagrams:\n\n\n\n\n\n\n\n\n\nVisualizing the Decision Boundary\nSince the sample problem is setup as a classification problem with only 2 input parameters, the decision boundary can also be visualised:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#evaluating-model-performance",
+    "href": "posts/quarto_live.html#evaluating-model-performance",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Evaluating Model Performance",
+    "text": "Evaluating Model Performance\nThis section evaluates the neural network’s performance on unseen test data:"
+  },
+  {
+    "objectID": "posts/quarto_live.html#key-concepts-covered",
+    "href": "posts/quarto_live.html#key-concepts-covered",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Key Concepts Covered",
+    "text": "Key Concepts Covered\nThis tutorial has covered the following concepts:\n\nInteractive Execution with Quarto Live - Running R code directly in the browser\nNeural Network Creation - Building a classifier with the neuralnet package\nNetwork Architecture Visualization - Understanding the structure of nodes and connections\nParameter Experimentation - Testing different configurations and observing results\nDecision Boundary Analysis - Visualizing how neural networks classify data points\n\nQuarto Live enables immediate modification of code examples and instant visualization of results, allowing users to explore neural network concepts interactively."
+  },
+  {
+    "objectID": "posts/quarto_live.html#further-exploration",
+    "href": "posts/quarto_live.html#further-exploration",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Further Exploration",
+    "text": "Further Exploration\nAfter completing this tutorial, users can continue learning by:\n\nExpanding Network Complexity - Testing different architectures and hyperparameters\nWorking with Different Datasets - Applying neural networks to other classification problems\nExploring Advanced Concepts - Investigating activation functions, optimization algorithms, and regularization techniques"
+  },
+  {
+    "objectID": "posts/quarto_live.html#additional-resources",
+    "href": "posts/quarto_live.html#additional-resources",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Additional Resources",
+    "text": "Additional Resources\nThe following resources provide further information about Quarto Live and neural networks:\n\nQuarto Live Documentation - Comprehensive guide to Quarto Live features\nWebR Documentation - Technical details about the WebR project\nQuarto Documentation - Complete information about the Quarto publishing system"
+  },
+  {
+    "objectID": "posts/quarto_live.html#enhanced-visualization",
+    "href": "posts/quarto_live.html#enhanced-visualization",
+    "title": "Explore Neural Networks Interactively with Quarto Live!",
+    "section": "Enhanced Visualization",
+    "text": "Enhanced Visualization\nCustom visualization parameters improve the interpretability of neural network diagrams:\n\n\n\n\n\n\n\n\n\nVisualizing the Decision Boundary\nSince the sample problem is setup as a classification problem with only 2 input parameters, the decision boundary can also be visualised:"
   }
 ]
