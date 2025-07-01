@@ -1,0 +1,47 @@
+pacman::p_load(NMF)
+
+M1 <- matrix(c(0.9, 0.1, 0, 0, 0, 
+               0.5, 0.3, 0.2, 0, 0, 
+               0.4, 0.2, 0.1, 0.3, 0, 
+               0.3, 0.1, 0.2, 0.2, 0.2, 
+               0.1, 0.05, 0.05, 0.02, 0.78), nrow = 5, byrow = T)
+
+M2 <- M1 + rnorm(25, mean = 0, sd = 0.01)
+M2[M2 < 0] <- 0
+M2 <- M2/rowSums(M2)
+
+M3 <- M1 + rnorm(25, mean = 0, sd = 0.01)
+M3[M3 < 0] <- 0
+M3 <- M3/rowSums(M3) %>% 
+
+M4 <- M1 + rnorm(25, mean = 0, sd = 0.01)
+M4[M4 < 0] <- 0
+M4 <- M4/rowSums(M4)
+
+M5 <- M1 + rnorm(25, mean = 0, sd = 0.01)
+M5[M5 < 0] <- 0
+M5 <- M5/rowSums(M5)
+
+
+# Assuming M1, M2, M3, M4, M5 are your transition matrices
+n <- nrow(M1)  # Assuming all matrices are n×n
+
+# Stack all matrices into a single matrix
+stacked_data <- cbind(as.vector(M1), as.vector(M2), as.vector(M3), 
+                      as.vector(M4), as.vector(M5))
+
+# Apply NMF with rank 1
+nmf_result <- nmf(stacked_data, rank = 1)
+
+# Extract the basis matrix (our combined matrix in vector form)
+combined_vector <- basis(nmf_result)
+M_combined <- matrix(combined_vector, nrow = n)
+
+# Extract the coefficient matrix (our weights)
+weights <- coef(nmf_result)
+weights <- weights / sum(weights)  # Normalize to sum to 1
+
+# Approximate original matrices
+M1_approx <- M_combined * weights[1]
+# Compare approximation accuracy
+error <- sum((M1 - M1_approx)^2)
