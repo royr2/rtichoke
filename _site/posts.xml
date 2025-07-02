@@ -1121,11 +1121,11 @@ font-style: inherit;">item</span>(), </span>
 <span id="cb6-95"></span>
 <span id="cb6-96">}</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Epoch 1 - Train Loss: 0.7958, Val Loss: 0.7369, Val Acc: 0.493
-Epoch 25 - Train Loss: 0.3267, Val Loss: 0.3035, Val Acc: 0.821
-Epoch 50 - Train Loss: 0.1548, Val Loss: 0.1350, Val Acc: 0.971
-Epoch 75 - Train Loss: 0.0599, Val Loss: 0.0479, Val Acc: 0.993
-Epoch 100 - Train Loss: 0.0381, Val Loss: 0.0356, Val Acc: 1.000</code></pre>
+<pre><code>Epoch 1 - Train Loss: 0.7612, Val Loss: 0.7070, Val Acc: 0.521
+Epoch 25 - Train Loss: 0.4119, Val Loss: 0.3789, Val Acc: 0.571
+Epoch 50 - Train Loss: 0.1754, Val Loss: 0.1642, Val Acc: 0.950
+Epoch 75 - Train Loss: 0.0745, Val Loss: 0.0788, Val Acc: 0.957
+Epoch 100 - Train Loss: 0.0502, Val Loss: 0.0581, Val Acc: 0.979</code></pre>
 </div>
 </div>
 </section>
@@ -1417,13 +1417,13 @@ font-style: inherit;">2</span>)</span>
 background-color: null;
 font-style: inherit;">print</span>(performance_results)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>            Task          Metric   Value
-1     Regression Test Loss (MSE)  0.0533
-2     Regression            RMSE  0.2308
-3     Regression       R-squared  0.9449
-4 Classification Test Loss (BCE)  0.0492
-5 Classification        Accuracy 98.0000
-6 Classification             AUC 99.9400</code></pre>
+<pre><code>            Task          Metric    Value
+1     Regression Test Loss (MSE)   0.0535
+2     Regression            RMSE   0.2314
+3     Regression       R-squared   0.9390
+4 Classification Test Loss (BCE)   0.0318
+5 Classification        Accuracy 100.0000
+6 Classification             AUC 100.0000</code></pre>
 </div>
 </div>
 </section>
@@ -2309,13 +2309,13 @@ background-color: null;
 font-style: inherit;">squeeze</span>())</span>
 <span id="cb2-13">  ))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>            x         y
-1 -0.02329975  1.861628
-2  1.92341769  7.555232
-3  0.11041667  2.613283
-4 -2.55959392 -5.931758
-5  0.36482519  3.099005
-6  0.97125226  4.551073</code></pre>
+<pre><code>            x          y
+1 -0.08612747  1.8008863
+2 -1.25033844 -1.9870641
+3  0.50849539  3.2301304
+4 -0.84759778 -0.5871375
+5  0.98969221  4.6887927
+6  0.68513012  4.2253904</code></pre>
 </div>
 </div>
 </section>
@@ -3011,10 +3011,10 @@ background-color: null;
 font-style: inherit;">print</span>(performance_summary)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                   Metric      Value
-1      Mean Squared Error 0.09061213
-2 Root Mean Squared Error 0.30101848
-3     Mean Absolute Error 0.23722124
-4               R-squared 0.99000990</code></pre>
+1      Mean Squared Error 0.08337645
+2 Root Mean Squared Error 0.28874981
+3     Mean Absolute Error 0.23023447
+4               R-squared 0.99202964</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -3411,7 +3411,7 @@ font-style: inherit;">\n\n</span><span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Bias value: 0.701076 -0.8832566 -1.28852 0.4193589 0.8179439 -0.4608558 0.6640872 0.2222885 </code></pre>
+<pre><code>Bias value: 1.195515 1.671513 -0.7068664 -1.191907 0.04101136 -0.7141974 0.4758868 0.9091494 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -3437,14 +3437,14 @@ background-color: null;
 font-style: inherit;">4</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        [,1]
-[1,]  1.2292
-[2,] -2.0338
-[3,]  0.3231
-[4,]  1.4845
-[5,]  1.2861
-[6,] -0.0174
-[7,]  0.1889
-[8,] -0.5916</code></pre>
+[1,] -0.4873
+[2,]  1.4355
+[3,] -0.2089
+[4,] -0.9139
+[5,] -0.9288
+[6,] -1.1871
+[7,] -0.5022
+[8,] -0.4147</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3471,7 +3471,7 @@ font-style: inherit;">round</span>(layer2_bias, <span class="dv" style="color: #
 background-color: null;
 font-style: inherit;">4</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1]  0.7011 -0.8833 -1.2885  0.4194  0.8179 -0.4609  0.6641  0.2223</code></pre>
+<pre><code>[1]  1.1955  1.6715 -0.7069 -1.1919  0.0410 -0.7142  0.4759  0.9091</code></pre>
 </div>
 </div>
 </section>
@@ -4103,7 +4103,7 @@ font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">mean</span>(sample_means)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01004047</code></pre>
+<pre><code>[1] 0.01022936</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -4113,7 +4113,7 @@ font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">mean</span>(sample_75_quantile)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01244002</code></pre>
+<pre><code>[1] 0.0130541</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -4123,7 +4123,7 @@ font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">mean</span>(sample_75_quantile)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01911104</code></pre>
+<pre><code>[1] 0.0191991</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -4378,9 +4378,9 @@ font-style: inherit;">3</span>)</span></code></pre></div>
 <pre><code># A tibble: 3 × 2
   splits               id          
   &lt;list&gt;               &lt;chr&gt;       
-1 &lt;split [10000/3718]&gt; Bootstrap001
-2 &lt;split [10000/3658]&gt; Bootstrap002
-3 &lt;split [10000/3697]&gt; Bootstrap003</code></pre>
+1 &lt;split [10000/3658]&gt; Bootstrap001
+2 &lt;split [10000/3647]&gt; Bootstrap002
+3 &lt;split [10000/3634]&gt; Bootstrap003</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -4392,7 +4392,7 @@ background-color: null;
 font-style: inherit;">1</span>]]</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;Analysis/Assess/Total&gt;
-&lt;10000/3718/10000&gt;</code></pre>
+&lt;10000/3658/10000&gt;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -4420,11 +4420,11 @@ background-color: null;
 font-style: inherit;">5</span>]</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     V1        id member_id loan_amnt funded_amnt
-1 70286 112910315        -1     14800       14800
-2 73512  53934393        -1     12000       12000
-3 78110 140608051        -1     25600       25600
-4 81086  35156431        -1     12000       12000
-5 45439 133471050        -1      9600        9600</code></pre>
+1 31748 138360321        -1     13600       13600
+2 75789 115210462        -1     20000       20000
+3  3036 128189912        -1     30000       30000
+4 56525 132835486        -1     32000       32000
+5 66830  39571816        -1     20000       20000</code></pre>
 </div>
 </div>
 <p>Each bootstrap sample consists of random draws with replacement from the original dataset, creating controlled variations that effectively reveal model sensitivity to different data compositions.</p>
@@ -4524,7 +4524,7 @@ font-style: inherit;">range</span>(pred)  <span class="co" style="color: #5E5E5E
 background-color: null;
 font-style: inherit;"># Output is on log odds scale</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -90.628589   1.188593</code></pre>
+<pre><code>[1] -22.892583   1.541133</code></pre>
 </div>
 </div>
 <p>The function returns predictions in log-odds format, which will subsequently be transformed to a more intuitive credit score scale in later steps.</p>
@@ -4576,7 +4576,7 @@ font-style: inherit;">do.call</span>(c, output)</span>
 background-color: null;
 font-style: inherit;">range</span>(boot_preds)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -131.523384    7.214532</code></pre>
+<pre><code>[1] -134.726341    5.145866</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -4617,7 +4617,7 @@ font-style: inherit;">&lt;-</span> q_low</span>
 background-color: null;
 font-style: inherit;">range</span>(boot_preds)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -5.0732427 -0.2253617</code></pre>
+<pre><code>[1] -5.0513367 -0.2280724</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -4650,13 +4650,13 @@ font-style: inherit;">nrow</span>(sample)))</span>
 background-color: null;
 font-style: inherit;">head</span>(boot_preds)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>       pred id
-1 -2.994542  1
-2 -2.329774  1
-3 -1.048926  1
-4 -2.509596  1
-5 -1.887268  1
-6 -3.137645  1</code></pre>
+<pre><code>        pred id
+1 -2.8101146  1
+2 -3.2471001  1
+3 -2.8057472  1
+4 -0.9186366  1
+5 -3.6240814  1
+6 -1.0116273  1</code></pre>
 </div>
 </div>
 <p>In this step, we apply the logistic regression model to each bootstrap sample and systematically collect the resulting predictions. Subsequently, we truncate extreme values (beyond the 1st and 99th percentiles) to remove outliers—a procedure analogous to capping techniques commonly employed in production credit models.</p>
@@ -10011,7 +10011,7 @@ font-style: inherit;"># Check the result (global minimum should be at (1,1))</sp
 background-color: null;
 font-style: inherit;">$</span>obj_loc</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "1.00000238859683,0.999992817623097"</code></pre>
+<pre><code>[1] "1.00001137991731,1.00001081979113"</code></pre>
 </div>
 </div>
 </section>
@@ -11264,8 +11264,8 @@ background-color: null;
 font-style: inherit;">cor</span>(new_random)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          [,1]      [,2]
-[1,] 1.0000000 0.2679134
-[2,] 0.2679134 1.0000000</code></pre>
+[1,] 1.0000000 0.2686143
+[2,] 0.2686143 1.0000000</code></pre>
 </div>
 </div>
 <p>The resulting <code>new_random</code> matrix contains values exhibiting approximately the target correlation structure.</p>
@@ -12351,9 +12351,9 @@ font-style: inherit;">levels</span>(test<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>bins)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] "[-5.11,-3.34]" "(-3.34,-2.89]" "(-2.89,-2.64]" "(-2.64,-2.41]"
- [5] "(-2.41,-2.23]" "(-2.23,-2.03]" "(-2.03,-1.83]" "(-1.83,-1.6]" 
- [9] "(-1.6,-1.26]"  "(-1.26,2.51]" </code></pre>
+<pre><code> [1] "[-5.79,-3.28]" "(-3.28,-2.88]" "(-2.88,-2.6]"  "(-2.6,-2.38]" 
+ [5] "(-2.38,-2.21]" "(-2.21,-2.04]" "(-2.04,-1.85]" "(-1.85,-1.6]" 
+ [9] "(-1.6,-1.21]"  "(-1.21,7.59]" </code></pre>
 </div>
 </div>
 </section>
@@ -12438,74 +12438,74 @@ font-style: inherit;">kable</span>(gains_table)</span></code></pre></div>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">[-5.11,-3.34]</td>
+<td style="text-align: left;">[-5.79,-3.28]</td>
 <td style="text-align: right;">300</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: right;">297</td>
 <td style="text-align: left;">1.0%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-3.34,-2.89]</td>
+<td style="text-align: left;">(-3.28,-2.88]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: left;">2.7%</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">294</td>
+<td style="text-align: left;">2.0%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.89,-2.64]</td>
+<td style="text-align: left;">(-2.88,-2.6]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">290</td>
-<td style="text-align: left;">3.3%</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">287</td>
+<td style="text-align: left;">4.3%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.64,-2.41]</td>
+<td style="text-align: left;">(-2.6,-2.38]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">286</td>
-<td style="text-align: left;">4.7%</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">284</td>
+<td style="text-align: left;">5.3%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.41,-2.23]</td>
+<td style="text-align: left;">(-2.38,-2.21]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">26</td>
-<td style="text-align: right;">274</td>
-<td style="text-align: left;">8.7%</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">280</td>
+<td style="text-align: left;">6.7%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.23,-2.03]</td>
+<td style="text-align: left;">(-2.21,-2.04]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">38</td>
-<td style="text-align: right;">262</td>
-<td style="text-align: left;">12.7%</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">260</td>
+<td style="text-align: left;">13.3%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.03,-1.83]</td>
+<td style="text-align: left;">(-2.04,-1.85]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">245</td>
+<td style="text-align: left;">18.3%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-1.85,-1.6]</td>
 <td style="text-align: right;">300</td>
 <td style="text-align: right;">46</td>
 <td style="text-align: right;">254</td>
 <td style="text-align: left;">15.3%</td>
 </tr>
-<tr class="even">
-<td style="text-align: left;">(-1.83,-1.6]</td>
-<td style="text-align: right;">300</td>
-<td style="text-align: right;">49</td>
-<td style="text-align: right;">251</td>
-<td style="text-align: left;">16.3%</td>
-</tr>
 <tr class="odd">
-<td style="text-align: left;">(-1.6,-1.26]</td>
+<td style="text-align: left;">(-1.6,-1.21]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">58</td>
-<td style="text-align: right;">242</td>
-<td style="text-align: left;">19.3%</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">236</td>
+<td style="text-align: left;">21.3%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.26,2.51]</td>
+<td style="text-align: left;">(-1.21,7.59]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">74</td>
-<td style="text-align: right;">226</td>
-<td style="text-align: left;">24.7%</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">233</td>
+<td style="text-align: left;">22.3%</td>
 </tr>
 </tbody>
 </table>
@@ -12591,101 +12591,101 @@ font-style: inherit;">kable</span>(gains_table)</span></code></pre></div>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">[-5.11,-3.34]</td>
+<td style="text-align: left;">[-5.79,-3.28]</td>
 <td style="text-align: right;">300</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: right;">297</td>
 <td style="text-align: left;">1.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.0092025</td>
-<td style="text-align: right;">0.1110696</td>
+<td style="text-align: right;">0.0090909</td>
+<td style="text-align: right;">0.1112360</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-3.34,-2.89]</td>
+<td style="text-align: left;">(-3.28,-2.88]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: left;">2.7%</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">294</td>
+<td style="text-align: left;">2.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.0337423</td>
-<td style="text-align: right;">0.2202693</td>
+<td style="text-align: right;">0.0272727</td>
+<td style="text-align: right;">0.2213483</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.89,-2.64]</td>
+<td style="text-align: left;">(-2.88,-2.6]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">290</td>
-<td style="text-align: left;">3.3%</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">287</td>
+<td style="text-align: left;">4.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.0644172</td>
-<td style="text-align: right;">0.3287210</td>
+<td style="text-align: right;">0.0666667</td>
+<td style="text-align: right;">0.3288390</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.64,-2.41]</td>
+<td style="text-align: left;">(-2.6,-2.38]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">286</td>
-<td style="text-align: left;">4.7%</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">284</td>
+<td style="text-align: left;">5.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.1073620</td>
-<td style="text-align: right;">0.4356769</td>
+<td style="text-align: right;">0.1151515</td>
+<td style="text-align: right;">0.4352060</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.41,-2.23]</td>
+<td style="text-align: left;">(-2.38,-2.21]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">26</td>
-<td style="text-align: right;">274</td>
-<td style="text-align: left;">8.7%</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">280</td>
+<td style="text-align: left;">6.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.1871166</td>
-<td style="text-align: right;">0.5381451</td>
+<td style="text-align: right;">0.1757576</td>
+<td style="text-align: right;">0.5400749</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.23,-2.03]</td>
+<td style="text-align: left;">(-2.21,-2.04]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">38</td>
-<td style="text-align: right;">262</td>
-<td style="text-align: left;">12.7%</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">260</td>
+<td style="text-align: left;">13.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.3036810</td>
-<td style="text-align: right;">0.6361257</td>
+<td style="text-align: right;">0.2969697</td>
+<td style="text-align: right;">0.6374532</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.03,-1.83]</td>
+<td style="text-align: left;">(-2.04,-1.85]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">245</td>
+<td style="text-align: left;">18.3%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: right;">0.4636364</td>
+<td style="text-align: right;">0.7292135</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-1.85,-1.6]</td>
 <td style="text-align: right;">300</td>
 <td style="text-align: right;">46</td>
 <td style="text-align: right;">254</td>
 <td style="text-align: left;">15.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.4447853</td>
-<td style="text-align: right;">0.7311144</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">(-1.83,-1.6]</td>
-<td style="text-align: right;">300</td>
-<td style="text-align: right;">49</td>
-<td style="text-align: right;">251</td>
-<td style="text-align: left;">16.3%</td>
-<td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.5950920</td>
-<td style="text-align: right;">0.8249813</td>
+<td style="text-align: right;">0.6030303</td>
+<td style="text-align: right;">0.8243446</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-1.6,-1.26]</td>
+<td style="text-align: left;">(-1.6,-1.21]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">58</td>
-<td style="text-align: right;">242</td>
-<td style="text-align: left;">19.3%</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">236</td>
+<td style="text-align: left;">21.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.7730061</td>
-<td style="text-align: right;">0.9154824</td>
+<td style="text-align: right;">0.7969697</td>
+<td style="text-align: right;">0.9127341</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.26,2.51]</td>
+<td style="text-align: left;">(-1.21,7.59]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">74</td>
-<td style="text-align: right;">226</td>
-<td style="text-align: left;">24.7%</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">233</td>
+<td style="text-align: left;">22.3%</td>
 <td style="text-align: left;">10.0%</td>
 <td style="text-align: right;">1.0000000</td>
 <td style="text-align: right;">1.0000000</td>
@@ -12820,7 +12820,7 @@ font-style: inherit;">kable</span>(gains_table)</span></code></pre></div>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">[-5.11,-3.34]</td>
+<td style="text-align: left;">[-5.79,-3.28]</td>
 <td style="text-align: right;">300</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: right;">297</td>
@@ -12833,121 +12833,121 @@ font-style: inherit;">kable</span>(gains_table)</span></code></pre></div>
 <td style="text-align: left;">1.0%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-3.34,-2.89]</td>
+<td style="text-align: left;">(-3.28,-2.88]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: left;">2.7%</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">294</td>
+<td style="text-align: left;">2.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">3.4%</td>
-<td style="text-align: left;">22.0%</td>
+<td style="text-align: left;">2.7%</td>
+<td style="text-align: left;">22.1%</td>
 <td style="text-align: right;">0.19</td>
 <td style="text-align: left;">3%</td>
-<td style="text-align: left;">1.8%</td>
+<td style="text-align: left;">1.5%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.89,-2.64]</td>
+<td style="text-align: left;">(-2.88,-2.6]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">290</td>
-<td style="text-align: left;">3.3%</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">287</td>
+<td style="text-align: left;">4.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">6.4%</td>
+<td style="text-align: left;">6.7%</td>
 <td style="text-align: left;">32.9%</td>
 <td style="text-align: right;">0.26</td>
-<td style="text-align: left;">6%</td>
-<td style="text-align: left;">2.3%</td>
+<td style="text-align: left;">7%</td>
+<td style="text-align: left;">2.4%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.64,-2.41]</td>
+<td style="text-align: left;">(-2.6,-2.38]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">286</td>
-<td style="text-align: left;">4.7%</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">284</td>
+<td style="text-align: left;">5.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">10.7%</td>
-<td style="text-align: left;">43.6%</td>
-<td style="text-align: right;">0.33</td>
-<td style="text-align: left;">11%</td>
-<td style="text-align: left;">2.9%</td>
+<td style="text-align: left;">11.5%</td>
+<td style="text-align: left;">43.5%</td>
+<td style="text-align: right;">0.32</td>
+<td style="text-align: left;">12%</td>
+<td style="text-align: left;">3.2%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.41,-2.23]</td>
+<td style="text-align: left;">(-2.38,-2.21]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">26</td>
-<td style="text-align: right;">274</td>
-<td style="text-align: left;">8.7%</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">280</td>
+<td style="text-align: left;">6.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">18.7%</td>
-<td style="text-align: left;">53.8%</td>
-<td style="text-align: right;">0.35</td>
-<td style="text-align: left;">19%</td>
-<td style="text-align: left;">4.1%</td>
+<td style="text-align: left;">17.6%</td>
+<td style="text-align: left;">54.0%</td>
+<td style="text-align: right;">0.36</td>
+<td style="text-align: left;">18%</td>
+<td style="text-align: left;">3.9%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.23,-2.03]</td>
+<td style="text-align: left;">(-2.21,-2.04]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">38</td>
-<td style="text-align: right;">262</td>
-<td style="text-align: left;">12.7%</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">260</td>
+<td style="text-align: left;">13.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">30.4%</td>
-<td style="text-align: left;">63.6%</td>
-<td style="text-align: right;">0.33</td>
+<td style="text-align: left;">29.7%</td>
+<td style="text-align: left;">63.7%</td>
+<td style="text-align: right;">0.34</td>
 <td style="text-align: left;">30%</td>
-<td style="text-align: left;">5.5%</td>
+<td style="text-align: left;">5.4%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.03,-1.83]</td>
+<td style="text-align: left;">(-2.04,-1.85]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">245</td>
+<td style="text-align: left;">18.3%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">46.4%</td>
+<td style="text-align: left;">72.9%</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: left;">46%</td>
+<td style="text-align: left;">7.3%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-1.85,-1.6]</td>
 <td style="text-align: right;">300</td>
 <td style="text-align: right;">46</td>
 <td style="text-align: right;">254</td>
 <td style="text-align: left;">15.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">44.5%</td>
-<td style="text-align: left;">73.1%</td>
-<td style="text-align: right;">0.29</td>
-<td style="text-align: left;">44%</td>
-<td style="text-align: left;">6.9%</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">(-1.83,-1.6]</td>
-<td style="text-align: right;">300</td>
-<td style="text-align: right;">49</td>
-<td style="text-align: right;">251</td>
-<td style="text-align: left;">16.3%</td>
-<td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">59.5%</td>
-<td style="text-align: left;">82.5%</td>
-<td style="text-align: right;">0.23</td>
+<td style="text-align: left;">60.3%</td>
+<td style="text-align: left;">82.4%</td>
+<td style="text-align: right;">0.22</td>
 <td style="text-align: left;">60%</td>
-<td style="text-align: left;">8.1%</td>
+<td style="text-align: left;">8.3%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-1.6,-1.26]</td>
+<td style="text-align: left;">(-1.6,-1.21]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">58</td>
-<td style="text-align: right;">242</td>
-<td style="text-align: left;">19.3%</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">236</td>
+<td style="text-align: left;">21.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">77.3%</td>
-<td style="text-align: left;">91.5%</td>
-<td style="text-align: right;">0.14</td>
-<td style="text-align: left;">77%</td>
-<td style="text-align: left;">9.3%</td>
+<td style="text-align: left;">79.7%</td>
+<td style="text-align: left;">91.3%</td>
+<td style="text-align: right;">0.12</td>
+<td style="text-align: left;">80%</td>
+<td style="text-align: left;">9.7%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.26,2.51]</td>
+<td style="text-align: left;">(-1.21,7.59]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">74</td>
-<td style="text-align: right;">226</td>
-<td style="text-align: left;">24.7%</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">233</td>
+<td style="text-align: left;">22.3%</td>
 <td style="text-align: left;">10.0%</td>
 <td style="text-align: left;">100.0%</td>
 <td style="text-align: left;">100.0%</td>
 <td style="text-align: right;">0.00</td>
 <td style="text-align: left;">100%</td>
-<td style="text-align: left;">10.9%</td>
+<td style="text-align: left;">11.0%</td>
 </tr>
 </tbody>
 </table>
@@ -13254,124 +13254,124 @@ font-style: inherit;">kable</span>(tab)</span></code></pre></div>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">(-1.26,2.51]</td>
+<td style="text-align: left;">(-1.21,7.59]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">74</td>
-<td style="text-align: right;">226</td>
-<td style="text-align: left;">24.7%</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">233</td>
+<td style="text-align: left;">22.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">22.7%</td>
-<td style="text-align: left;">8.5%</td>
-<td style="text-align: right;">0.14</td>
-<td style="text-align: left;">23%</td>
-<td style="text-align: left;">24.7%</td>
+<td style="text-align: left;">20.3%</td>
+<td style="text-align: left;">8.7%</td>
+<td style="text-align: right;">0.12</td>
+<td style="text-align: left;">20%</td>
+<td style="text-align: left;">22.3%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.6,-1.26]</td>
+<td style="text-align: left;">(-1.6,-1.21]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">58</td>
-<td style="text-align: right;">242</td>
-<td style="text-align: left;">19.3%</td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">236</td>
+<td style="text-align: left;">21.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">40.5%</td>
-<td style="text-align: left;">17.5%</td>
-<td style="text-align: right;">0.23</td>
+<td style="text-align: left;">39.7%</td>
+<td style="text-align: left;">17.6%</td>
+<td style="text-align: right;">0.22</td>
 <td style="text-align: left;">40%</td>
-<td style="text-align: left;">22.0%</td>
+<td style="text-align: left;">21.8%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-1.83,-1.6]</td>
-<td style="text-align: right;">300</td>
-<td style="text-align: right;">49</td>
-<td style="text-align: right;">251</td>
-<td style="text-align: left;">16.3%</td>
-<td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">55.5%</td>
-<td style="text-align: left;">26.9%</td>
-<td style="text-align: right;">0.29</td>
-<td style="text-align: left;">56%</td>
-<td style="text-align: left;">20.1%</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">(-2.03,-1.83]</td>
+<td style="text-align: left;">(-1.85,-1.6]</td>
 <td style="text-align: right;">300</td>
 <td style="text-align: right;">46</td>
 <td style="text-align: right;">254</td>
 <td style="text-align: left;">15.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">69.6%</td>
-<td style="text-align: left;">36.4%</td>
-<td style="text-align: right;">0.33</td>
-<td style="text-align: left;">70%</td>
-<td style="text-align: left;">18.9%</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">(-2.23,-2.03]</td>
-<td style="text-align: right;">300</td>
-<td style="text-align: right;">38</td>
-<td style="text-align: right;">262</td>
-<td style="text-align: left;">12.7%</td>
-<td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">81.3%</td>
-<td style="text-align: left;">46.2%</td>
-<td style="text-align: right;">0.35</td>
-<td style="text-align: left;">81%</td>
-<td style="text-align: left;">17.7%</td>
+<td style="text-align: left;">53.6%</td>
+<td style="text-align: left;">27.1%</td>
+<td style="text-align: right;">0.27</td>
+<td style="text-align: left;">54%</td>
+<td style="text-align: left;">19.7%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.41,-2.23]</td>
+<td style="text-align: left;">(-2.04,-1.85]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">26</td>
-<td style="text-align: right;">274</td>
-<td style="text-align: left;">8.7%</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">245</td>
+<td style="text-align: left;">18.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">89.3%</td>
-<td style="text-align: left;">56.4%</td>
-<td style="text-align: right;">0.33</td>
-<td style="text-align: left;">89%</td>
+<td style="text-align: left;">70.3%</td>
+<td style="text-align: left;">36.3%</td>
+<td style="text-align: right;">0.34</td>
+<td style="text-align: left;">70%</td>
+<td style="text-align: left;">19.3%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-2.21,-2.04]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">260</td>
+<td style="text-align: left;">13.3%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">82.4%</td>
+<td style="text-align: left;">46.0%</td>
+<td style="text-align: right;">0.36</td>
+<td style="text-align: left;">82%</td>
+<td style="text-align: left;">18.1%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-2.38,-2.21]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">280</td>
+<td style="text-align: left;">6.7%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">88.5%</td>
+<td style="text-align: left;">56.5%</td>
+<td style="text-align: right;">0.32</td>
+<td style="text-align: left;">88%</td>
 <td style="text-align: left;">16.2%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.64,-2.41]</td>
+<td style="text-align: left;">(-2.6,-2.38]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">286</td>
-<td style="text-align: left;">4.7%</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">284</td>
+<td style="text-align: left;">5.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">93.6%</td>
+<td style="text-align: left;">93.3%</td>
 <td style="text-align: left;">67.1%</td>
 <td style="text-align: right;">0.26</td>
-<td style="text-align: left;">94%</td>
-<td style="text-align: left;">14.5%</td>
+<td style="text-align: left;">93%</td>
+<td style="text-align: left;">14.7%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.89,-2.64]</td>
+<td style="text-align: left;">(-2.88,-2.6]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">290</td>
-<td style="text-align: left;">3.3%</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">287</td>
+<td style="text-align: left;">4.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">96.6%</td>
-<td style="text-align: left;">78.0%</td>
+<td style="text-align: left;">97.3%</td>
+<td style="text-align: left;">77.9%</td>
 <td style="text-align: right;">0.19</td>
 <td style="text-align: left;">97%</td>
-<td style="text-align: left;">13.1%</td>
+<td style="text-align: left;">13.4%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-3.34,-2.89]</td>
+<td style="text-align: left;">(-3.28,-2.88]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">292</td>
-<td style="text-align: left;">2.7%</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">294</td>
+<td style="text-align: left;">2.0%</td>
 <td style="text-align: left;">10.0%</td>
 <td style="text-align: left;">99.1%</td>
 <td style="text-align: left;">88.9%</td>
 <td style="text-align: right;">0.10</td>
 <td style="text-align: left;">99%</td>
-<td style="text-align: left;">12.0%</td>
+<td style="text-align: left;">12.1%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">[-5.11,-3.34]</td>
+<td style="text-align: left;">[-5.79,-3.28]</td>
 <td style="text-align: right;">300</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: right;">297</td>
@@ -13381,7 +13381,7 @@ font-style: inherit;">kable</span>(tab)</span></code></pre></div>
 <td style="text-align: left;">100.0%</td>
 <td style="text-align: right;">0.00</td>
 <td style="text-align: left;">100%</td>
-<td style="text-align: left;">10.9%</td>
+<td style="text-align: left;">11.0%</td>
 </tr>
 </tbody>
 </table>
@@ -13707,7 +13707,7 @@ font-style: inherit;">range</span>(prices_df<span class="sc" style="color: #5E5E
 background-color: null;
 font-style: inherit;">$</span>date)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "2017-11-17" "2025-06-20"</code></pre>
+<pre><code>[1] "2017-11-17" "2025-06-30"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -13716,7 +13716,7 @@ font-style: inherit;"># Check dimensions (number of trading days × number of st
 background-color: null;
 font-style: inherit;">dim</span>(prices_df)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1874   49</code></pre>
+<pre><code>[1] 1880   49</code></pre>
 </div>
 </div>
 </section>
@@ -14600,7 +14600,7 @@ font-style: inherit;">sum</span>(out<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>obj_loc)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9990315</code></pre>
+<pre><code>[1] 0.9894275</code></pre>
 </div>
 </div>
 <p>In this implementation, the tracking of all particle movements throughout the optimization process occurs. This enables visualization of how the swarm converges toward the optimal solution.</p>
@@ -14903,7 +14903,7 @@ font-style: inherit;">%*%</span> mean_returns, <span class="dv" style="color: #A
 background-color: null;
 font-style: inherit;">5</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio returns: 0.00062"</code></pre>
+<pre><code>[1] "Portfolio returns: 0.00065"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -14928,7 +14928,7 @@ font-style: inherit;">$</span>par), <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">5</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio Std dev: 0.00882"</code></pre>
+<pre><code>[1] "Portfolio Std dev: 0.0089"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -14939,7 +14939,7 @@ font-style: inherit;">sum</span>(opt<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>par)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9946492</code></pre>
+<pre><code>[1] 0.9937205</code></pre>
 </div>
 </div>
 </section>
@@ -15225,7 +15225,7 @@ font-style: inherit;">%*%</span> mean_returns, <span class="dv" style="color: #A
 background-color: null;
 font-style: inherit;">5</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio returns: 0.00075"</code></pre>
+<pre><code>[1] "Portfolio returns: 0.00077"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -15250,7 +15250,7 @@ font-style: inherit;">$</span>par), <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">5</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio Std dev: 0.01113"</code></pre>
+<pre><code>[1] "Portfolio Std dev: 0.01082"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -15261,7 +15261,7 @@ font-style: inherit;">sum</span>(opt<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>par)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9935669</code></pre>
+<pre><code>[1] 0.9930395</code></pre>
 </div>
 </div>
 <p>Adding the tracking error constraint, not only balances risk and return but also tracks the performance of an equally-weighted benchmark. The <code>lambda2</code> parameter controls the closeness of benchmark tracking - higher values result in portfolios that more closely resemble the benchmark.</p>
