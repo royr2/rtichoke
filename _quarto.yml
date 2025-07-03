@@ -3,6 +3,7 @@ project:
 
 website:
   title: "R'tichoke"
+  google-analytics: "G-EMPXPEL31W"  # Replace with your tracking ID
   site-url: "https://rtichoke.netlify.app"
   navbar:
     background: primary
