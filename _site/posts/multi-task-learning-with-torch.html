@@ -101,6 +101,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-EMPXPEL31W"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
+</script>
 
 
 <link rel="stylesheet" href="../styles.css">
@@ -520,11 +529,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Epoch 1 - Train Loss: 0.7612, Val Loss: 0.7070, Val Acc: 0.521
-Epoch 25 - Train Loss: 0.4119, Val Loss: 0.3789, Val Acc: 0.571
-Epoch 50 - Train Loss: 0.1754, Val Loss: 0.1642, Val Acc: 0.950
-Epoch 75 - Train Loss: 0.0745, Val Loss: 0.0788, Val Acc: 0.957
-Epoch 100 - Train Loss: 0.0502, Val Loss: 0.0581, Val Acc: 0.979</code></pre>
+<pre><code>Epoch 1 - Train Loss: 0.8446, Val Loss: 0.7606, Val Acc: 0.471
+Epoch 25 - Train Loss: 0.3659, Val Loss: 0.3461, Val Acc: 0.729
+Epoch 50 - Train Loss: 0.1816, Val Loss: 0.1701, Val Acc: 0.964
+Epoch 75 - Train Loss: 0.0859, Val Loss: 0.0705, Val Acc: 1.000
+Epoch 100 - Train Loss: 0.0584, Val Loss: 0.0456, Val Acc: 0.993</code></pre>
 </div>
 </div>
 </section>
@@ -584,13 +593,13 @@ Epoch 100 - Train Loss: 0.0502, Val Loss: 0.0581, Val Acc: 0.979</code></pre>
 <span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(performance_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>            Task          Metric    Value
-1     Regression Test Loss (MSE)   0.0535
-2     Regression            RMSE   0.2314
-3     Regression       R-squared   0.9390
-4 Classification Test Loss (BCE)   0.0318
-5 Classification        Accuracy 100.0000
-6 Classification             AUC 100.0000</code></pre>
+<pre><code>            Task          Metric   Value
+1     Regression Test Loss (MSE)  0.0525
+2     Regression            RMSE  0.2290
+3     Regression       R-squared  0.9365
+4 Classification Test Loss (BCE)  0.0922
+5 Classification        Accuracy 96.3300
+6 Classification             AUC 99.7200</code></pre>
 </div>
 </div>
 </section>
