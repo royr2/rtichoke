@@ -2,6 +2,7 @@
   {
     "listing": "/posts.html",
     "items": [
+      "/posts/text-analytics-quanteda-part1.html",
       "/posts/quarto_live.html",
       "/posts/multi-task-learning-with-torch.html",
       "/posts/simple-neural-net-with-torch.html",

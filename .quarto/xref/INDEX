@@ -178,5 +178,8 @@
   },
   "posts/quarto_live.qmd": {
     "quarto_live.html": "90251c20"
+  },
+  "posts/text-analytics-quanteda-part1.qmd": {
+    "text-analytics-quanteda-part1.html": "d645d5ec"
   }
 }

@@ -9,8 +9,2866 @@
 <link>https://rtichoke.netlify.app/posts.html</link>
 <atom:link href="https://rtichoke.netlify.app/posts.xml" rel="self" type="application/rss+xml"/>
 <description></description>
-<generator>quarto-1.6.42</generator>
-<lastBuildDate>Mon, 30 Jun 2025 18:30:00 GMT</lastBuildDate>
+<generator>quarto-1.7.31</generator>
+<lastBuildDate>Mon, 06 Oct 2025 18:30:00 GMT</lastBuildDate>
+<item>
+  <title>Text Analytics in R with quanteda (Part 1)</title>
+  <link>https://rtichoke.netlify.app/posts/text-analytics-quanteda-part1.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<section id="required-packages" class="level2">
+<h2 class="anchored" data-anchor-id="required-packages">Required Packages</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(quanteda)</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(quanteda.textstats)</span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(quanteda.textplots)</span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(readr)</span>
+<span id="cb1-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(dplyr)</span>
+<span id="cb1-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2)</span>
+<span id="cb1-7"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(stringr)</span>
+<span id="cb1-8"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(DT)</span>
+<span id="cb1-9"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(tidytext)</span></code></pre></div>
+</div>
+</section>
+<section id="understanding-text-analytics-fundamentals" class="level2">
+<h2 class="anchored" data-anchor-id="understanding-text-analytics-fundamentals">Understanding Text Analytics Fundamentals</h2>
+<p>Text analytics transforms text into structured data suitable for analysis. A typical workflow looks like so:</p>
+<ol type="1">
+<li><strong>Text acquisition and loading</strong>: Importing text data from various sources</li>
+<li><strong>Preprocessing</strong>: Cleaning and standardizing text</li>
+<li><strong>Tokenization</strong>: Breaking text into meaningful units (words, sentences, n-grams)</li>
+<li><strong>Document-Feature Matrix (DFM) creation</strong>: Representing text numerically</li>
+<li><strong>Analysis</strong>: Extracting insights through statistical and computational methods</li>
+</ol>
+</section>
+<section id="creating-a-corpus-prepping-data-for-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="creating-a-corpus-prepping-data-for-analysis">Creating a Corpus: Prepping data for analysis</h2>
+<p>A <strong>corpus</strong> is a structured collection of texts. <code>quanteda</code> provides the <code>corpus()</code> function to create corpus objects from various data sources.</p>
+<section id="example-1-simple-corpus-from-character-vector" class="level3">
+<h3 class="anchored" data-anchor-id="example-1-simple-corpus-from-character-vector">Example 1: Simple Corpus from Character Vector</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create a simple corpus from a character vector</span></span>
+<span id="cb2-2">texts <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(</span>
+<span id="cb2-3">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"The quick brown fox jumps over the lazy dog."</span>,</span>
+<span id="cb2-4">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Natural language processing is fascinating and powerful."</span>,</span>
+<span id="cb2-5">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Text analytics enables data-driven decision making."</span>,</span>
+<span id="cb2-6">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Machine learning algorithms can analyze text at scale."</span>,</span>
+<span id="cb2-7">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Data science combines statistics, programming, and domain knowledge."</span></span>
+<span id="cb2-8">)</span>
+<span id="cb2-9"></span>
+<span id="cb2-10"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create corpus</span></span>
+<span id="cb2-11">corp <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">corpus</span>(texts)</span>
+<span id="cb2-12"></span>
+<span id="cb2-13"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Examine the corpus</span></span>
+<span id="cb2-14"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(corp)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Corpus consisting of 5 documents, showing 5 documents:
+
+  Text Types Tokens Sentences
+ text1    10     10         1
+ text2     8      8         1
+ text3     7      7         1
+ text4     9      9         1
+ text5    10     11         1</code></pre>
+</div>
+</div>
+</section>
+<section id="example-2-corpus-from-data-frame" class="level3">
+<h3 class="anchored" data-anchor-id="example-2-corpus-from-data-frame">Example 2: Corpus from Data Frame</h3>
+<p>In practice, text data typically comes with associated metadata (e.g., author, date, category). <code>quanteda</code> handles this well:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create a data frame with text and metadata</span></span>
+<span id="cb4-2">text_df <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(</span>
+<span id="cb4-3">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(</span>
+<span id="cb4-4">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Customer service was excellent and responsive."</span>,</span>
+<span id="cb4-5">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Product quality is poor. Very disappointed."</span>,</span>
+<span id="cb4-6">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Shipping was fast. Happy with my purchase."</span>,</span>
+<span id="cb4-7">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Price is too high for the quality received."</span>,</span>
+<span id="cb4-8">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Great value for money. Would recommend!"</span></span>
+<span id="cb4-9">  ),</span>
+<span id="cb4-10">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">rating =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>),</span>
+<span id="cb4-11">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">product_category =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Electronics"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Clothing"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Electronics"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Clothing"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Electronics"</span>),</span>
+<span id="cb4-12">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">review_date =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.Date</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2025-01-15"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2025-02-20"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2025-03-10"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2025-04-05"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2025-05-12"</span>)),</span>
+<span id="cb4-13">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">stringsAsFactors =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span></span>
+<span id="cb4-14">)</span>
+<span id="cb4-15"></span>
+<span id="cb4-16"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">datatable</span>(text_df)</span></code></pre></div>
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-8fc125d7830687eb58cb" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-8fc125d7830687eb58cb">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5"],["Customer service was excellent and responsive.","Product quality is poor. Very disappointed.","Shipping was fast. Happy with my purchase.","Price is too high for the quality received.","Great value for money. Would recommend!"],[5,2,4,2,5],["Electronics","Clothing","Electronics","Clothing","Electronics"],["2025-01-15","2025-02-20","2025-03-10","2025-04-05","2025-05-12"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>text<\/th>\n      <th>rating<\/th>\n      <th>product_category<\/th>\n      <th>review_date<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"text","targets":1},{"name":"rating","targets":2},{"name":"product_category","targets":3},{"name":"review_date","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create corpus from data frame</span></span>
+<span id="cb5-2">reviews_corp <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">corpus</span>(text_df, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">text_field =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"text"</span>)</span>
+<span id="cb5-3"></span>
+<span id="cb5-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Examine corpus with metadata</span></span>
+<span id="cb5-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(reviews_corp)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Corpus consisting of 5 documents, showing 5 documents:
+
+  Text Types Tokens Sentences rating product_category review_date
+ text1     7      7         1      5      Electronics  2025-01-15
+ text2     7      8         2      2         Clothing  2025-02-20
+ text3     8      9         2      4      Electronics  2025-03-10
+ text4     9      9         1      2         Clothing  2025-04-05
+ text5     8      8         2      5      Electronics  2025-05-12</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Access document variables (metadata) (columns not declared as "text_field")</span></span>
+<span id="cb7-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">docvars</span>(reviews_corp)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  rating product_category review_date
+1      5      Electronics  2025-01-15
+2      2         Clothing  2025-02-20
+3      4      Electronics  2025-03-10
+4      2         Clothing  2025-04-05
+5      5      Electronics  2025-05-12</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Subset corpus by metadata</span></span>
+<span id="cb9-2">high_rated <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">corpus_subset</span>(reviews_corp, rating <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb9-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(high_rated)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Corpus consisting of 3 documents, showing 3 documents:
+
+  Text Types Tokens Sentences rating product_category review_date
+ text1     7      7         1      5      Electronics  2025-01-15
+ text3     8      9         2      4      Electronics  2025-03-10
+ text5     8      8         2      5      Electronics  2025-05-12</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="tokenization-breaking-text-into-units" class="level2">
+<h2 class="anchored" data-anchor-id="tokenization-breaking-text-into-units">Tokenization: Breaking text into units</h2>
+<p>Tokenization is the process of splitting text into individual units (tokens), typically words. The <code>tokens()</code> function provides lots of tokenisation capabilities.</p>
+<section id="basic-tokenization" class="level3">
+<h3 class="anchored" data-anchor-id="basic-tokenization">Basic Tokenization</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Tokenize the reviews corpus</span></span>
+<span id="cb11-2">toks <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(reviews_corp)</span>
+<span id="cb11-3"></span>
+<span id="cb11-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># View tokens from all documents</span></span>
+<span id="cb11-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(toks)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tokens consisting of 5 documents and 3 docvars.
+text1 :
+[1] "Customer"   "service"    "was"        "excellent"  "and"       
+[6] "responsive" "."         
+
+text2 :
+[1] "Product"      "quality"      "is"           "poor"         "."           
+[6] "Very"         "disappointed" "."           
+
+text3 :
+[1] "Shipping" "was"      "fast"     "."        "Happy"    "with"     "my"      
+[8] "purchase" "."       
+
+text4 :
+[1] "Price"    "is"       "too"      "high"     "for"      "the"      "quality" 
+[8] "received" "."       
+
+text5 :
+[1] "Great"     "value"     "for"       "money"     "."         "Would"    
+[7] "recommend" "!"        </code></pre>
+</div>
+</div>
+</section>
+<section id="advanced-tokenization-options" class="level3">
+<h3 class="anchored" data-anchor-id="advanced-tokenization-options">Advanced Tokenization Options</h3>
+<p><code>quanteda</code> offers a lot of control over tokenization:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create sample text with various elements</span></span>
+<span id="cb13-2">sample_text <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Dr. Smith's email is john.smith@example.com. </span></span>
+<span id="cb13-3"><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">                He earned $100,000 in 2024! Visit https://example.com </span></span>
+<span id="cb13-4"><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">                for more info. #DataScience #AI"</span></span>
+<span id="cb13-5"></span>
+<span id="cb13-6">sample_corp <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">corpus</span>(sample_text)</span>
+<span id="cb13-7"></span>
+<span id="cb13-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Different tokenization approaches</span></span>
+<span id="cb13-9">tokens_default <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(sample_corp)</span>
+<span id="cb13-10">tokens_no_punct <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(sample_corp, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span>
+<span id="cb13-11">tokens_no_numbers <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(sample_corp, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_numbers =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span>
+<span id="cb13-12">tokens_no_symbols <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(sample_corp, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_symbols =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span>
+<span id="cb13-13">tokens_lowercase <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(sample_corp, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_tolower</span>()</span>
+<span id="cb13-14"></span>
+<span id="cb13-15"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compare results</span></span>
+<span id="cb13-16"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(tokens_default)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tokens consisting of 1 document.
+text1 :
+ [1] "Dr"                     "."                      "Smith's"               
+ [4] "email"                  "is"                     "john.smith@example.com"
+ [7] "."                      "He"                     "earned"                
+[10] "$"                      "100,000"                "in"                    
+[ ... and 10 more ]</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(tokens_no_punct)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tokens consisting of 1 document.
+text1 :
+ [1] "Dr"                     "Smith's"                "email"                 
+ [4] "is"                     "john.smith@example.com" "He"                    
+ [7] "earned"                 "$"                      "100,000"               
+[10] "in"                     "2024"                   "Visit"                 
+[ ... and 6 more ]</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(tokens_no_numbers)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tokens consisting of 1 document.
+text1 :
+ [1] "Dr"                     "."                      "Smith's"               
+ [4] "email"                  "is"                     "john.smith@example.com"
+ [7] "."                      "He"                     "earned"                
+[10] "$"                      "in"                     "!"                     
+[ ... and 8 more ]</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(tokens_no_symbols)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tokens consisting of 1 document.
+text1 :
+ [1] "Dr"                     "."                      "Smith's"               
+ [4] "email"                  "is"                     "john.smith@example.com"
+ [7] "."                      "He"                     "earned"                
+[10] "100,000"                "in"                     "2024"                  
+[ ... and 9 more ]</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(tokens_lowercase)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tokens consisting of 1 document.
+text1 :
+ [1] "dr"                     "smith's"                "email"                 
+ [4] "is"                     "john.smith@example.com" "he"                    
+ [7] "earned"                 "$"                      "100,000"               
+[10] "in"                     "2024"                   "visit"                 
+[ ... and 6 more ]</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="stopword-removal" class="level2">
+<h2 class="anchored" data-anchor-id="stopword-removal">Stopword Removal</h2>
+<p>Stopwords are common words (e.g., “the”, “is”, “at”) that typically don’t carry significant meaning. Removing them reduces noise and improves ovrerall efficiency.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># View built-in English stopwords (first 20)</span></span>
+<span id="cb23-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stopwords</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"english"</span>), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "i"          "me"         "my"         "myself"     "we"        
+ [6] "our"        "ours"       "ourselves"  "you"        "your"      
+[11] "yours"      "yourself"   "yourselves" "he"         "him"       
+[16] "his"        "himself"    "she"        "her"        "hers"      </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Count of English stopwords</span></span>
+<span id="cb25-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stopwords</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"english"</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 175</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Remove stopwords from tokens</span></span>
+<span id="cb27-2">toks_no_stop <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(reviews_corp, </span>
+<span id="cb27-3">                       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>,</span>
+<span id="cb27-4">                       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_numbers =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb27-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_tolower</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb27-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_remove</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stopwords</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"english"</span>))</span>
+<span id="cb27-7"></span>
+<span id="cb27-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compare with and without stopwords</span></span>
+<span id="cb27-9"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(reviews_corp, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>])</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tokens consisting of 1 document and 3 docvars.
+text1 :
+[1] "Customer"   "service"    "was"        "excellent"  "and"       
+[6] "responsive"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(toks_no_stop[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>])</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tokens consisting of 1 document and 3 docvars.
+text1 :
+[1] "customer"   "service"    "excellent"  "responsive"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Count tokens before and after</span></span>
+<span id="cb31-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ntoken</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(reviews_corp, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>text1 text2 text3 text4 text5 
+    6     6     7     8     6 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ntoken</span>(toks_no_stop))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>text1 text2 text3 text4 text5 
+    4     4     4     4     4 </code></pre>
+</div>
+</div>
+</section>
+<section id="stemming" class="level2">
+<h2 class="anchored" data-anchor-id="stemming">Stemming</h2>
+<p><strong>Stemming</strong> reduces words to their root form by removing suffixes (e.g., “running” → “run”).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Example text demonstrating word variations</span></span>
+<span id="cb35-2">stem_text <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(</span>
+<span id="cb35-3">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"The running runners ran faster than expected."</span>,</span>
+<span id="cb35-4">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Computing computers computed complex calculations."</span>,</span>
+<span id="cb35-5">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"The analyst analyzed analytical data using analysis techniques."</span></span>
+<span id="cb35-6">)</span>
+<span id="cb35-7"></span>
+<span id="cb35-8">stem_corp <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">corpus</span>(stem_text)</span>
+<span id="cb35-9"></span>
+<span id="cb35-10"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Tokenize</span></span>
+<span id="cb35-11">stem_toks <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(stem_corp, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_tolower</span>()</span>
+<span id="cb35-12"></span>
+<span id="cb35-13"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Apply stemming</span></span>
+<span id="cb35-14">stem_toks_stemmed <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_wordstem</span>(stem_toks)</span>
+<span id="cb35-15"></span>
+<span id="cb35-16"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compare original and stemmed</span></span>
+<span id="cb35-17"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(stem_toks[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>])</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tokens consisting of 1 document.
+text1 :
+[1] "the"      "running"  "runners"  "ran"      "faster"   "than"     "expected"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(stem_toks_stemmed[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>])</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tokens consisting of 1 document.
+text1 :
+[1] "the"    "run"    "runner" "ran"    "faster" "than"   "expect"</code></pre>
+</div>
+</div>
+</section>
+<section id="document-feature-matrix-dfm-numerical-representation" class="level2">
+<h2 class="anchored" data-anchor-id="document-feature-matrix-dfm-numerical-representation">Document-Feature Matrix (DFM): Numerical Representation</h2>
+<p>A <strong>Document-Feature Matrix (DFM)</strong> is a numerical representation of text where rows represent documents, columns represent features (typically words), and cell values indicate feature frequency in each document. This structure enables statistical analysis and machine learning applications.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create a DFM from our reviews corpus</span></span>
+<span id="cb39-2">reviews_dfm <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> reviews_corp <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb39-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_numbers =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb39-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_tolower</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb39-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_remove</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stopwords</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"english"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb39-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm</span>()</span>
+<span id="cb39-7"></span>
+<span id="cb39-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Examine the DFM</span></span>
+<span id="cb39-9"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(reviews_dfm)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Document-feature matrix of: 5 documents, 19 features (78.95% sparse) and 3 docvars.
+       features
+docs    customer service excellent responsive product quality poor disappointed
+  text1        1       1         1          1       0       0    0            0
+  text2        0       0         0          0       1       1    1            1
+  text3        0       0         0          0       0       0    0            0
+  text4        0       0         0          0       0       1    0            0
+  text5        0       0         0          0       0       0    0            0
+       features
+docs    shipping fast
+  text1        0    0
+  text2        0    0
+  text3        1    1
+  text4        0    0
+  text5        0    0
+[ reached max_nfeat ... 9 more features ]</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># View DFM dimensions</span></span>
+<span id="cb41-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dim</span>(reviews_dfm))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  5 19</code></pre>
+</div>
+</div>
+</section>
+<section id="feature-statistics-understanding-word-frequencies" class="level2">
+<h2 class="anchored" data-anchor-id="feature-statistics-understanding-word-frequencies">Feature Statistics: Understanding Word Frequencies</h2>
+<p>Analyzing feature frequencies reveals the most important terms in the corpus.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Calculate feature frequencies</span></span>
+<span id="cb43-2">feat_freq <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">textstat_frequency</span>(reviews_dfm)</span>
+<span id="cb43-3"></span>
+<span id="cb43-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># View top features</span></span>
+<span id="cb43-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(feat_freq, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        feature frequency rank docfreq group
+1       quality         2    1       2   all
+2      customer         1    2       1   all
+3       service         1    2       1   all
+4     excellent         1    2       1   all
+5    responsive         1    2       1   all
+6       product         1    2       1   all
+7          poor         1    2       1   all
+8  disappointed         1    2       1   all
+9      shipping         1    2       1   all
+10         fast         1    2       1   all
+11        happy         1    2       1   all
+12     purchase         1    2       1   all
+13        price         1    2       1   all
+14         high         1    2       1   all
+15     received         1    2       1   all</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Visualize top features</span></span>
+<span id="cb45-2">feat_freq <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb45-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb45-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">reorder</span>(feature, frequency), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> frequency)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb45-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_col</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"steelblue"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb45-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_flip</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb45-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Top 15 Most Frequent Terms"</span>,</span>
+<span id="cb45-8">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Term"</span>,</span>
+<span id="cb45-9">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Frequency"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb45-10">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_minimal</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://rtichoke.netlify.app/posts/text-analytics-quanteda-part1_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="group-based-feature-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="group-based-feature-analysis">Group-Based Feature Analysis</h3>
+<p>Analyzing features by groups (e.g., high vs.&nbsp;low ratings) reveals distinctive vocabulary:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Group DFM by rating category</span></span>
+<span id="cb46-2">reviews_dfm_grouped <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> reviews_corp <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb46-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_numbers =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb46-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_tolower</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb46-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_remove</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stopwords</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"english"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb46-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb46-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm_group</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">groups =</span> rating)</span>
+<span id="cb46-8"></span>
+<span id="cb46-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Calculate frequencies by group</span></span>
+<span id="cb46-10">freq_by_rating <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">textstat_frequency</span>(reviews_dfm_grouped, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">groups =</span> rating)</span>
+<span id="cb46-11"></span>
+<span id="cb46-12"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># View top features for each rating</span></span>
+<span id="cb46-13"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(freq_by_rating <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter</span>(group <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      feature frequency rank docfreq group
+12   customer         1    1       1     5
+13    service         1    1       1     5
+14  excellent         1    1       1     5
+15 responsive         1    1       1     5
+16      great         1    1       1     5
+17      value         1    1       1     5
+18      money         1    1       1     5
+19  recommend         1    1       1     5</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb48" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(freq_by_rating <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter</span>(group <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       feature frequency rank docfreq group
+1      quality         2    1       1     2
+2      product         1    2       1     2
+3         poor         1    2       1     2
+4 disappointed         1    2       1     2
+5        price         1    2       1     2
+6         high         1    2       1     2
+7     received         1    2       1     2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb50" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Visualize comparison</span></span>
+<span id="cb50-2">freq_by_rating <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb50-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter</span>(group <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb50-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">group_by</span>(group) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb50-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">slice_max</span>(frequency, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">n =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb50-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ungroup</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb50-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">feature =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">reorder_within</span>(feature, frequency, group)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> </span>
+<span id="cb50-8">  </span>
+<span id="cb50-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> feature, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> frequency, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">factor</span>(group))) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb50-10">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_col</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">show.legend =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb50-11">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">facet_wrap</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> group, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">scales =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"free_y"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">labeller =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labeller</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">group =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2-Star Reviews"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"5"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"5-Star Reviews"</span>))) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb50-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_reordered</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb50-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_flip</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb50-14">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Top Terms by Review Rating"</span>,</span>
+<span id="cb50-15">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Term"</span>,</span>
+<span id="cb50-16">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Frequency"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb50-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_minimal</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://rtichoke.netlify.app/posts/text-analytics-quanteda-part1_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="word-clouds-visual-exploration" class="level2">
+<h2 class="anchored" data-anchor-id="word-clouds-visual-exploration">Word Clouds: Visual Exploration</h2>
+<p>Word clouds provide intuitive visualization of term frequencies:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create word cloud</span></span>
+<span id="cb51-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">123</span>)</span>
+<span id="cb51-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">textplot_wordcloud</span>(reviews_dfm, </span>
+<span id="cb51-4">                   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">min_count =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,</span>
+<span id="cb51-5">                   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">max_words =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>,</span>
+<span id="cb51-6">                   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">rotation =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.25</span>,</span>
+<span id="cb51-7">                   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> RColorBrewer<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">brewer.pal</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Dark2"</span>))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://rtichoke.netlify.app/posts/text-analytics-quanteda-part1_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="n-grams-multi-word-expressions" class="level2">
+<h2 class="anchored" data-anchor-id="n-grams-multi-word-expressions">N-grams: Multi-Word Expressions</h2>
+<p><strong>N-grams</strong> are contiguous sequences of n tokens. Bigrams (2-grams) and trigrams (3-grams) capture multi-word expressions and phrases that single words miss.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create sample text for n-gram analysis</span></span>
+<span id="cb52-2">ngram_text <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(</span>
+<span id="cb52-3">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Machine learning and artificial intelligence are transforming data science."</span>,</span>
+<span id="cb52-4">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Natural language processing enables text analytics at scale."</span>,</span>
+<span id="cb52-5">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Deep learning models achieve state of the art results."</span>,</span>
+<span id="cb52-6">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Data science requires domain knowledge and technical skills."</span>,</span>
+<span id="cb52-7">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Text mining extracts insights from unstructured data."</span></span>
+<span id="cb52-8">)</span>
+<span id="cb52-9"></span>
+<span id="cb52-10">ngram_corp <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">corpus</span>(ngram_text)</span>
+<span id="cb52-11"></span>
+<span id="cb52-12"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create bigrams</span></span>
+<span id="cb52-13">bigrams <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> ngram_corp <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb52-14">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb52-15">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_tolower</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb52-16">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_ngrams</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">n =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb52-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm</span>()</span>
+<span id="cb52-18"></span>
+<span id="cb52-19"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Calculate bigram frequencies</span></span>
+<span id="cb52-20">bigram_freq <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">textstat_frequency</span>(bigrams)</span>
+<span id="cb52-21"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(bigram_freq, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   feature frequency rank docfreq group
+1             data_science         2    1       2   all
+2         machine_learning         1    2       1   all
+3             learning_and         1    2       1   all
+4           and_artificial         1    2       1   all
+5  artificial_intelligence         1    2       1   all
+6         intelligence_are         1    2       1   all
+7         are_transforming         1    2       1   all
+8        transforming_data         1    2       1   all
+9         natural_language         1    2       1   all
+10     language_processing         1    2       1   all
+11      processing_enables         1    2       1   all
+12            enables_text         1    2       1   all
+13          text_analytics         1    2       1   all
+14            analytics_at         1    2       1   all
+15                at_scale         1    2       1   all</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb54" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Visualize top bigrams</span></span>
+<span id="cb54-2">bigram_freq <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb54-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb54-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">reorder</span>(feature, frequency), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> frequency)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb54-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_col</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"indianred"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb54-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_flip</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb54-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Top 10 Bigrams"</span>,</span>
+<span id="cb54-8">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Bigram"</span>,</span>
+<span id="cb54-9">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Frequency"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb54-10">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_minimal</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://rtichoke.netlify.app/posts/text-analytics-quanteda-part1_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create trigrams</span></span>
+<span id="cb55-2">trigrams <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> ngram_corp <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb55-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb55-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_tolower</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb55-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_ngrams</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">n =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb55-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm</span>()</span>
+<span id="cb55-7"></span>
+<span id="cb55-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Calculate trigram frequencies</span></span>
+<span id="cb55-9">trigram_freq <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">textstat_frequency</span>(trigrams)</span>
+<span id="cb55-10"></span>
+<span id="cb55-11"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Visualize top bigrams</span></span>
+<span id="cb55-12">trigram_freq <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb55-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb55-14">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">reorder</span>(feature, frequency), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> frequency)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb55-15">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_col</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"steelblue"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb55-16">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_flip</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb55-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Top 10 Trigrams"</span>,</span>
+<span id="cb55-18">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Trigram"</span>,</span>
+<span id="cb55-19">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Frequency"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb55-20">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_minimal</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://rtichoke.netlify.app/posts/text-analytics-quanteda-part1_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="real-world-example-analyzing-customer-feedback" class="level2">
+<h2 class="anchored" data-anchor-id="real-world-example-analyzing-customer-feedback">Real-World Example: Analyzing Customer Feedback</h2>
+<p>Let’s try and apply these techniques to a more realistic scenario.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create a realistic customer feedback dataset</span></span>
+<span id="cb56-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">456</span>)</span>
+<span id="cb56-3">feedback_df <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(</span>
+<span id="cb56-4">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">text =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(</span>
+<span id="cb56-5">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Absolutely love this product! Best purchase I've made all year. Quality is outstanding."</span>,</span>
+<span id="cb56-6">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Terrible experience. Product broke after one week. Customer service was unhelpful."</span>,</span>
+<span id="cb56-7">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Good value for the price. Works as expected. Would buy again."</span>,</span>
+<span id="cb56-8">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Shipping took forever. Product is okay but not worth the wait."</span>,</span>
+<span id="cb56-9">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Amazing quality and fast delivery. Highly recommend to everyone!"</span>,</span>
+<span id="cb56-10">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Product description was misleading. Not what I expected at all."</span>,</span>
+<span id="cb56-11">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Decent product but customer support needs improvement. Long wait times."</span>,</span>
+<span id="cb56-12">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Exceeded my expectations! Great features and easy to use."</span>,</span>
+<span id="cb56-13">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Poor quality control. Received damaged item. Return process was difficult."</span>,</span>
+<span id="cb56-14">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Perfect! Exactly what I needed. Five stars all around."</span>,</span>
+<span id="cb56-15">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Overpriced for what you get. Better alternatives available elsewhere."</span>,</span>
+<span id="cb56-16">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Good product but instructions were confusing. Setup took hours."</span>,</span>
+<span id="cb56-17">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Love it! Works perfectly and looks great too."</span>,</span>
+<span id="cb56-18">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Not satisfied. Product feels cheap and flimsy."</span>,</span>
+<span id="cb56-19">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Best customer service ever! They resolved my issue immediately."</span>,</span>
+<span id="cb56-20">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Average product. Nothing special but gets the job done."</span>,</span>
+<span id="cb56-21">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Fantastic! Will definitely purchase from this company again."</span>,</span>
+<span id="cb56-22">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Disappointed with the quality. Expected much better."</span>,</span>
+<span id="cb56-23">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Great features but battery life is poor."</span>,</span>
+<span id="cb56-24">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Excellent value. Highly recommend for budget shoppers."</span></span>
+<span id="cb56-25">  ),</span>
+<span id="cb56-26">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">rating =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>),</span>
+<span id="cb56-27">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">category =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sample</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Electronics"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Home &amp; Kitchen"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Clothing"</span>), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">replace =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb56-28">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">helpful_votes =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sample</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">replace =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb56-29">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">stringsAsFactors =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span></span>
+<span id="cb56-30">)</span>
+<span id="cb56-31"></span>
+<span id="cb56-32"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create corpus</span></span>
+<span id="cb56-33">feedback_corp <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">corpus</span>(feedback_df, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">text_field =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"text"</span>)</span>
+<span id="cb56-34"></span>
+<span id="cb56-35"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Complete preprocessing pipeline</span></span>
+<span id="cb56-36">feedback_dfm <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> feedback_corp <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb56-37">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>, </span>
+<span id="cb56-38">         <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_numbers =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>,</span>
+<span id="cb56-39">         <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_symbols =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb56-40">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_tolower</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb56-41">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_remove</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stopwords</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"english"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb56-42">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_wordstem</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb56-43">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm</span>()</span>
+<span id="cb56-44"></span>
+<span id="cb56-45"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Analyze overall sentiment-related terms</span></span>
+<span id="cb56-46">sentiment_terms <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"love"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"best"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"great"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"excel"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"amaz"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"perfect"</span>, </span>
+<span id="cb56-47">                     <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"terribl"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"poor"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"worst"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"disappoint"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bad"</span>)</span>
+<span id="cb56-48"></span>
+<span id="cb56-49">sentiment_dfm <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm_select</span>(feedback_dfm, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pattern =</span> sentiment_terms)</span>
+<span id="cb56-50"></span>
+<span id="cb56-51"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Calculate sentiment term frequencies</span></span>
+<span id="cb56-52">sentiment_freq <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">textstat_frequency</span>(sentiment_dfm)</span>
+<span id="cb56-53"></span>
+<span id="cb56-54"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Visualize sentiment terms</span></span>
+<span id="cb56-55"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(sentiment_freq, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">reorder</span>(feature, frequency), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> frequency)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb56-56">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_col</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> feature), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">show.legend =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb56-57">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_flip</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb56-58">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Frequency of Sentiment-Related Terms"</span>,</span>
+<span id="cb56-59">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Customer Feedback Analysis"</span>,</span>
+<span id="cb56-60">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Term (Stemmed)"</span>,</span>
+<span id="cb56-61">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Frequency"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb56-62">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_minimal</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb56-63">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_fill_manual</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">values =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(</span>
+<span id="cb56-64">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"love"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkgreen"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"best"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkgreen"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"great"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkgreen"</span>,</span>
+<span id="cb56-65">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"excel"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkgreen"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"amaz"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkgreen"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"perfect"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkgreen"</span>,</span>
+<span id="cb56-66">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"terribl"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkred"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"poor"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkred"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"worst"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkred"</span>,</span>
+<span id="cb56-67">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"disappoint"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkred"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bad"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkred"</span></span>
+<span id="cb56-68">  ))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://rtichoke.netlify.app/posts/text-analytics-quanteda-part1_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb57" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compare high vs low-rated reviews</span></span>
+<span id="cb57-2"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create a rating category variable</span></span>
+<span id="cb57-3">rating_category <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ifelse</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">docvars</span>(feedback_corp, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rating"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"High Rating"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Low Rating"</span>)</span>
+<span id="cb57-4"></span>
+<span id="cb57-5">feedback_grouped <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> feedback_corp <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb57-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_numbers =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb57-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_tolower</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb57-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_remove</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stopwords</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"english"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb57-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb57-10">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm_group</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">groups =</span> rating_category)</span>
+<span id="cb57-11"></span>
+<span id="cb57-12"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Calculate keyness (distinctive terms)</span></span>
+<span id="cb57-13">keyness_stats <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">textstat_keyness</span>(feedback_grouped, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">target =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"High Rating"</span>)</span>
+<span id="cb57-14"></span>
+<span id="cb57-15"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Visualize keyness</span></span>
+<span id="cb57-16"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">textplot_keyness</span>(keyness_stats, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">n =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkgreen"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"darkred"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb57-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Distinctive Terms: High vs Low Ratings"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb57-18">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_minimal</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://rtichoke.netlify.app/posts/text-analytics-quanteda-part1_files/figure-html/unnamed-chunk-17-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="document-similarity-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="document-similarity-analysis">Document Similarity Analysis</h2>
+<p>Understanding document similarity is crucial for tasks like duplicate detection, document clustering, and recommendation systems:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Use the preprocessed DFM for better similarity measurement</span></span>
+<span id="cb58-2">feedback_dfm_clean <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> feedback_corp <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb58-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_numbers =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb58-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_tolower</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb58-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_remove</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stopwords</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"english"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb58-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_wordstem</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb58-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm</span>()</span>
+<span id="cb58-8"></span>
+<span id="cb58-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Calculate document similarity using cosine similarity</span></span>
+<span id="cb58-10">doc_similarity <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">textstat_simil</span>(feedback_dfm_clean, </span>
+<span id="cb58-11">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cosine"</span>,</span>
+<span id="cb58-12">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">margin =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"documents"</span>)</span>
+<span id="cb58-13"></span>
+<span id="cb58-14"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Find most similar documents to first review (a positive review)</span></span>
+<span id="cb58-15">similarity_df <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.data.frame</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.matrix</span>(doc_similarity))</span>
+<span id="cb58-16">similarity_to_doc1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sort</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.numeric</span>(similarity_df[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, ]), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">decreasing =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>]  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Skip first (itself)</span></span>
+<span id="cb58-17"></span>
+<span id="cb58-18"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># First review document</span></span>
+<span id="cb58-19"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.character</span>(feedback_corp)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                                                                    text1 
+"Absolutely love this product! Best purchase I've made all year. Quality is outstanding." </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb60" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Top 3 similar documents</span></span>
+<span id="cb60-2"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span>(i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>) {</span>
+<span id="cb60-3">  doc_idx <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">order</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.numeric</span>(similarity_df[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, ]), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">decreasing =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)[i]</span>
+<span id="cb60-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cat</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">Document"</span>, doc_idx, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"(Similarity:"</span>, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">round</span>(similarity_df[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, doc_idx], <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"):</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span>
+<span id="cb60-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cat</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.character</span>(feedback_corp)[doc_idx], <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span>
+<span id="cb60-6">}</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Document 6 (Similarity: 0.167 ):
+Product description was misleading. Not what I expected at all. 
+
+Document 17 (Similarity: 0.167 ):
+Fantastic! Will definitely purchase from this company again. 
+
+Document 13 (Similarity: 0.149 ):
+Love it! Works perfectly and looks great too. </code></pre>
+</div>
+</div>
+<p>It is worth noting that cosine similarity alone might not be enough since the top most similar document does not match the document’s sentiment.</p>
+<section id="sentiment-aware-similarity" class="level3">
+<h3 class="anchored" data-anchor-id="sentiment-aware-similarity">Sentiment-Aware Similarity</h3>
+<p>To improve similarity assessment we can incorporate sentiment. Let’s add sentiment score as a feature.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Define positive and negative sentiment lexicons</span></span>
+<span id="cb62-2">positive_words <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"love"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"best"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"great"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"excellent"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"amazing"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"perfect"</span>, </span>
+<span id="cb62-3">                    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"fantastic"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"outstanding"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"happy"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"wonderful"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"superb"</span>)</span>
+<span id="cb62-4"></span>
+<span id="cb62-5">negative_words <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"terrible"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"poor"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"worst"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"disappointing"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bad"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"awful"</span>,</span>
+<span id="cb62-6">                    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"horrible"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"useless"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"disappointed"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"misleading"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cheap"</span>)</span>
+<span id="cb62-7"></span>
+<span id="cb62-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create tokens</span></span>
+<span id="cb62-9">feedback_toks <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> feedback_corp <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb62-10">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_numbers =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb62-11">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_tolower</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb62-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_remove</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stopwords</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"english"</span>))</span>
+<span id="cb62-13"></span>
+<span id="cb62-14"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Calculate sentiment scores for each document</span></span>
+<span id="cb62-15">sentiment_scores <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sapply</span>(feedback_toks, <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(doc_tokens) {</span>
+<span id="cb62-16">  pos_count <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(doc_tokens <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> positive_words)</span>
+<span id="cb62-17">  neg_count <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(doc_tokens <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> negative_words)</span>
+<span id="cb62-18">  </span>
+<span id="cb62-19">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Net sentiment score</span></span>
+<span id="cb62-20">  (pos_count <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> neg_count) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(doc_tokens)</span>
+<span id="cb62-21">})</span>
+<span id="cb62-22"></span>
+<span id="cb62-23"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create DFM with sentiment features</span></span>
+<span id="cb62-24">feedback_dfm_sentiment <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> feedback_toks <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb62-25">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_wordstem</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb62-26">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm</span>()</span>
+<span id="cb62-27"></span>
+<span id="cb62-28"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Add sentiment score as a weighted feature</span></span>
+<span id="cb62-29"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create a sentiment feature by replicating the sentiment score</span></span>
+<span id="cb62-30">sentiment_feature_matrix <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">matrix</span>(sentiment_scores <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>,  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Scale up for visibility</span></span>
+<span id="cb62-31">                                   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">nrow =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ndoc</span>(feedback_dfm_sentiment),</span>
+<span id="cb62-32">                                   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ncol =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,</span>
+<span id="cb62-33">                                   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">dimnames =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">docnames</span>(feedback_dfm_sentiment), </span>
+<span id="cb62-34">                                                   <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SENTIMENT_SCORE"</span>))</span>
+<span id="cb62-35"></span>
+<span id="cb62-36"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Combine with original DFM</span></span>
+<span id="cb62-37">feedback_dfm_with_sentiment <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cbind</span>(feedback_dfm_sentiment, sentiment_feature_matrix)</span>
+<span id="cb62-38"></span>
+<span id="cb62-39"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Calculate similarity with sentiment</span></span>
+<span id="cb62-40">doc_similarity_sentiment <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">textstat_simil</span>(feedback_dfm_with_sentiment,</span>
+<span id="cb62-41">                                           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cosine"</span>,</span>
+<span id="cb62-42">                                           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">margin =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"documents"</span>)</span>
+<span id="cb62-43"></span>
+<span id="cb62-44"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compare results</span></span>
+<span id="cb62-45">similarity_df_sentiment <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.data.frame</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.matrix</span>(doc_similarity_sentiment))</span>
+<span id="cb62-46"></span>
+<span id="cb62-47"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#Standard vs Sentiment-Aware Similarity</span></span>
+<span id="cb62-48"></span>
+<span id="cb62-49"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># First document</span></span>
+<span id="cb62-50"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cat</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.character</span>(feedback_corp)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Absolutely love this product! Best purchase I've made all year. Quality is outstanding. </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb64" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Sentiment-aware similarity</span></span>
+<span id="cb64-2"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span>(i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>) {</span>
+<span id="cb64-3">  doc_idx <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">order</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.numeric</span>(similarity_df_sentiment[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, ]), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">decreasing =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)[i]</span>
+<span id="cb64-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cat</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">Document"</span>, doc_idx, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"(Similarity:"</span>, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">round</span>(similarity_df_sentiment[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, doc_idx], <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"):</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span>
+<span id="cb64-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cat</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.character</span>(feedback_corp)[doc_idx], <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span>
+<span id="cb64-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cat</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Rating:"</span>, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">docvars</span>(feedback_corp, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rating"</span>)[doc_idx], </span>
+<span id="cb64-7">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"| Sentiment:"</span>, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">round</span>(sentiment_scores[doc_idx], <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"</span>)</span>
+<span id="cb64-8">}</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Document 13 (Similarity: 0.697 ):
+Love it! Works perfectly and looks great too. 
+Rating: 5 | Sentiment: 0.4 
+
+Document 17 (Similarity: 0.65 ):
+Fantastic! Will definitely purchase from this company again. 
+Rating: 5 | Sentiment: 0.25 
+
+Document 5 (Similarity: 0.427 ):
+Amazing quality and fast delivery. Highly recommend to everyone! 
+Rating: 5 | Sentiment: 0.143 </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="feature-co-occurrence-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="feature-co-occurrence-analysis">Feature Co-occurrence Analysis</h2>
+<p>Understanding which words frequently appear together can help reveal semantic relationships.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Create feature co-occurrence matrix</span></span>
+<span id="cb66-2">fcm <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> feedback_corp <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb66-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">remove_punct =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb66-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_tolower</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb66-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tokens_remove</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stopwords</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"english"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb66-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">fcm</span>()</span>
+<span id="cb66-7"></span>
+<span id="cb66-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># View top co-occurrences</span></span>
+<span id="cb66-9">feat_cooc <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> fcm[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20</span>]</span>
+<span id="cb66-10"></span>
+<span id="cb66-11"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Visualize semantic network</span></span>
+<span id="cb66-12"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">123</span>)</span>
+<span id="cb66-13"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">textplot_network</span>(fcm, </span>
+<span id="cb66-14">                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">min_freq =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>,</span>
+<span id="cb66-15">                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">edge_alpha =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>,</span>
+<span id="cb66-16">                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">edge_size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>,</span>
+<span id="cb66-17">                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">vertex_labelsize =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb66-18">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">title =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Semantic Network of Customer Feedback"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://rtichoke.netlify.app/posts/text-analytics-quanteda-part1_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="dfm-manipulation-and-transformation" class="level2">
+<h2 class="anchored" data-anchor-id="dfm-manipulation-and-transformation">DFM Manipulation and Transformation</h2>
+<p><code>quanteda</code> provides powerful functions for manipulating DFMs:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Trim DFM to remove rare and very common features</span></span>
+<span id="cb67-2">feedback_dfm_trimmed <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm_trim</span>(feedback_dfm,</span>
+<span id="cb67-3">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">min_termfreq =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>,  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Remove terms appearing &lt; 2 times</span></span>
+<span id="cb67-4">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">max_docfreq =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span>,  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Remove terms in &gt; 80% of docs</span></span>
+<span id="cb67-5">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">docfreq_type =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"prop"</span>)</span>
+<span id="cb67-6"></span>
+<span id="cb67-7"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Original DFM dimensions</span></span>
+<span id="cb67-8"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dim</span>(feedback_dfm))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 20 95</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb69" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Trimmed DFM dimensions </span></span>
+<span id="cb69-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dim</span>(feedback_dfm_trimmed))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 20 22</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb71" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Weight DFM using TF-IDF</span></span>
+<span id="cb71-2">feedback_tfidf <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm_tfidf</span>(feedback_dfm_trimmed)</span>
+<span id="cb71-3"></span>
+<span id="cb71-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Top features by TF-IDF</span></span>
+<span id="cb71-5">tfidf_freq <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">textstat_frequency</span>(feedback_tfidf, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">force =</span> T)</span>
+<span id="cb71-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(tfidf_freq, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   feature frequency rank docfreq group
+1  product  3.183520    1       8   all
+2  qualiti  2.795880    2       4   all
+3   expect  2.795880    2       4   all
+4   custom  2.471726    4       3   all
+5    great  2.471726    4       3   all
+6     love  2.000000    6       2   all
+7     best  2.000000    6       2   all
+8  purchas  2.000000    6       2   all
+9   servic  2.000000    6       2   all
+10    good  2.000000    6       2   all
+11    valu  2.000000    6       2   all
+12    work  2.000000    6       2   all
+13    took  2.000000    6       2   all
+14    wait  2.000000    6       2   all
+15    high  2.000000    6       2   all</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb73" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Select specific features</span></span>
+<span id="cb73-2">service_terms <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"service"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"support"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"help"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"response"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"customer"</span>)</span>
+<span id="cb73-3">service_dfm <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm_select</span>(feedback_dfm, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pattern =</span> service_terms)</span>
+<span id="cb73-4"></span>
+<span id="cb73-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Frequency of service related terms</span></span>
+<span id="cb73-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">print</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colSums</span>(service_dfm))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>support 
+      1 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb75" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Remove specific features</span></span>
+<span id="cb75-2">filtered_dfm <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfm_remove</span>(feedback_dfm, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pattern =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"product"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"item"</span>))</span>
+<span id="cb75-3"></span>
+<span id="cb75-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Original feature count</span></span>
+<span id="cb75-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">nfeat</span>(feedback_dfm)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 95</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb77" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Filtered feature count</span></span>
+<span id="cb77-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">nfeat</span>(filtered_dfm)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 93</code></pre>
+</div>
+</div>
+</section>
+<section id="additional-resources" class="level2">
+<h2 class="anchored" data-anchor-id="additional-resources">Additional Resources</h2>
+<ul>
+<li><a href="https://quanteda.io/">quanteda documentation</a></li>
+<li><a href="https://tutorials.quanteda.io/">quanteda tutorials</a></li>
+<li><a href="https://www.tidytextmining.com/">Text Mining with R</a></li>
+<li><a href="https://cran.r-project.org/web/views/NaturalLanguageProcessing.html">CRAN Task View</a></li>
+</ul>
+
+
+</section>
+
+ ]]></description>
+  <category>R</category>
+  <category>Text Analytics</category>
+  <category>quanteda</category>
+  <category>NLP</category>
+  <guid>https://rtichoke.netlify.app/posts/text-analytics-quanteda-part1.html</guid>
+  <pubDate>Mon, 06 Oct 2025 18:30:00 GMT</pubDate>
+  <media:content url="https://rtichoke.netlify.app/images/quanteda.png" medium="image" type="image/png" height="80" width="144"/>
+</item>
 <item>
   <title>Explore Neural Networks Interactively with Quarto Live!</title>
   <link>https://rtichoke.netlify.app/posts/quarto_live.html</link>
@@ -4103,7 +6961,7 @@ font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">mean</span>(sample_means)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.009703491</code></pre>
+<pre><code>[1] 0.009906391</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -4113,7 +6971,7 @@ font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">mean</span>(sample_75_quantile)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.0128602</code></pre>
+<pre><code>[1] 0.01258664</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -4123,7 +6981,7 @@ font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">mean</span>(sample_75_quantile)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01888102</code></pre>
+<pre><code>[1] 0.01874947</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -4378,9 +7236,9 @@ font-style: inherit;">3</span>)</span></code></pre></div>
 <pre><code># A tibble: 3 × 2
   splits               id          
   &lt;list&gt;               &lt;chr&gt;       
-1 &lt;split [10000/3658]&gt; Bootstrap001
-2 &lt;split [10000/3699]&gt; Bootstrap002
-3 &lt;split [10000/3662]&gt; Bootstrap003</code></pre>
+1 &lt;split [10000/3649]&gt; Bootstrap001
+2 &lt;split [10000/3709]&gt; Bootstrap002
+3 &lt;split [10000/3647]&gt; Bootstrap003</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -4392,7 +7250,7 @@ background-color: null;
 font-style: inherit;">1</span>]]</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;Analysis/Assess/Total&gt;
-&lt;10000/3658/10000&gt;</code></pre>
+&lt;10000/3649/10000&gt;</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -4420,11 +7278,11 @@ background-color: null;
 font-style: inherit;">5</span>]</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     V1        id member_id loan_amnt funded_amnt
-1  2569  43370732        -1     10000       10000
-2 78827  67248942        -1     21075       21075
-3  9419 116821167        -1     12600       12600
-4 46614   2824955        -1     23675       23675
-5 21588 142969404        -1      3000        3000</code></pre>
+1 22430 114166507        -1     13000       13000
+2 55129 127052896        -1      5000        5000
+3 13025  76081453        -1      1000        1000
+4 24027  50023608        -1     30000       30000
+5 69896  10135115        -1     12000       12000</code></pre>
 </div>
 </div>
 <p>Each bootstrap sample consists of random draws with replacement from the original dataset, creating controlled variations that effectively reveal model sensitivity to different data compositions.</p>
@@ -4524,7 +7382,7 @@ font-style: inherit;">range</span>(pred)  <span class="co" style="color: #5E5E5E
 background-color: null;
 font-style: inherit;"># Output is on log odds scale</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -95.736222   1.285087</code></pre>
+<pre><code>[1] -8.471958  1.835021</code></pre>
 </div>
 </div>
 <p>The function returns predictions in log-odds format, which will subsequently be transformed to a more intuitive credit score scale in later steps.</p>
@@ -4576,7 +7434,7 @@ font-style: inherit;">do.call</span>(c, output)</span>
 background-color: null;
 font-style: inherit;">range</span>(boot_preds)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -143.845193    4.267461</code></pre>
+<pre><code>[1] -133.361692    5.662145</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -4617,7 +7475,7 @@ font-style: inherit;">&lt;-</span> q_low</span>
 background-color: null;
 font-style: inherit;">range</span>(boot_preds)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -5.0490565 -0.2286057</code></pre>
+<pre><code>[1] -5.0418073 -0.2119723</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -4651,12 +7509,12 @@ background-color: null;
 font-style: inherit;">head</span>(boot_preds)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       pred id
-1 -1.952815  1
-2 -2.239750  1
-3 -2.745251  1
-4 -3.275424  1
-5 -2.044382  1
-6 -1.591879  1</code></pre>
+1 -2.538423  1
+2 -2.470983  1
+3 -1.570534  1
+4 -1.197423  1
+5 -3.012944  1
+6 -2.370000  1</code></pre>
 </div>
 </div>
 <p>In this step, we apply the logistic regression model to each bootstrap sample and systematically collect the resulting predictions. Subsequently, we truncate extreme values (beyond the 1st and 99th percentiles) to remove outliers—a procedure analogous to capping techniques commonly employed in production credit models.</p>
