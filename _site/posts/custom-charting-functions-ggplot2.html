@@ -229,8 +229,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
   <li><a href="#advanced-function-enhancement" id="toc-advanced-function-enhancement" class="nav-link" data-scroll-target="#advanced-function-enhancement">Advanced Function Enhancement</a></li>
   <li><a href="#integrated-function-implementation" id="toc-integrated-function-implementation" class="nav-link" data-scroll-target="#integrated-function-implementation">Integrated Function Implementation</a></li>
   <li><a href="#cross-chart-type-theme-application" id="toc-cross-chart-type-theme-application" class="nav-link" data-scroll-target="#cross-chart-type-theme-application">Cross-Chart Type Theme Application</a></li>
-  <li><a href="#strategic-advantages-of-custom-charting-functions" id="toc-strategic-advantages-of-custom-charting-functions" class="nav-link" data-scroll-target="#strategic-advantages-of-custom-charting-functions">Strategic Advantages of Custom Charting Functions</a></li>
-  <li><a href="#implementation-strategy-custom-functions-vs.-direct-ggplot2" id="toc-implementation-strategy-custom-functions-vs.-direct-ggplot2" class="nav-link" data-scroll-target="#implementation-strategy-custom-functions-vs.-direct-ggplot2">Implementation Strategy: Custom Functions vs.&nbsp;Direct ggplot2</a></li>
+  <li><a href="#why-use-custom-charting-functions" id="toc-why-use-custom-charting-functions" class="nav-link" data-scroll-target="#why-use-custom-charting-functions">Why use Custom Charting Functions</a></li>
   </ul>
 </nav>
     </div>
@@ -471,13 +470,12 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>                                                                  <span class="at">scale =</span> y_axis_scale)), </span>
 <span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>             <span class="st">"percent"</span> <span class="ot">=</span> <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> percent))}</span>
 <span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Capitalise all names</span></span>
-<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>  vec <span class="ot">&lt;-</span> <span class="fu">lapply</span>(p<span class="sc">$</span>labels, str_to_title)</span>
-<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>(vec) <span class="ot">&lt;-</span> <span class="fu">names</span>(p<span class="sc">$</span>labels)</span>
-<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>  p<span class="sc">$</span>labels <span class="ot">&lt;-</span> vec</span>
-<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(p)</span>
-<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Capitalise all names using labs()</span></span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>  capitalized_labels <span class="ot">&lt;-</span> <span class="fu">lapply</span>(p<span class="sc">$</span>labels, str_to_title)</span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">do.call</span>(labs, capitalized_labels)</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(p)</span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="integrated-function-implementation" class="level2">
@@ -499,7 +497,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="custom-charting-functions-ggplot2_files/figure-html/final-line-chart-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="custom-charting-functions-ggplot2_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -531,8 +529,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </div>
 </div>
 </section>
-<section id="strategic-advantages-of-custom-charting-functions" class="level2">
-<h2 class="anchored" data-anchor-id="strategic-advantages-of-custom-charting-functions">Strategic Advantages of Custom Charting Functions</h2>
+<section id="why-use-custom-charting-functions" class="level2">
+<h2 class="anchored" data-anchor-id="why-use-custom-charting-functions">Why use Custom Charting Functions</h2>
 <p>The development of custom charting functions utilizing ggplot2 provides substantial advantages for analytical workflows:</p>
 <ol type="1">
 <li><p><strong>Visual Consistency</strong>: Ensures uniform appearance and styling across all visualizations within reports or analytical dashboards.</p></li>
@@ -540,10 +538,6 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <li><p><strong>Maintenance Optimization</strong>: Facilitates centralized style updates through single function modifications, propagating changes across all implementations.</p></li>
 <li><p><strong>Accessibility Enhancement</strong>: Abstracts ggplot2 complexity for team members with varying levels of package familiarity, democratizing visualization capabilities.</p></li>
 </ol>
-</section>
-<section id="implementation-strategy-custom-functions-vs.-direct-ggplot2" class="level2">
-<h2 class="anchored" data-anchor-id="implementation-strategy-custom-functions-vs.-direct-ggplot2">Implementation Strategy: Custom Functions vs.&nbsp;Direct ggplot2</h2>
-<p>The development of customized charting functions utilizing <code>ggplot2</code> demonstrates optimal value when creating repetitive visualization types within structured analytical workflows. For exploratory data analysis activities, direct <code>ggplot2</code> implementation often provides superior flexibility, enabling rapid prototyping and layered chart construction within integrated analytical pipelines.</p>
 
 
 </section>

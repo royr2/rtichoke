@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<head>
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.31">
 
-<meta charset="utf-8" />
-<meta name="generator" content="quarto-1.7.31" />
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Interactive R in Your Browser with WebR – R'tichoke</title>
+<title>Interactive R in Your Browser with WebR – R’tichoke</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -59,7 +57,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }
 </style>
 
-<!-- htmldependencies:E3FAD763 -->
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7e58e3368124f49f6e3733161a9b089d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-658c2336f25e20434af7fb9caa8b0f44.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -87,7 +102,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-EMPXPEL31W"></script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-EMPXPEL31W"></script>
 
 <script type="text/javascript">
 
@@ -98,93 +113,91 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </script>
 
 
-<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="styles.css">
 </head>
 
-<body>
+<body class="nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="/index.html">
-    <span class="navbar-title">R&#39;tichoke</span>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">R’tichoke</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
-  aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation"
-  onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="/index.html"> 
+    <a class="nav-link" href="./index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="/installation.html"> 
+    <a class="nav-link" href="./installation.html"> 
 <span class="menu-text">R Installation Guide</span></a>
   </li>  
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false" >
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Get Started</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-get-started">    
         <li>
-    <a class="dropdown-item" href="/get-started/r-package-management.html">
+    <a class="dropdown-item" href="./get-started/r-package-management.html">
  <span class="dropdown-text">Installing Packages</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/get-started/variables.html">
+    <a class="dropdown-item" href="./get-started/variables.html">
  <span class="dropdown-text">Variables in R</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/get-started/loops.html">
+    <a class="dropdown-item" href="./get-started/loops.html">
  <span class="dropdown-text">Loops and Apply Functions</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/get-started/indexing.html">
+    <a class="dropdown-item" href="./get-started/indexing.html">
  <span class="dropdown-text">Indexing Arrays</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/get-started/reading-data.html">
+    <a class="dropdown-item" href="./get-started/reading-data.html">
  <span class="dropdown-text">Reading Data</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/get-started/dplyr.html">
+    <a class="dropdown-item" href="./get-started/dplyr.html">
  <span class="dropdown-text">Introduction to dplyr</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/get-started/data-table.html">
+    <a class="dropdown-item" href="./get-started/data-table.html">
  <span class="dropdown-text">Introduction to data.table</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/get-started/base-graphics.html">
+    <a class="dropdown-item" href="./get-started/base-graphics.html">
  <span class="dropdown-text">Base Graphics</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/get-started/ggplot2.html">
+    <a class="dropdown-item" href="./get-started/ggplot2.html">
  <span class="dropdown-text">ggplot2 Graphics</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/get-started/parallel-computing-in-r.html">
+    <a class="dropdown-item" href="./get-started/parallel-computing-in-r.html">
  <span class="dropdown-text">Parallel Computing in R</span></a>
   </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="/webr.html"> 
+    <a class="nav-link active" href="./webr.html" aria-current="page"> 
 <span class="menu-text">WebR Playground</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="/posts.html"> 
+    <a class="nav-link" href="./posts.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="/about.html"> 
+    <a class="nav-link" href="./about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
@@ -203,7 +216,22 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <div id="quarto-toc-target"></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#run-r-code-in-the-browser---no-installation-required" id="toc-run-r-code-in-the-browser---no-installation-required" class="nav-link active" data-scroll-target="#run-r-code-in-the-browser---no-installation-required">Run R Code in the Browser - No Installation Required</a></li>
+  <li><a href="#what-is-webr" id="toc-what-is-webr" class="nav-link" data-scroll-target="#what-is-webr">What is WebR?</a></li>
+  <li><a href="#using-the-webr-playground" id="toc-using-the-webr-playground" class="nav-link" data-scroll-target="#using-the-webr-playground">Using the WebR Playground</a></li>
+  <li><a href="#example-code-for-practice" id="toc-example-code-for-practice" class="nav-link" data-scroll-target="#example-code-for-practice">Example Code for Practice</a>
+  <ul class="collapse">
+  <li><a href="#basic-calculations" id="toc-basic-calculations" class="nav-link" data-scroll-target="#basic-calculations">Basic Calculations</a></li>
+  <li><a href="#data-analysis" id="toc-data-analysis" class="nav-link" data-scroll-target="#data-analysis">Data Analysis</a></li>
+  <li><a href="#working-with-built-in-datasets" id="toc-working-with-built-in-datasets" class="nav-link" data-scroll-target="#working-with-built-in-datasets">Working with Built-in Datasets</a></li>
+  </ul></li>
+  <li><a href="#future-enhancements" id="toc-future-enhancements" class="nav-link" data-scroll-target="#future-enhancements">Future Enhancements</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -226,28 +254,13 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 
 </header>
 
-<nav id="TOC" role="doc-toc">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#run-r-code-in-the-browser---no-installation-required" id="toc-run-r-code-in-the-browser---no-installation-required">Run R Code in the Browser - No Installation Required</a></li>
-  <li><a href="#what-is-webr" id="toc-what-is-webr">What is WebR?</a></li>
-  <li><a href="#using-the-webr-playground" id="toc-using-the-webr-playground">Using the WebR Playground</a></li>
-  <li><a href="#example-code-for-practice" id="toc-example-code-for-practice">Example Code for Practice</a>
-  <ul>
-  <li><a href="#basic-calculations" id="toc-basic-calculations">Basic Calculations</a></li>
-  <li><a href="#data-analysis" id="toc-data-analysis">Data Analysis</a></li>
-  <li><a href="#working-with-built-in-datasets" id="toc-working-with-built-in-datasets">Working with Built-in Datasets</a></li>
-  </ul></li>
-  <li><a href="#future-enhancements" id="toc-future-enhancements">Future Enhancements</a></li>
-  </ul>
-</nav>
+
 <section id="run-r-code-in-the-browser---no-installation-required" class="level2">
-<h2>Run R Code in the Browser - No Installation Required</h2>
+<h2 class="anchored" data-anchor-id="run-r-code-in-the-browser---no-installation-required">Run R Code in the Browser - No Installation Required</h2>
 <p>The WebR Playground allows users to write and execute R code directly in their browser. This feature is ideal for beginners wanting to experiment with R or for quick code testing when away from the main development environment.</p>
 </section>
 <section id="what-is-webr" class="level2">
-<h2>What is WebR?</h2>
+<h2 class="anchored" data-anchor-id="what-is-webr">What is WebR?</h2>
 <p><a href="https://docs.r-wasm.org/webr/latest/">WebR</a> is a version of R compiled to WebAssembly, enabling R code execution directly in web browsers. This provides:</p>
 <ul>
 <li>No installation required</li>
@@ -256,11 +269,11 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </ul>
 </section>
 <section id="using-the-webr-playground" class="level2">
-<h2>Using the WebR Playground</h2>
+<h2 class="anchored" data-anchor-id="using-the-webr-playground">Using the WebR Playground</h2>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
-<i class='callout-icon'></i>
+<i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
 Current Limitations
@@ -278,11 +291,11 @@ Current Limitations
 </div>
 </section>
 <section id="example-code-for-practice" class="level2">
-<h2>Example Code for Practice</h2>
+<h2 class="anchored" data-anchor-id="example-code-for-practice">Example Code for Practice</h2>
 <p>The following simple R code examples can be tested in the WebR Playground:</p>
 <section id="basic-calculations" class="level3">
-<h3>Basic Calculations</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic arithmetic</span></span>
+<h3 class="anchored" data-anchor-id="basic-calculations">Basic Calculations</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic arithmetic</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> <span class="dv">5</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="dv">16</span>)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(<span class="dv">10</span>)</span>
@@ -291,61 +304,54 @@ Current Limitations
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(x)</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(x)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(x)</span></code></pre></div>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="data-analysis" class="level3">
-<h3>Data Analysis</h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create some sample data</span></span>
+<h3 class="anchored" data-anchor-id="data-analysis">Data Analysis</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create some sample data</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">8</span>, <span class="dv">7</span>, <span class="dv">12</span>, <span class="dv">14</span>, <span class="dv">16</span>, <span class="dv">18</span>, <span class="dv">20</span>)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the data</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;x values:&quot;</span>, x, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;y values:&quot;</span>, y, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"x values:"</span>, x, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"y values:"</span>, y, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate some statistics</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>mean_x <span class="ot">&lt;-</span> <span class="fu">mean</span>(x)</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>mean_y <span class="ot">&lt;-</span> <span class="fu">mean</span>(y)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Mean of x:&quot;</span>, mean_x, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Mean of y:&quot;</span>, mean_y, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mean of x:"</span>, mean_x, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mean of y:"</span>, mean_y, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit a linear model</span></span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x)</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code></pre></div>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="working-with-built-in-datasets" class="level3">
-<h3>Working with Built-in Datasets</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Explore the built-in mtcars dataset</span></span>
+<h3 class="anchored" data-anchor-id="working-with-built-in-datasets">Working with Built-in Datasets</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Explore the built-in mtcars dataset</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(mtcars)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mtcars)</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mtcars)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic statistics</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(mtcars<span class="sc">$</span>mpg, mtcars<span class="sc">$</span>wt)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(mtcars<span class="sc">$</span>mpg[mtcars<span class="sc">$</span>am <span class="sc">==</span> <span class="dv">0</span>], mtcars<span class="sc">$</span>mpg[mtcars<span class="sc">$</span>am <span class="sc">==</span> <span class="dv">1</span>])</span></code></pre></div>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(mtcars<span class="sc">$</span>mpg[mtcars<span class="sc">$</span>am <span class="sc">==</span> <span class="dv">0</span>], mtcars<span class="sc">$</span>mpg[mtcars<span class="sc">$</span>am <span class="sc">==</span> <span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="future-enhancements" class="level2">
-<h2>Future Enhancements</h2>
+<h2 class="anchored" data-anchor-id="future-enhancements">Future Enhancements</h2>
 <ol type="1">
 <li>Support for basic plotting</li>
 <li>Access to more packages</li>
 <li>Ability to save and share code snippets</li>
 </ol>
 <p><a href="webr-playground.html">Access the WebR Playground →</a></p>
-<div id="quarto-navigation-envelope" class="hidden">
-<p><span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1zaWRlYmFyLXRpdGxl">R’tichoke</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXItdGl0bGU=">R’tichoke</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6SG9tZQ==">Home</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L2luZGV4Lmh0bWw=">/index.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6UiBJbnN0YWxsYXRpb24gR3VpZGU=">R Installation Guide</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L2luc3RhbGxhdGlvbi5odG1s">/installation.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6R2V0IFN0YXJ0ZWQ=">Get Started</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6SW5zdGFsbGluZyBQYWNrYWdlcw==">Installing Packages</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L2dldC1zdGFydGVkL3ItcGFja2FnZS1tYW5hZ2VtZW50Lmh0bWw=">/get-started/r-package-management.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6VmFyaWFibGVzIGluIFI=">Variables in R</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L2dldC1zdGFydGVkL3ZhcmlhYmxlcy5odG1s">/get-started/variables.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6TG9vcHMgYW5kIEFwcGx5IEZ1bmN0aW9ucw==">Loops and Apply Functions</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L2dldC1zdGFydGVkL2xvb3BzLmh0bWw=">/get-started/loops.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6SW5kZXhpbmcgQXJyYXlz">Indexing Arrays</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L2dldC1zdGFydGVkL2luZGV4aW5nLmh0bWw=">/get-started/indexing.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6UmVhZGluZyBEYXRh">Reading Data</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L2dldC1zdGFydGVkL3JlYWRpbmctZGF0YS5odG1s">/get-started/reading-data.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6SW50cm9kdWN0aW9uIHRvIGRwbHly">Introduction to dplyr</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L2dldC1zdGFydGVkL2RwbHlyLmh0bWw=">/get-started/dplyr.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6SW50cm9kdWN0aW9uIHRvIGRhdGEudGFibGU=">Introduction to data.table</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L2dldC1zdGFydGVkL2RhdGEtdGFibGUuaHRtbA==">/get-started/data-table.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6QmFzZSBHcmFwaGljcw==">Base Graphics</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L2dldC1zdGFydGVkL2Jhc2UtZ3JhcGhpY3MuaHRtbA==">/get-started/base-graphics.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6Z2dwbG90MiBHcmFwaGljcw==">ggplot2 Graphics</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L2dldC1zdGFydGVkL2dncGxvdDIuaHRtbA==">/get-started/ggplot2.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6UGFyYWxsZWwgQ29tcHV0aW5nIGluIFI=">Parallel Computing in R</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L2dldC1zdGFydGVkL3BhcmFsbGVsLWNvbXB1dGluZy1pbi1yLmh0bWw=">/get-started/parallel-computing-in-r.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6V2ViUiBQbGF5Z3JvdW5k">WebR Playground</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L3dlYnIuaHRtbA==">/webr.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6QmxvZw==">Blog</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L3Bvc3RzLmh0bWw=">/posts.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6QWJvdXQ=">About</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6L2Fib3V0Lmh0bWw=">/about.html</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6Ui1CbG9nZ2Vycw==">R-Bloggers</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLWludC1uYXZiYXI6aHR0cHM6Ly93d3cuci1ibG9nZ2Vycy5jb20v">https://www.r-bloggers.com/</span></p>
-<div class="hidden quarto-markdown-envelope-contents" data-render-id="Zm9vdGVyLWxlZnQ=">
-<p>2025 R’tichoke</p>
-</div>
-</div>
-<div id="quarto-meta-markdown" class="hidden">
-<p><span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLW1ldGF0aXRsZQ==">Interactive R in Your Browser with WebR – R’tichoke</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLXR3aXR0ZXJjYXJkdGl0bGU=">Interactive R in Your Browser with WebR – R’tichoke</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLW9nY2FyZHRpdGxl">Interactive R in Your Browser with WebR – R’tichoke</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLW1ldGFzaXRlbmFtZQ==">R’tichoke</span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLXR3aXR0ZXJjYXJkZGVzYw=="></span> <span class="hidden quarto-markdown-envelope-contents" data-render-id="cXVhcnRvLW9nY2FyZGRkZXNj"></span></p>
-</div>
+
+
 </section>
 
 </main> <!-- /main -->
-<script id = "quarto-html-after-body" type="application/javascript">
+<script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
     const anchorJS = new window.AnchorJS();
@@ -748,8 +754,8 @@ Current Limitations
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-      <div class='footer-contents'> 2025 R'tichoke</div>  
-    </div>   
+<p>2025 R’tichoke</p>
+</div>   
     <div class="nav-footer-center">
       &nbsp;
     </div>
@@ -757,19 +763,13 @@ Current Limitations
       <ul class="footer-items list-unstyled">
     <li class="nav-item compact">
     <a class="nav-link" href="https://github.com">
-      <i 
-  class="bi bi-github" 
-  role="img" 
->
+      <i class="bi bi-github" role="img">
 </i> 
     </a>
   </li>  
     <li class="nav-item compact">
     <a class="nav-link" href="https://twitter.com">
-      <i 
-  class="bi bi-twitter" 
-  role="img" 
->
+      <i class="bi bi-twitter" role="img">
 </i> 
     </a>
   </li>  
@@ -778,6 +778,7 @@ Current Limitations
   </div>
 </footer>
 
-</body>
 
-</html>
+
+
+</body></html>

@@ -682,14 +682,14 @@ $ loan_purpose_other              &lt;dbl&gt; -0.2208157, -0.2208157, -0.2208157
 <span id="cb25-78"><a href="#cb25-78" aria-hidden="true" tabindex="-1"></a>log_reg_results <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"roc_auc"</span>) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(mean)) <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 8
-   penalty mixture .metric .estimator  mean     n std_err .config              
-     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;                
-1 0.00167     1    roc_auc binary     0.853     3 0.00841 Preprocessor1_Model45
-2 0.00167     0.75 roc_auc binary     0.853     3 0.00841 Preprocessor1_Model35
-3 0.00599     0.25 roc_auc binary     0.853     3 0.00869 Preprocessor1_Model16
-4 0.00167     0.5  roc_auc binary     0.853     3 0.00836 Preprocessor1_Model25
-5 0.000464    1    roc_auc binary     0.852     3 0.00817 Preprocessor1_Model44
-6 0.00167     0.25 roc_auc binary     0.852     3 0.00837 Preprocessor1_Model15</code></pre>
+   penalty mixture .metric .estimator  mean     n std_err .config         
+     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;           
+1 0.00167     1    roc_auc binary     0.853     3 0.00841 pre0_mod25_post0
+2 0.00167     0.75 roc_auc binary     0.853     3 0.00841 pre0_mod24_post0
+3 0.00599     0.25 roc_auc binary     0.853     3 0.00869 pre0_mod27_post0
+4 0.00167     0.5  roc_auc binary     0.853     3 0.00836 pre0_mod23_post0
+5 0.000464    1    roc_auc binary     0.852     3 0.00817 pre0_mod20_post0
+6 0.00167     0.25 roc_auc binary     0.852     3 0.00837 pre0_mod22_post0</code></pre>
 </div>
 </div>
 </section>
@@ -757,10 +757,10 @@ XGBoost Validation Metrics:</code></pre>
 <pre><code># A tibble: 4 × 3
   .metric     .estimator .estimate
   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-1 accuracy    binary         0.948
-2 kap         binary         0.111
-3 mn_log_loss binary         3.24 
-4 roc_auc     binary         0.172</code></pre>
+1 accuracy    binary         0.950
+2 kap         binary         0.158
+3 mn_log_loss binary         3.25 
+4 roc_auc     binary         0.174</code></pre>
 </div>
 </div>
 </section>
@@ -847,9 +847,9 @@ XGBoost Validation Metrics:</code></pre>
   .metric     .estimator .estimate
   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 1 accuracy    binary        0.932 
-2 kap         binary        0.0316
-3 mn_log_loss binary        3.21  
-4 roc_auc     binary        0.172 </code></pre>
+2 kap         binary        0.0184
+3 mn_log_loss binary        3.24  
+4 roc_auc     binary        0.169 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate AUC on test set</span></span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>test_auc <span class="ot">&lt;-</span> test_results <span class="sc">%&gt;%</span></span>
@@ -857,7 +857,7 @@ XGBoost Validation Metrics:</code></pre>
 <span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Test Set ROC AUC: "</span>, test_auc<span class="sc">$</span>.estimate, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-Test Set ROC AUC:  0.1723324 </code></pre>
+Test Set ROC AUC:  0.1689963 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a gains table (commonly used in credit scoring)</span></span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>gains_table <span class="ot">&lt;-</span> test_results <span class="sc">%&gt;%</span></span>
@@ -884,16 +884,16 @@ Test Set ROC AUC:  0.1723324 </code></pre>
 <pre><code># A tibble: 10 × 11
    risk_decile total_accounts defaults non_defaults default_rate avg_score
          &lt;int&gt;          &lt;int&gt;    &lt;int&gt;        &lt;int&gt;        &lt;dbl&gt;     &lt;dbl&gt;
- 1          10            200       58          142        0.29       577.
- 2           9            200       26          174        0.13       628.
- 3           8            200       19          181        0.095      640.
- 4           7            200        8          192        0.04       665.
- 5           6            200        7          193        0.035      682.
- 6           4            200        6          194        0.03       727.
- 7           2            200        2          198        0.01       776.
- 8           5            200        2          198        0.01       716.
- 9           1            200        1          199        0.005      790.
-10           3            200        1          199        0.005      757.
+ 1          10            200       62          138        0.31       578.
+ 2           9            200       24          176        0.12       622.
+ 3           8            200       13          187        0.065      646.
+ 4           7            200       12          188        0.06       662.
+ 5           6            200        7          193        0.035      688.
+ 6           4            200        6          194        0.03       732.
+ 7           5            200        3          197        0.015      714.
+ 8           2            200        2          198        0.01       774.
+ 9           3            200        1          199        0.005      751.
+10           1            200        0          200        0          790.
 # ℹ 5 more variables: cumulative_defaults &lt;int&gt;, pct_defaults_captured &lt;dbl&gt;,
 #   cumulative_accounts &lt;int&gt;, pct_accounts &lt;dbl&gt;, lift &lt;dbl&gt;</code></pre>
 </div>

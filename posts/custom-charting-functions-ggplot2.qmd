@@ -222,10 +222,9 @@ custom_theme <- function(plt,
                                                                   scale = y_axis_scale)), 
              "percent" = scale_y_continuous(labels = percent))}
   
-  # Capitalise all names
-  vec <- lapply(p$labels, str_to_title)
-  names(vec) <- names(p$labels)
-  p$labels <- vec
+  # Capitalise all names using labs()
+  capitalized_labels <- lapply(p$labels, str_to_title)
+  p <- p + do.call(labs, capitalized_labels)
   
   return(p)
 }
@@ -236,8 +235,6 @@ custom_theme <- function(plt,
 The following demonstration illustrates the coordinated application of our enhanced functions to generate a polished, publication-ready visualization:
 
 ```{r}
-#| label: final-line-chart
-
 line_chart(plotdf,
            x = "date", 
            y = "MA", 
@@ -274,7 +271,7 @@ custom_theme(p,
              y_axis_scale = 0.001)
 ```
 
-## Strategic Advantages of Custom Charting Functions
+## Why use Custom Charting Functions
 
 The development of custom charting functions utilizing ggplot2 provides substantial advantages for analytical workflows:
 
@@ -285,7 +282,3 @@ The development of custom charting functions utilizing ggplot2 provides substant
 3. **Maintenance Optimization**: Facilitates centralized style updates through single function modifications, propagating changes across all implementations.
 
 4. **Accessibility Enhancement**: Abstracts ggplot2 complexity for team members with varying levels of package familiarity, democratizing visualization capabilities.
-
-## Implementation Strategy: Custom Functions vs. Direct ggplot2
-
-The development of customized charting functions utilizing `ggplot2` demonstrates optimal value when creating repetitive visualization types within structured analytical workflows. For exploratory data analysis activities, direct `ggplot2` implementation often provides superior flexibility, enabling rapid prototyping and layered chart construction within integrated analytical pipelines.
