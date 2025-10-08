@@ -24,9 +24,11 @@ library(DT)
 library(tidytext)
 ```
 
-## Understanding Text Analytics Fundamentals
+## Introduction
 
-Text analytics transforms text into structured data suitable for analysis. A typical workflow looks like so:
+In this post, we'll explore how to transform text data into meaningful insights using the `quanteda` package which provides a powerful and intuitive framework for text analysis.
+
+## Typical workflow
 
 1. **Text acquisition and loading**: Importing text data from various sources
 2. **Preprocessing**: Cleaning and standardizing text
