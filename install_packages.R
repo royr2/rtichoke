@@ -57,6 +57,7 @@ packages <- c(
   "quanteda",           # Quantitative analysis of textual data
   "quanteda.textstats", # Text statistics for quanteda
   "quanteda.textplots", # Text plots for quanteda
+  "tidytext",
   
   # Python integration
   "reticulate", # Interface to Python
