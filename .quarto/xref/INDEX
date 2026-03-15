@@ -181,5 +181,14 @@
   },
   "posts/text-analytics-quanteda-part1.qmd": {
     "text-analytics-quanteda-part1.html": "d645d5ec"
+  },
+  "posts/rcpp-for-credit-risk.qmd": {
+    "rcpp-for-credit-risk.html": "e2423a0e"
+  },
+  "posts/rag-pipeline-in-r.qmd": {
+    "rag-pipeline-in-r.html": "ce09dc2e"
+  },
+  "posts/text-analytics-quanteda.qmd": {
+    "text-analytics-quanteda.html": "d462fd04"
   }
 }

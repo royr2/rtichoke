@@ -1,5 +1,5 @@
 ---
-title: "Text Analytics in R with quanteda (Part 1)"
+title: "Text Analytics in R: Using quanteda"
 date: "2025-10-07"
 categories: [R, Text Analytics, quanteda, NLP]
 image: "../images/quanteda.png"

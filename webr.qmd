@@ -7,6 +7,10 @@ image: https://www.r-project.org/Rlogo.png
 
 The WebR Playground allows users to write and execute R code directly in their browser. This feature is ideal for beginners wanting to experiment with R or for quick code testing when away from the main development environment.
 
+:::{.callout-note}
+[Access the WebR Playground here →](webr-playground.html)
+:::
+
 ## What is WebR?
 
 [WebR](https://docs.r-wasm.org/webr/latest/) is a version of R compiled to WebAssembly, enabling R code execution directly in web browsers. This provides:
@@ -89,4 +93,3 @@ t.test(mtcars$mpg[mtcars$am == 0], mtcars$mpg[mtcars$am == 1])
 2. Access to more packages
 3. Ability to save and share code snippets
 
-[Access the WebR Playground →](webr-playground.html)

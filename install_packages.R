@@ -64,7 +64,13 @@ packages <- c(
   
   # Other utilities
   "devtools",   # Tools to make developing R packages easier
-  "pROC"        # ROC curve analysis
+  "pROC",       # ROC curve analysis. 
+  
+  # Add more packages as needed for future posts
+  "ggrepel",    # Non-overlapping text labels for ggplot2
+  "DBI",        # Database interface (used by ragnar's DuckDB store)
+  "ellmer",     # LLM interaction and tool registration. 
+  "ragnar"     # Retrieval-augmented generation store (DuckDB + VSS)
 )
 
 # Install packages if they're not already installed

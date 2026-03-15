@@ -29,6 +29,7 @@ This approach is particularly valuable when dealing with related prediction prob
 #| eval: false
 
 # install.packages(c("torch", "tidyverse", "corrplot"))
+# install_torch()
 library(torch)
 library(tidyverse)
 ```
