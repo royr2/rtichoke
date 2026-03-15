@@ -2,7 +2,7 @@
   {
     "listing": "/posts.html",
     "items": [
-      "/posts/rag-pipeline-in-r.html",
+      "/posts/text-analytics-rag-pipeline-in-r.html",
       "/posts/text-analytics-quanteda.html",
       "/posts/quarto_live.html",
       "/posts/multi-task-learning-with-torch.html",

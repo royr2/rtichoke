@@ -1,7 +1,7 @@
 ---
 title: "Text Analytics in R: Dense embeddings and RAG pipeline with `ragnar` and `ellmer`"
 author: "Riddhiman Roy"
-date: "2026-06-15"
+date: "2026-03-15"
 categories: [R, NLP, RAG, LLMs, ragnar, ellmer]
 image: "../images/embedding.png"
 execute:
@@ -14,9 +14,9 @@ execute:
 ## Required Packages
 
 ```{r}
-# install.packages(c("ragnar", "ellmer", "dplyr", "ggplot2", "tibble"))
-
 #| eval: true
+
+# install.packages(c("ragnar", "ellmer", "dplyr", "ggplot2", "tibble"))
 library(ragnar)
 library(ellmer)
 library(dplyr)

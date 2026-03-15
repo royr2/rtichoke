@@ -301,12 +301,12 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>           x          y
-1  1.8817354  7.9022245
-2 -0.8679982 -0.8631950
-3  0.4900556  3.6928346
-4 -1.2524966 -1.7791054
-5 -0.4966515  0.2696869
-6  1.3650099  6.4063520</code></pre>
+1  0.2119659  3.2310448
+2  0.7803231  4.3232222
+3 -1.3723643 -2.1747975
+4 -0.4662973  0.3716846
+5  0.2161258  2.3220065
+6  0.2041167  2.5450215</code></pre>
 </div>
 </div>
 </section>
@@ -494,10 +494,10 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(performance_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                   Metric      Value
-1      Mean Squared Error 0.09129281
-2 Root Mean Squared Error 0.30214701
-3     Mean Absolute Error 0.24589797
-4               R-squared 0.99103287</code></pre>
+1      Mean Squared Error 0.09778227
+2 Root Mean Squared Error 0.31270156
+3     Mean Absolute Error 0.24139704
+4               R-squared 0.99197752</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare with true relationship (y = 3x + 2)</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate predictions on a grid for comparison</span></span>
@@ -576,7 +576,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </div>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Bias value:"</span>, layer2_bias, <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Bias value: 0.3721812 0.05079099 -0.5865266 0.3816326 1.446982 0.2603171 0.5737283 -0.5166451 </code></pre>
+<pre><code>Bias value: -0.2541555 0.6706745 -0.2462078 -0.6282271 1.716779 -0.4144657 0.3886158 -0.5996569 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Display first layer weights and biases</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"First layer weights:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -586,14 +586,14 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">round</span>(layer1_weight, <span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        [,1]
-[1,] -0.6228
-[2,]  1.3811
-[3,] -1.5365
-[4,]  1.1146
-[5,]  0.7104
-[6,] -0.5756
-[7,] -0.2719
-[8,] -0.0966</code></pre>
+[1,] -1.7569
+[2,]  1.2407
+[3,]  1.5214
+[4,] -0.6163
+[5,]  1.0652
+[6,] -0.4062
+[7,] -0.4239
+[8,] -0.5864</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">First layer biases:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -602,7 +602,7 @@ First layer biases:</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">round</span>(layer2_bias, <span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1]  0.3722  0.0508 -0.5865  0.3816  1.4470  0.2603  0.5737 -0.5166</code></pre>
+<pre><code>[1] -0.2542  0.6707 -0.2462 -0.6282  1.7168 -0.4145  0.3886 -0.5997</code></pre>
 </div>
 </div>
 </section>
@@ -1125,7 +1125,7 @@ First layer biases:</code></pre>
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>2025 R’tichoke</p>
+<p>2026 R’tichoke</p>
 </div>   
     <div class="nav-footer-center">
       &nbsp;

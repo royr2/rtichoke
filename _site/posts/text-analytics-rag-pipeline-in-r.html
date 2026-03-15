@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Riddhiman Roy">
-<meta name="dcterms.date" content="2026-06-15">
+<meta name="dcterms.date" content="2026-03-15">
 
 <title>Text Analytics in R: Dense embeddings and RAG pipeline with ragnar and ellmer – R'tichoke</title>
 <style>
@@ -272,7 +272,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 15, 2026</p>
+      <p class="date">March 15, 2026</p>
     </div>
   </div>
   
@@ -288,13 +288,11 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <h2 class="anchored" data-anchor-id="required-packages">Required Packages</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c("ragnar", "ellmer", "dplyr", "ggplot2", "tibble"))</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ragnar)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ellmer)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ragnar)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ellmer)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="introduction" class="level2">
@@ -559,7 +557,7 @@ doc3    1    0    1</code></pre>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="rag-pipeline-in-r_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="text-analytics-rag-pipeline-in-r_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -655,41 +653,35 @@ doc3    1    0    1</code></pre>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># With RAG (retrieval tool registered)</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>answer_rag <span class="ot">&lt;-</span> chat<span class="sc">$</span><span class="fu">chat</span>(query)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Based on the retrieved information, a loan to move to Stage 2 under IFRS 9 is 
-triggered by a significant increase in credit risk relative to initial 
-recognition, even if no actual default has occurred. This means that as long as
-there have been no defaults, any changes that indicate a higher risk of future 
-defaults are used to determine when a stage classification is needed.
+<pre><code>The information retrieved does not specifically provide what triggers a loan to
+move to Stage 2 under IFRS 9. However, it suggests that the criteria for moving
+to Stage 2 might be closely related to an increase in default likelihood, as 
+stated in one of the search results referencing "a significant increase in 
+credit risk relative to initial recognition".
 
-Note: The answer does not come from the Credit Policy chunk_id (12), which 
-refers to more general guidelines on credit decisions and non-performing loan 
-provisioning.</code></pre>
+Based solely on this result we cannot definitively state what triggers a loan 
+under Stage 2 yet.</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Without RAG (fresh chat, no tools, no context)</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>chat_naive   <span class="ot">&lt;-</span> <span class="fu">chat_ollama</span>(<span class="at">model =</span> <span class="st">"llama3.1"</span>)</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>answer_naive <span class="ot">&lt;-</span> chat_naive<span class="sc">$</span><span class="fu">chat</span>(query)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Under IFRS 9, a financial asset is initially measured at cost and accounted for
-at amortised cost or fair value through profit or loss, depending on the 
-classification. However, if certain conditions are met, it can be reclassified 
-from one category to another (including being moved to Stage 2 of the 
-impairment process), and then eventually to an allowance.
+<pre><code>Under International Financial Reporting Standards (IFRS) 9, a loan is 
+classified as an impaired asset and moved to Stage 2 when it experiences a 
+significant increase in credit risk since the initial recognition of the loan.
 
-A loan will normally move to Stage 2 under IFRS 9 when there is objective 
-evidence that it may not be recoverable. This would typically be triggered if:
+To be specific, a loan moves to Stage 2 if there are indicators that suggest a 
+significant deterioration in the debtor's ability to repay the loan, which is 
+considered to be more than insignificant. This can be due to various factors 
+such as:
 
-1. **Impairment indicators are present** on either a credit type basis or a 
-specific transaction basis:
-   - A significant decrease in the value of a financial asset becomes known. Or
-   - A borrower experiences financial difficulties.
-   
-2. **Objective evidence**: It's the critical phrase here. That is, there should
-be actual data pointing towards potential impairment rather than just general 
-market considerations affecting all loans.
+* A decline in payments or any other sign that the borrower may default
+* A material increase in off-balance-sheet credit risk, such as a guarantee 
+from a high-risk counterparty
+* A significant fall in credit ratings of the debtor
 
-This stage is essentially about identifying possible issues that could lead to 
-further significant impairment if additional objective evidence becomes known 
-or an update of previously recognized losses occurs.</code></pre>
+Stage 2 is also known as "probable losses" (under IFRS 9) or "substandard 
+loans" under many banking regulator's rules.</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">approach =</span> <span class="fu">c</span>(<span class="st">"RAG (grounded)"</span>, <span class="st">"No RAG (naive)"</span>),</span>
@@ -699,8 +691,8 @@ or an update of previously recognized losses occurs.</code></pre>
 <pre><code># A tibble: 2 × 2
   approach       answer                                                         
   &lt;chr&gt;          &lt;chr&gt;                                                          
-1 RAG (grounded) "Based on the retrieved information, a loan to move to Stage 2…
-2 No RAG (naive) "Under IFRS 9, a financial asset is initially measured at cost…</code></pre>
+1 RAG (grounded) "The information retrieved does not specifically provide what …
+2 No RAG (naive) "Under International Financial Reporting Standards (IFRS) 9, a…</code></pre>
 </div>
 </div>
 <p>The RAG answer cites the specific IFRS 9 trigger from the corpus. The naive answer while broadly correct lacks grounding, and for certain edge cases could hallucinate and quote triggers that might not exist. Grounding the LLM with retrieved context helps keep it aligned with the source material.</p>
@@ -734,23 +726,18 @@ or an update of previously recognized losses occurs.</code></pre>
 <span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">answer   =</span> purrr<span class="sc">::</span><span class="fu">map_chr</span>(questions, ask_rag)</span>
 <span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>A trigger for an IFRS 9 Stage 2 migration includes a significant increased in 
-credit risk relative to the initial recognition, even without any actual 
-default occurring. Other triggers can include the recalculation of the credit 
-score card which happens quarterly and changes in macroeconomic conditions that
-affect applicant populations as well as loan payments over 90 days past due 
-resulting in a non-performing loan classification and full provisioning.</code></pre>
+<pre><code>A significant increase in credit risk relative to initial recognition triggers 
+an IFRS 9 Stage 2 migration.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>A loan is typically considered non-performing when it remains past due for 90 
-days or more.</code></pre>
+<pre><code>According to the information retrieved, a loan is classified as non-performing 
+when it has a payment that is more than 90 days past due.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>The Capital Conservation Buffer requirement, part of the Basel III framework, 
-mandates that banks hold at least 2.5% of Common Equity Tier 1 capital above 
-the regulatory minimum to act as a buffer during times of financial stress or 
-conservation. This is in addition to other capital requirements and serves as 
-an extra layer of protection for banks' financial stability.</code></pre>
+<pre><code>The Capital Conservation Buffer requirement is to hold a minimum Common Equity 
+Tier 1 ratio of 2.5% above the regulatory minimum, as per Basel III 
+regulations. This means that banks must maintain a strong capital base to 
+mitigate risks and ensure their financial stability.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>The credit scorecard is recalibrated quarterly.</code></pre>
@@ -760,8 +747,8 @@ an extra layer of protection for banks' financial stability.</code></pre>
 <pre><code># A tibble: 4 × 2
   question                                             answer                   
   &lt;chr&gt;                                                &lt;chr&gt;                    
-1 What triggers an IFRS 9 Stage 2 migration?           A trigger for an IFRS 9 …
-2 When is a loan classified as non-performing?         A loan is typically cons…
+1 What triggers an IFRS 9 Stage 2 migration?           A significant increase i…
+2 When is a loan classified as non-performing?         According to the informa…
 3 What is the Capital Conservation Buffer requirement? The Capital Conservation…
 4 How often is the credit scorecard recalibrated?      The credit scorecard is …</code></pre>
 </div>
@@ -1184,7 +1171,7 @@ an extra layer of protection for banks' financial stability.</code></pre>
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>2025 R’tichoke</p>
+<p>2026 R’tichoke</p>
 </div>   
     <div class="nav-footer-center">
       &nbsp;

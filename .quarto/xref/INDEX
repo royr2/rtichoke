@@ -190,5 +190,8 @@
   },
   "posts/text-analytics-quanteda.qmd": {
     "text-analytics-quanteda.html": "d462fd04"
+  },
+  "posts/text-analytics-rag-pipeline-in-r.qmd": {
+    "text-analytics-rag-pipeline-in-r.html": "6a09aec5"
   }
 }

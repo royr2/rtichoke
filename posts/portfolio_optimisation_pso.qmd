@@ -26,6 +26,9 @@ library(dplyr)     # For data manipulation and transformation
 library(quantmod)  # For downloading financial data
 library(tidyr)     # For reshaping data (pivot_wider, gather functions)
 library(plotly)    # For creating interactive 3D visualizations
+library(stringr)   # For string manipulation (used in ticker formatting)
+library(purrr)     # For functional programming (reduce function)
+library(slider)    # For rolling calculations (rolling correlation)
 ```
 
 ## Data Collection
@@ -51,40 +54,37 @@ The next step involves downloading historical price data for these stocks using 
 ```{r}
 # Append ".NS" to tickers for Yahoo Finance format (NS = National Stock Exchange)
 tickers <- paste0(ticker_list$Symbol, ".NS")
-tickers <- tickers[!tickers %in% c("ETERNAL.NS", "JIOFIN.NS")]
+tickers <- tickers[!tickers %in% c("ETERNAL.NS", "JIOFIN.NS", "TMPV.NS")]
 
 # Initialize empty dataframe to store all ticker data
 ticker_df <- data.frame()
 
-# Create a progress bar to monitor the download process
-# pb <- txtProgressBar(min = 1, max = length(tickers), style = 3)
-
 # Loop through each ticker and download its historical data
 for(nms in tickers){
+  
   # Download data from Yahoo Finance
   df <- getSymbols(Symbols = nms, verbose = FALSE, auto.assign = FALSE)
   
-  # Rename columns for clarity
-  colnames(df) <- c("open", "high", "low", "close", "volume", "adjusted")
-  df$date = rownames(df)
-  
   # Convert to dataframe and add ticker and date information
-  df <- data.frame(df)
+  df <- fortify(df)
+  colnames(df) <- c("date", "open", "high", "low", "close", "volume", "adjusted")
   df$ticker <- nms
-  df$date <- rownames(df)
   
   # Append to the main dataframe
   ticker_df <- rbind(ticker_df, df)
   
-  Sys.sleep(0.2)
+  Sys.sleep(0.1)
   
-  # Update progress bar
-  # setTxtProgressBar(pb, which(tickers == nms))
 }
 
 # Reshape data to wide format with dates as rows and tickers as columns
-# This format facilitates the calculation of returns across all stocks
-prices_df <- pivot_wider(data = ticker_df, id_cols = "date", names_from = "ticker", values_from = "close")
+# Remove any duplicate entries for the same date and ticker (if any)
+ticker_df <- ticker_df %>% 
+  group_by(date, ticker) %>% 
+  slice(1) %>% 
+  ungroup()
+
+prices_df <- pivot_wider(ticker_df, id_cols = "date", names_from = "ticker", values_from = "close")
 
 # Remove rows with missing values to ensure complete data
 prices_df <- na.omit(prices_df)
@@ -98,40 +98,61 @@ dim(prices_df)
 
 ### Visualizing the Data
 
+Rather than plotting raw prices, a rolling pairwise correlation chart better reveals periods of high and low co-movement between stocks — directly relevant to the diversification benefits we seek in portfolio construction.
+
 ```{r}
-# Plot closing prices for metal stocks
-prices_df %>% 
-  # Convert from wide to long format for easier plotting with ggplot2
-  pivot_longer(-date, names_to = "ticker", values_to = "price") %>% 
-  
-  # Attach industry information from our original ticker list
-  left_join(ticker_list %>% 
-              mutate(ticker = paste0(Symbol, ".NS")) %>% 
-              select(ticker, industry = Industry),
-            by = "ticker") %>% 
-  
-  # Convert date strings to Date objects
-  mutate(date = as.Date(date)) %>% 
-  
-  # Filter to show only metal industry stocks for clarity
-  filter(stringr::str_detect(tolower(industry), "metal")) %>% 
-  
-  # Create the line plot
-  ggplot(aes(x = date, y = price, color = ticker)) + 
-  geom_line(linewidth = 0.8) + 
-  theme_minimal() + 
-  scale_color_brewer(palette = "RdBu") +  # Use a color-blind friendly palette
-  labs(title = "Closing Prices", 
-       subtitle = "Nifty 50 metal stocks",
-       x = "Date", 
-       y = "Closing Price") + 
-  theme(legend.position = "top", 
-        legend.title = element_text(colour = "transparent"), 
-        axis.title.x = element_text(face = "bold"), 
-        axis.title.y = element_text(face = "bold"))
+# Extract metal stock tickers
+metal_tickers <- ticker_list |>
+  filter(str_detect(tolower(Industry), "metal")) |>
+  mutate(ticker = paste0(Symbol, ".NS")) |>
+  pull(ticker)
+
+# Compute daily returns for metal stocks
+metal_returns <- prices_df |>
+  select(date, any_of(metal_tickers)) |>
+  mutate(date = as.Date(date)) |>
+  arrange(date) |>
+  mutate(across(-date, \(x) x / lag(x) - 1)) |>
+  drop_na()
+
+dates   <- metal_returns$date
+ret_mat <- as.matrix(metal_returns[, -1])
+
+# Get all unique pairs
+pairs <- combn(colnames(ret_mat), 2, simplify = FALSE)
+
+# Rolling correlation for each pair across the data set
+roll_corr <- lapply(pairs, function(pair){
+  slide_dbl(1:nrow(ret_mat), 
+            ~ cor(ret_mat[.x, pair[1]], 
+                  ret_mat[.x, pair[2]]),
+            .before = 60,  # Look back 60 days for rolling correlation
+            .complete = TRUE)
+})
+
+# Average correlation across all pairs at each date
+avg_corr <- purrr::reduce(roll_corr, `+`) / length(roll_corr)
+avg_corr_df <- tibble(date = dates,
+                      avg_corr = avg_corr)
+
+# Area chart with regime shading
+ggplot(avg_corr_df, aes(x = date, y = avg_corr)) +
+  geom_line(linewidth = 0.7, colour = "grey30") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.2)) +
+  labs(
+    title    = "Rolling 60-Day Average Pairwise Correlation",
+    subtitle = "Nifty 50 metal stocks",
+    x        = "Date",
+    y        = "Average Pairwise Correlation"
+  ) +
+  theme(
+    axis.title.x = element_text(face = "bold"),
+    axis.title.y = element_text(face = "bold")
+  )
 ```
 
-The visualization demonstrates the price movements of metal stocks over time. The data reveals periods of both correlation and divergence between different stocks, highlighting the importance of diversification in portfolio construction.
+The chart highlights periods of **high correlation** where metal stocks move together — reducing diversification benefits — and **low correlation** where stocks diverge, offering better risk reduction. 
 
 ### Calculating Returns
 
@@ -191,7 +212,7 @@ obj_func <- function(wts,
   # Add penalty for violating the full investment constraint (sum of weights = 1)
   # The squared term ensures the penalty increases quadratically with violation size
   obj <- obj - lambda1 * (sum(wts) - 1)^2
-    # Return negative value since PSO minimizes by default, but the goal is to maximize
+  # Return negative value since PSO minimizes by default, but the goal is to maximize
   # the objective (higher returns, lower risk)
   return(-obj)
 }
@@ -249,8 +270,8 @@ pso_optim <- function(obj_func,
     # Update velocities using PSO formula:
     # New velocity = inertia + cognitive component + social component
     dX <- w * dX +                         # Inertia (continue in same direction)
-          c1*runif(1)*(pbest - X) +        # Pull toward personal best
-          c2*runif(1)*t(gbest - t(X))      # Pull toward global best
+      c1*runif(1)*(pbest - X) +        # Pull toward personal best
+      c2*runif(1)*t(gbest - t(X))      # Pull toward global best
     
     # Update positions based on velocities
     X <- X + dX
