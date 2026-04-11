@@ -24,9 +24,7 @@ library(DT)
 library(tidytext)
 ```
 
-## Introduction
-
-In this post, we'll explore how to transform text data into meaningful insights using the `quanteda` package which provides a powerful and intuitive framework for text analysis.
+In this post, let's explore how to transform text data into meaningful insights using the `quanteda` package — a powerful and intuitive framework for text analysis.
 
 ## Typical workflow
 

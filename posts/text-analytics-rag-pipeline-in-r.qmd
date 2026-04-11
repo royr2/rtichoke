@@ -1,6 +1,5 @@
 ---
 title: "Text Analytics in R: Dense embeddings and RAG pipeline with `ragnar` and `ellmer`"
-author: "Riddhiman Roy"
 date: "2026-03-15"
 categories: [R, NLP, RAG, LLMs, ragnar, ellmer]
 image: "../images/embedding.png"
@@ -24,9 +23,7 @@ library(ggplot2)
 library(tibble)
 ```
 
-## Introduction
-
- This [earlier post](text-analytics-quanteda.qmd), explored building a text analytics pipeline using `quanteda`. We created a Document Feature Matrix (DFM), weighted it with TF-IDF, and measured document similarity using **cosine similarity**.
+This [earlier post](text-analytics-quanteda.qmd) explored building a text analytics pipeline using `quanteda`. We created a Document Feature Matrix (DFM), weighted it with TF-IDF, and measured document similarity using **cosine similarity**.
 
 It worked, but we also ran into a limitation - `cosine similarity alone might not be enough since the top most similar document did not match the document's sentiment`
 
@@ -41,7 +38,7 @@ After stopword removal, they share zero vocabulary, producing near-zero TF-IDF c
 
 One fix is to use **dense embeddings** - neural representations where similar meanings map to nearby vectors. With dense embeddings, we should be able to capture semantic similarity between two sentences, even when they share no words.
 
-In this post, we'll explore how to build a Retrieval Augmented Generation (RAG) pipeline in R using `ragnar` and `ellmer` to demonstrate the power of dense embeddings for retrieval and generation. The RAG pipeline would look like so:
+In this post, let's build a Retrieval Augmented Generation (RAG) pipeline in R using `ragnar` and `ellmer` to demonstrate the power of dense embeddings for retrieval and generation. The RAG pipeline would look like so:
 
 ```
 Documents → Chunk → Embed → Store → [Query] → Retrieve → Generate Answer

@@ -10,14 +10,12 @@ execute:
   eval: true
 ---
 
-## Introduction
-
-In credit risk modeling and binary classification applications, analysts employ gains tables (also known as KS tables) as a fundamental tool for measuring and quantifying model performance. This tutorial dives into the construction and interpretion of gains tables using R.
+Gains tables (also known as KS tables) are a go-to tool for evaluating binary classification models in credit risk. In this post, let's build one from scratch in R and unpack what each metric tells us.
 ## Theoretical Foundation: Understanding Gains Tables
 
 A gains table systematically discretizes the population (typically a validation or test dataset) into groups based on the model's output predictions (probability scores, log odds, or risk scores). Each group conventionally represents 10% of the total population (deciles), though alternative binning strategies may be employed. The output presents summary statistics for each group and analyzes the cumulative distributions of events (defaults) and non-events to quantify the model's discriminatory performance.
 
-## Package Dependencies
+## Required Packages
 
 ```{r}
 #| label: setup
@@ -31,7 +29,7 @@ library(scales)
 
 ## Dataset Preparation
 
-This tutorial utilizes a sample from the Lending Club dataset, which contains comprehensive loan information and associated outcomes suitable for credit risk modeling applications.
+Let's use a sample from the Lending Club dataset, which has loan characteristics, borrower details, and repayment outcomes — exactly what we need.
 
 ```{r}
 #| label: data-load
@@ -45,7 +43,7 @@ dim(sample)
 
 ## Target Definition
 
-The initial step requires the creation of a binary target variable for modeling purposes. In this credit risk application, we identify borrowers who defaulted on their loan obligations.
+First, let's create a binary target variable that flags borrowers who defaulted on their loans.
 
 ```{r}
 #| label: target-definition
@@ -68,7 +66,7 @@ sample %>%
 
 ## Model Development
 
-Subsequently, we develop a logistic regression model to generate predictions that will serve as the foundation for gains table construction.
+Let's fit a simple logistic regression model to generate predicted scores.
 
 ```{r}
 #| label: data-prep
@@ -113,7 +111,7 @@ test$pred <- predict(mdl, newdata = test)
 
 ## Gains Table Construction
 
-The following section demonstrates the step-by-step construction of a comprehensive gains table through systematic binning and statistical analysis.
+Let's now build the gains table step by step — binning the population and computing the key metrics in each group.
 
 ### Population Discretization into Bins
 

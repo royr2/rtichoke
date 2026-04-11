@@ -10,11 +10,9 @@ execute:
   eval: true
 ---
 
-## Introduction
+Nature-inspired optimization algorithms can be surprisingly effective at navigating complex, high-dimensional search spaces. In this post, let's build a Particle Swarm Optimization (PSO) algorithm from scratch in R.
 
-Nature-inspired optimization algorithms demonstrate remarkable efficiency in solving complex optimization problems. This post provides a  implementation of Particle Swarm Optimization (PSO) from fundamental principles in R. The methodology presented enables efficient exploration of complex solution spaces through coordinated swarm intelligence.
-
-## Package Dependencies
+## Required Packages
 
 ```{r}
 # Load required packages
@@ -26,7 +24,7 @@ library(metR)      # For geom_arrow
 
 ## Optimization Test Function: Ackley's Function
 
-This tutorial employs Ackley's function as the optimization benchmark—a challenging multimodal function characterized by numerous local minima that frequently entrap conventional optimization algorithms:
+Let's use Ackley's function as the benchmark — a challenging multimodal function with many local minima that trap conventional optimization algorithms:
 
 ```{r}
 obj_func <- function(x, y){
@@ -53,7 +51,7 @@ contour_plot
 
 ## Theoretical Foundation of Particle Swarm Optimization
 
-PSO emulates the collective foraging behavior of biological swarms through the integration of individual memory with social information sharing:
+PSO emulates the foraging behavior of biological swarms through individual memory and information sharing:
 
 1. **Initialization**: Random distribution of particles across the search space
 2. **Memory Mechanism**: Each particle maintains a record of its personal best position

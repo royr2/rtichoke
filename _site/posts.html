@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.9.35">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>posts – R'tichoke</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -38,10 +41,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7e58e3368124f49f6e3733161a9b089d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-9e41006022cc14e6bca310783a21a71f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-658c2336f25e20434af7fb9caa8b0f44.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-af1142a47761cd6f12b407da64115aad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -109,7 +112,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -122,7 +125,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -242,7 +245,7 @@ window.Quarto = {
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(16)</span></div><div class="category" data-category="QW5hbHl0aWNz">Analytics <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Qm9vdHN0cmFwcGluZw==">Bootstrapping <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Q3JlZGl0JTIwUmlzayUyMEFuYWx5dGljcw==">Credit Risk Analytics <span class="quarto-category-count">(3)</span></div><div class="category" data-category="RGF0YSUyMFZpc3VhbGl6YXRpb24=">Data Visualization <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RGVlcCUyMExlYXJuaW5n">Deep Learning <span class="quarto-category-count">(2)</span></div><div class="category" data-category="ZWxsbWVy">ellmer <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RmluYW5jZQ==">Finance <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Z2dwbG90Mg==">ggplot2 <span class="quarto-category-count">(1)</span></div><div class="category" data-category="SW50cm9kdWN0aW9u">Introduction <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TExNcw==">LLMs <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TWFjaGluZSUyMExlYXJuaW5n">Machine Learning <span class="quarto-category-count">(2)</span></div><div class="category" data-category="TW9kZWwlMjBFdmFsdWF0aW9u">Model Evaluation <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TXVsdGktVGFzayUyMExlYXJuaW5n">Multi-Task Learning <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TmV1cmFsJTIwTmV0d29ya3M=">Neural Networks <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TkxQ">NLP <span class="quarto-category-count">(2)</span></div><div class="category" data-category="T3B0aW1pemF0aW9u">Optimization <span class="quarto-category-count">(2)</span></div><div class="category" data-category="UHl0aG9u">Python <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cXVhbnRlZGE=">quanteda <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UXVhcnRv">Quarto <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Ug==">R <span class="quarto-category-count">(16)</span></div><div class="category" data-category="UkFH">RAG <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cmFnbmFy">ragnar <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cmV0aWN1bGF0ZQ==">reticulate <span class="quarto-category-count">(1)</span></div><div class="category" data-category="U2ltdWxhdGlvbg==">Simulation <span class="quarto-category-count">(1)</span></div><div class="category" data-category="U3RhdGlzdGljcw==">Statistics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="VGV4dCUyMEFuYWx5dGljcw==">Text Analytics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dGlkeW1vZGVscw==">tidymodels <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dG9yY2g=">torch <span class="quarto-category-count">(2)</span></div><div class="category" data-category="VmlzdWFsaXphdGlvbg==">Visualization <span class="quarto-category-count">(2)</span></div><div class="category" data-category="V2ViUg==">WebR <span class="quarto-category-count">(1)</span></div><div class="category" data-category="WEdCb29zdA==">XGBoost <span class="quarto-category-count">(1)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(17)</span></div><div class="category" data-category="QW5hbHl0aWNz">Analytics <span class="quarto-category-count">(2)</span></div><div class="category" data-category="Qm9vdHN0cmFwcGluZw==">Bootstrapping <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Q3JlZGl0JTIwUmlzayUyMEFuYWx5dGljcw==">Credit Risk Analytics <span class="quarto-category-count">(3)</span></div><div class="category" data-category="RGF0YSUyMFZpc3VhbGl6YXRpb24=">Data Visualization <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RGVlcCUyMExlYXJuaW5n">Deep Learning <span class="quarto-category-count">(2)</span></div><div class="category" data-category="ZWxsbWVy">ellmer <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RmluYW5jZQ==">Finance <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Z2dwbG90Mg==">ggplot2 <span class="quarto-category-count">(1)</span></div><div class="category" data-category="SW50cm9kdWN0aW9u">Introduction <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TExNcw==">LLMs <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TWFjaGluZSUyMExlYXJuaW5n">Machine Learning <span class="quarto-category-count">(3)</span></div><div class="category" data-category="TW9kZWwlMjBFdmFsdWF0aW9u">Model Evaluation <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TXVsdGktVGFzayUyMExlYXJuaW5n">Multi-Task Learning <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TmV1cmFsJTIwTmV0d29ya3M=">Neural Networks <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TkxQ">NLP <span class="quarto-category-count">(2)</span></div><div class="category" data-category="T3B0aW1pemF0aW9u">Optimization <span class="quarto-category-count">(2)</span></div><div class="category" data-category="UHl0aG9u">Python <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cXVhbnRlZGE=">quanteda <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UXVhcnRv">Quarto <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Ug==">R <span class="quarto-category-count">(17)</span></div><div class="category" data-category="UkFH">RAG <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cmFnbmFy">ragnar <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cmV0aWN1bGF0ZQ==">reticulate <span class="quarto-category-count">(1)</span></div><div class="category" data-category="U2ltdWxhdGlvbg==">Simulation <span class="quarto-category-count">(1)</span></div><div class="category" data-category="U3RhdGlzdGljcw==">Statistics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="VGV4dCUyMEFuYWx5dGljcw==">Text Analytics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dGlkeW1vZGVscw==">tidymodels <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dG9yY2g=">torch <span class="quarto-category-count">(2)</span></div><div class="category" data-category="VmlzdWFsaXphdGlvbg==">Visualization <span class="quarto-category-count">(2)</span></div><div class="category" data-category="V2ViUg==">WebR <span class="quarto-category-count">(1)</span></div><div class="category" data-category="WEdCb29zdA==">XGBoost <span class="quarto-category-count">(1)</span></div></div></div>
 <!-- main -->
 <main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
 
@@ -255,7 +258,36 @@ window.Quarto = {
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="UiUyQ05MUCUyQ1JBRyUyQ0xMTXMlMkNyYWduYXIlMkNlbGxtZXI=" data-listing-date-sort="1773513000000" data-listing-file-modified-sort="1773569135775" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2076">
+<div class="quarto-post image-right" data-index="0" data-categories="UiUyQ01hY2hpbmUlMjBMZWFybmluZw==" data-listing-date-sort="1775845800000" data-listing-file-modified-sort="1775923816404" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1405">
+<div class="thumbnail"><a href="./posts/ml-frameworks-ready-reckoner.html" class="no-external">
+
+<img loading="lazy" src="./images/ml-frameworks.png" class="thumbnail-image">
+
+</a></div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/ml-frameworks-ready-reckoner.html" class="no-external">Machine Learning Frameworks in R</a>
+</h3>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('Ug=='); return false;">R</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('TWFjaGluZSUyMExlYXJuaW5n'); return false;">Machine Learning</div>
+
+</div>
+<div class="delink listing-description"><a href="./posts/ml-frameworks-ready-reckoner.html" class="no-external">
+R’s ecosystem offers a rich selection of machine learning frameworks, each with distinct design philosophies and strengths. This post is a side-by-side comparison of five ML…<strong></strong>
+</a></div>
+</div>
+<div class="metadata">
+<a href="./posts/ml-frameworks-ready-reckoner.html" class="no-external">
+<div class="listing-date">
+Apr 11, 2026
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="1" data-categories="UiUyQ05MUCUyQ1JBRyUyQ0xMTXMlMkNyYWduYXIlMkNlbGxtZXI=" data-listing-date-sort="1773513000000" data-listing-file-modified-sort="1775492619993" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2071">
 <div class="thumbnail"><a href="./posts/text-analytics-rag-pipeline-in-r.html" class="no-external">
 
 <img loading="lazy" src="./images/embedding.png" class="thumbnail-image">
@@ -281,7 +313,7 @@ window.Quarto = {
 
 </div>
 <div class="delink listing-description"><a href="./posts/text-analytics-rag-pipeline-in-r.html" class="no-external">
-This earlier post, explored building a text analytics pipeline using <code>quanteda</code>. We created a Document Feature Matrix (DFM), weighted it with TF-IDF, and measured document…<strong></strong>
+This earlier post explored building a text analytics pipeline using <code>quanteda</code>. We created a Document Feature Matrix (DFM), weighted it with TF-IDF, and measured document…<strong></strong>
 </a></div>
 </div>
 <div class="metadata">
@@ -289,13 +321,10 @@ This earlier post, explored building a text analytics pipeline using <code>quant
 <div class="listing-date">
 Mar 15, 2026
 </div>
-<div class="listing-author">
-Riddhiman Roy
-</div>
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="UiUyQ1RleHQlMjBBbmFseXRpY3MlMkNxdWFudGVkYSUyQ05MUA==" data-listing-date-sort="1759775400000" data-listing-file-modified-sort="1773561520997" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2918">
+<div class="quarto-post image-right" data-index="2" data-categories="UiUyQ1RleHQlMjBBbmFseXRpY3MlMkNxdWFudGVkYSUyQ05MUA==" data-listing-date-sort="1759775400000" data-listing-file-modified-sort="1775492619993" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2916">
 <div class="thumbnail"><a href="./posts/text-analytics-quanteda.html" class="no-external">
 
 <img loading="lazy" src="./images/quanteda.png" class="thumbnail-image">
@@ -317,7 +346,7 @@ Riddhiman Roy
 
 </div>
 <div class="delink listing-description"><a href="./posts/text-analytics-quanteda.html" class="no-external">
-In this post, we’ll explore how to transform text data into meaningful insights using the <code>quanteda</code> package which provides a powerful and intuitive framework for text analysis.
+In this post, let’s explore how to transform text data into meaningful insights using the <code>quanteda</code> package — a powerful and intuitive framework for text analysis.
 </a></div>
 </div>
 <div class="metadata">
@@ -328,7 +357,7 @@ Oct 7, 2025
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="UiUyQ1F1YXJ0byUyQ05ldXJhbCUyME5ldHdvcmtzJTJDV2ViUiUyQ1Zpc3VhbGl6YXRpb24=" data-listing-date-sort="1751308200000" data-listing-file-modified-sort="1759852300179" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="961">
+<div class="quarto-post image-right" data-index="3" data-categories="UiUyQ1F1YXJ0byUyQ05ldXJhbCUyME5ldHdvcmtzJTJDV2ViUiUyQ1Zpc3VhbGl6YXRpb24=" data-listing-date-sort="1751308200000" data-listing-file-modified-sort="1775492619993" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="961">
 <div class="thumbnail"><a href="./posts/quarto_live.html" class="no-external">
 
 <img loading="lazy" src="./images/quarto.png" class="thumbnail-image">
@@ -363,7 +392,7 @@ Jul 1, 2025
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="UiUyQ0RlZXAlMjBMZWFybmluZyUyQ3RvcmNoJTJDTXVsdGktVGFzayUyMExlYXJuaW5n" data-listing-date-sort="1746901800000" data-listing-file-modified-sort="1772937200017" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2144">
+<div class="quarto-post image-right" data-index="4" data-categories="UiUyQ0RlZXAlMjBMZWFybmluZyUyQ3RvcmNoJTJDTXVsdGktVGFzayUyMExlYXJuaW5n" data-listing-date-sort="1746901800000" data-listing-file-modified-sort="1775492619993" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2143">
 <div class="thumbnail"><a href="./posts/multi-task-learning-with-torch.html" class="no-external">
 
 <img loading="lazy" src="./images/torch.png" class="thumbnail-image">
@@ -396,7 +425,7 @@ May 11, 2025
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="4" data-categories="UiUyQ0RlZXAlMjBMZWFybmluZyUyQ3RvcmNo" data-listing-date-sort="1733337000000" data-listing-file-modified-sort="1759862540398" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1711">
+<div class="quarto-post image-right" data-index="5" data-categories="UiUyQ0RlZXAlMjBMZWFybmluZyUyQ3RvcmNo" data-listing-date-sort="1733337000000" data-listing-file-modified-sort="1775492619993" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1698">
 <div class="thumbnail"><a href="./posts/simple-neural-net-with-torch.html" class="no-external">
 
 <img loading="lazy" src="./images/nn.png" class="thumbnail-image">
@@ -416,7 +445,7 @@ May 11, 2025
 
 </div>
 <div class="delink listing-description"><a href="./posts/simple-neural-net-with-torch.html" class="no-external">
-The <code>torch</code> package brings deep learning to R by providing bindings to the popular PyTorch library. This comprehensive tutorial demonstrates how to build and train a simple…<code></code>
+The <code>torch</code> package brings PyTorch to R. In this post, let’s build and train a simple neural network from scratch.
 </a></div>
 </div>
 <div class="metadata">
@@ -427,7 +456,7 @@ Dec 5, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="5" data-categories="UiUyQ0NyZWRpdCUyMFJpc2slMjBBbmFseXRpY3MlMkNCb290c3RyYXBwaW5n" data-listing-date-sort="1731609000000" data-listing-file-modified-sort="1759861896452" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1985">
+<div class="quarto-post image-right" data-index="6" data-categories="UiUyQ0NyZWRpdCUyMFJpc2slMjBBbmFseXRpY3MlMkNCb290c3RyYXBwaW5n" data-listing-date-sort="1731609000000" data-listing-file-modified-sort="1775492619992" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1900">
 <div class="thumbnail"><a href="./posts/assessing-score-reliability.html" class="no-external">
 
 <img loading="lazy" src="./images/score_reliability.png" class="thumbnail-image">
@@ -447,7 +476,7 @@ Dec 5, 2024
 
 </div>
 <div class="delink listing-description"><a href="./posts/assessing-score-reliability.html" class="no-external">
-Credit scoring models demonstrate optimal performance within the central regions of the score distribution, yet exhibit diminished reliability at the distribution extremes…
+Credit scoring models tend to perform well in the middle of the score distribution — but reliability drops at the extremes, where data thins out. In this post, let’s use…
 </a></div>
 </div>
 <div class="metadata">
@@ -458,7 +487,7 @@ Nov 15, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="6" data-categories="UiUyQ01hY2hpbmUlMjBMZWFybmluZyUyQ3RpZHltb2RlbHM=" data-listing-date-sort="1728671400000" data-listing-file-modified-sort="1759852300178" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2502">
+<div class="quarto-post image-right" data-index="7" data-categories="UiUyQ01hY2hpbmUlMjBMZWFybmluZyUyQ3RpZHltb2RlbHM=" data-listing-date-sort="1728671400000" data-listing-file-modified-sort="1775492619993" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2512">
 <div class="thumbnail"><a href="./posts/modeling-with-tidymodels.html" class="no-external">
 
 <img loading="lazy" src="./images/tidymodels.png" class="thumbnail-image">
@@ -478,7 +507,7 @@ Nov 15, 2024
 
 </div>
 <div class="delink listing-description"><a href="./posts/modeling-with-tidymodels.html" class="no-external">
-The tidymodels framework provides a cohesive set of packages for modeling and machine learning in R, following tidyverse principles. In this post, we’ll build a realistic…
+The tidymodels framework provides a cohesive set of packages for modeling and machine learning in R, following tidyverse principles. In this post, let’s build a realistic…
 </a></div>
 </div>
 <div class="metadata">
@@ -489,7 +518,7 @@ Oct 12, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="7" data-categories="UiUyQ0FuYWx5dGljcyUyQ01hY2hpbmUlMjBMZWFybmluZw==" data-listing-date-sort="1726597800000" data-listing-file-modified-sort="1759852300159" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1485">
+<div class="quarto-post image-right" data-index="8" data-categories="UiUyQ0FuYWx5dGljcyUyQ01hY2hpbmUlMjBMZWFybmluZw==" data-listing-date-sort="1726597800000" data-listing-file-modified-sort="1775492619993" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1416">
 <div class="thumbnail"><a href="./posts/bayesian-optimization-xgboost.html" class="no-external">
 
 <img loading="lazy" src="./images/bayesian_opt.png" class="thumbnail-image">
@@ -509,7 +538,7 @@ Oct 12, 2024
 
 </div>
 <div class="delink listing-description"><a href="./posts/bayesian-optimization-xgboost.html" class="no-external">
-Hyperparameter tuning for machine learning models represents a computationally intensive and time-consuming process. This tutorial demonstrates the implementation of…
+Hyperparameter tuning is computationally intensive and time-consuming. In this post, let’s use Bayesian optimization to search for good XGBoost hyperparameters — a…
 </a></div>
 </div>
 <div class="metadata">
@@ -520,7 +549,7 @@ Sep 18, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="8" data-categories="UiUyQ09wdGltaXphdGlvbiUyQ1Zpc3VhbGl6YXRpb24=" data-listing-date-sort="1721586600000" data-listing-file-modified-sort="1759852300167" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1961">
+<div class="quarto-post image-right" data-index="9" data-categories="UiUyQ09wdGltaXphdGlvbiUyQ1Zpc3VhbGl6YXRpb24=" data-listing-date-sort="1721586600000" data-listing-file-modified-sort="1775492619993" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1939">
 <div class="thumbnail"><a href="./posts/building-particle-swarm-optimizer.html" class="no-external">
 
 <img loading="lazy" src="./images/pso_anim.gif" class="thumbnail-image">
@@ -540,7 +569,7 @@ Sep 18, 2024
 
 </div>
 <div class="delink listing-description"><a href="./posts/building-particle-swarm-optimizer.html" class="no-external">
-Nature-inspired optimization algorithms demonstrate remarkable efficiency in solving complex optimization problems. This post provides a implementation of Particle Swarm…
+Nature-inspired optimization algorithms can be surprisingly effective at navigating complex, high-dimensional search spaces. In this post, let’s build a Particle Swarm…
 </a></div>
 </div>
 <div class="metadata">
@@ -551,7 +580,7 @@ Jul 22, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="9" data-categories="UiUyQ0RhdGElMjBWaXN1YWxpemF0aW9uJTJDZ2dwbG90Mg==" data-listing-date-sort="1715625000000" data-listing-file-modified-sort="1759862446895" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2633">
+<div class="quarto-post image-right" data-index="10" data-categories="UiUyQ0RhdGElMjBWaXN1YWxpemF0aW9uJTJDZ2dwbG90Mg==" data-listing-date-sort="1715625000000" data-listing-file-modified-sort="1775492619990" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2612">
 <div class="thumbnail"><a href="./posts/custom-charting-functions-ggplot2.html" class="no-external">
 
 <img loading="lazy" src="./images/custom_charts.png" class="thumbnail-image">
@@ -571,7 +600,7 @@ Jul 22, 2024
 
 </div>
 <div class="delink listing-description"><a href="./posts/custom-charting-functions-ggplot2.html" class="no-external">
-While R provides numerous options for two-dimensional graphics and data visualization, <code>ggplot2</code> offers great functionality, features, and visual quality. This tutorial shows…<code></code>
+R has plenty of visualization options, but <code>ggplot2</code> stands out for its flexibility, quality, and composability. In this post, let’s build reusable custom charting functions…<code></code>
 </a></div>
 </div>
 <div class="metadata">
@@ -582,7 +611,7 @@ May 14, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="10" data-categories="UiUyQ1N0YXRpc3RpY3MlMkNTaW11bGF0aW9u" data-listing-date-sort="1710786600000" data-listing-file-modified-sort="1759852300167" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="871">
+<div class="quarto-post image-right" data-index="11" data-categories="UiUyQ1N0YXRpc3RpY3MlMkNTaW11bGF0aW9u" data-listing-date-sort="1710786600000" data-listing-file-modified-sort="1775492619990" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="862">
 <div class="thumbnail"><a href="./posts/generating-correlated-random-numbers.html" class="no-external">
 
 <img loading="lazy" src="./images/correlated.png" class="thumbnail-image">
@@ -602,7 +631,7 @@ May 14, 2024
 
 </div>
 <div class="delink listing-description"><a href="./posts/generating-correlated-random-numbers.html" class="no-external">
-The generation of random data with specified correlation patterns can be useful in statistical simulation and this tutorial provides a methodology for creating correlated…
+Generating random data with a specific correlation structure is a common need in statistical simulation. In this post, let’s walk through how to do it in R using matrix…
 </a></div>
 </div>
 <div class="metadata">
@@ -613,7 +642,7 @@ Mar 19, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="11" data-categories="UiUyQ0NyZWRpdCUyMFJpc2slMjBBbmFseXRpY3MlMkNNb2RlbCUyMEV2YWx1YXRpb24=" data-listing-date-sort="1706380200000" data-listing-file-modified-sort="1759852300178" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1352">
+<div class="quarto-post image-right" data-index="12" data-categories="UiUyQ0NyZWRpdCUyMFJpc2slMjBBbmFseXRpY3MlMkNNb2RlbCUyMEV2YWx1YXRpb24=" data-listing-date-sort="1706380200000" data-listing-file-modified-sort="1775492619991" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1323">
 <div class="thumbnail"><a href="./posts/measuring-model-performance-gains-table.html" class="no-external">
 
 <img loading="lazy" src="./images/gains.png" class="thumbnail-image">
@@ -633,7 +662,7 @@ Mar 19, 2024
 
 </div>
 <div class="delink listing-description"><a href="./posts/measuring-model-performance-gains-table.html" class="no-external">
-In credit risk modeling and binary classification applications, analysts employ gains tables (also known as KS tables) as a fundamental tool for measuring and quantifying…
+Gains tables (also known as KS tables) are a go-to tool for evaluating binary classification models in credit risk. In this post, let’s build one from scratch in R and…
 </a></div>
 </div>
 <div class="metadata">
@@ -644,7 +673,7 @@ Jan 28, 2024
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="12" data-categories="UiUyQ0ZpbmFuY2UlMkNPcHRpbWl6YXRpb24=" data-listing-date-sort="1684261800000" data-listing-file-modified-sort="1773566447666" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="21" data-listing-word-count-sort="4076">
+<div class="quarto-post image-right" data-index="13" data-categories="UiUyQ0ZpbmFuY2UlMkNPcHRpbWl6YXRpb24=" data-listing-date-sort="1684261800000" data-listing-file-modified-sort="1775492619993" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="21" data-listing-word-count-sort="4076">
 <div class="thumbnail"><a href="./posts/portfolio_optimisation_pso.html" class="no-external">
 
 <img loading="lazy" src="./images/portfolio_optimisation.png" class="thumbnail-image">
@@ -675,7 +704,7 @@ May 17, 2023
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="13" data-categories="UiUyQ0FuYWx5dGljcyUyQ0ludHJvZHVjdGlvbg==" data-listing-date-sort="1679423400000" data-listing-file-modified-sort="1759852300178" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1622">
+<div class="quarto-post image-right" data-index="14" data-categories="UiUyQ0FuYWx5dGljcyUyQ0ludHJvZHVjdGlvbg==" data-listing-date-sort="1679423400000" data-listing-file-modified-sort="1775492619990" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1622">
 <div class="thumbnail"><a href="./posts/intro-to-r-analytics.html" class="no-external">
 
 <img loading="lazy" src="./images/r-logo.png" class="thumbnail-image">
@@ -695,7 +724,7 @@ May 17, 2023
 
 </div>
 <div class="delink listing-description"><a href="./posts/intro-to-r-analytics.html" class="no-external">
-R is a powerful language specifically designed for data analysis and visualization. This guide demonstrates practical examples of using R for real-world analytics tasks.
+R is a powerful language built for data analysis and visualization. This post walks through practical examples of using R for real-world analytics tasks.
 </a></div>
 </div>
 <div class="metadata">
@@ -706,7 +735,7 @@ Mar 22, 2023
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="14" data-categories="UiUyQ0NyZWRpdCUyMFJpc2slMjBBbmFseXRpY3MlMkNYR0Jvb3N0" data-listing-date-sort="1674066600000" data-listing-file-modified-sort="1759852300179" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1396">
+<div class="quarto-post image-right" data-index="15" data-categories="UiUyQ0NyZWRpdCUyMFJpc2slMjBBbmFseXRpY3MlMkNYR0Jvb3N0" data-listing-date-sort="1674066600000" data-listing-file-modified-sort="1775492619992" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1391">
 <div class="thumbnail"><a href="./posts/monotonic-binning-using-xgboost.html" class="no-external">
 
 <img loading="lazy" src="./images/monotonic.png" class="thumbnail-image">
@@ -737,7 +766,7 @@ Jan 19, 2023
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="15" data-categories="UiUyQ1B5dGhvbiUyQ3JldGljdWxhdGU=" data-listing-date-sort="1673721000000" data-listing-file-modified-sort="1759852300168" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="435">
+<div class="quarto-post image-right" data-index="16" data-categories="UiUyQ1B5dGhvbiUyQ3JldGljdWxhdGU=" data-listing-date-sort="1673721000000" data-listing-file-modified-sort="1775492619993" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="435">
 <div class="thumbnail"><a href="./posts/getting-started-with-reticulate.html" class="no-external">
 
 <img loading="lazy" src="./images/reticulate.png" class="thumbnail-image">
@@ -822,13 +851,14 @@ Jan 15, 2023
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

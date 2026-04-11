@@ -10,7 +10,7 @@ execute:
   eval: true
 ---
 
-R is a powerful language specifically designed for data analysis and visualization. This guide demonstrates practical examples of using R for real-world analytics tasks.
+R is a powerful language built for data analysis and visualization. This post walks through practical examples of using R for real-world analytics tasks.
 
 ## Exploring a Dataset
 

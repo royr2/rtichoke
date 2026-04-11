@@ -10,7 +10,7 @@ execute:
   eval: true
 ---
 
-The `torch` package brings deep learning to R by providing bindings to the popular PyTorch library. This comprehensive tutorial demonstrates how to build and train a simple neural network using `torch` in R.
+The `torch` package brings PyTorch to R. In this post, let's build and train a simple neural network from scratch.
 
 ## Installation
 

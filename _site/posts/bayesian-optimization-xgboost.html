@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.9.35">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -10,6 +10,9 @@
 
 <title>Optimizing XGBoost Hyperparameters Using Bayesian Optimization in R – R’tichoke</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -72,10 +75,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7e58e3368124f49f6e3733161a9b089d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-9e41006022cc14e6bca310783a21a71f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-658c2336f25e20434af7fb9caa8b0f44.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-af1142a47761cd6f12b407da64115aad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -221,8 +224,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#package-dependencies" id="toc-package-dependencies" class="nav-link" data-scroll-target="#package-dependencies">Package Dependencies</a></li>
+  <li><a href="#required-packages" id="toc-required-packages" class="nav-link active" data-scroll-target="#required-packages">Required Packages</a></li>
   <li><a href="#data-acquisition-and-initial-processing" id="toc-data-acquisition-and-initial-processing" class="nav-link" data-scroll-target="#data-acquisition-and-initial-processing">Data Acquisition and Initial Processing</a></li>
   <li><a href="#bayesian-optimization-framework-implementation" id="toc-bayesian-optimization-framework-implementation" class="nav-link" data-scroll-target="#bayesian-optimization-framework-implementation">Bayesian Optimization Framework Implementation</a></li>
   <li><a href="#executing-the-optimization-process" id="toc-executing-the-optimization-process" class="nav-link" data-scroll-target="#executing-the-optimization-process">Executing the Optimization Process</a></li>
@@ -268,32 +270,28 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </header>
 
 
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>Hyperparameter tuning for machine learning models represents a computationally intensive and time-consuming process. This tutorial demonstrates the implementation of Bayesian optimization techniques to efficiently identify optimal XGBoost hyperparameters, thereby reducing computational overhead while enhancing model performance. The methodology presented provides a systematic approach to hyperparameter optimization that significantly outperforms traditional grid search methods.</p>
-</section>
-<section id="package-dependencies" class="level2">
-<h2 class="anchored" data-anchor-id="package-dependencies">Package Dependencies</h2>
-<p>This tutorial requires several specialized R packages for machine learning, optimization, and data preprocessing. The following packages must be installed and loaded before proceeding with the implementation.</p>
+<p>Hyperparameter tuning is computationally intensive and time-consuming. In this post, let’s use Bayesian optimization to search for good XGBoost hyperparameters — a systematic approach that typically requires far fewer evaluations than an exhaustive grid search.</p>
+<section id="required-packages" class="level2">
+<h2 class="anchored" data-anchor-id="required-packages">Required Packages</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(xgboost)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ParBayesianOptimization)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mlbench)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(recipes)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rsample)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rsample)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="data-acquisition-and-initial-processing" class="level2">
 <h2 class="anchored" data-anchor-id="data-acquisition-and-initial-processing">Data Acquisition and Initial Processing</h2>
-<p>This tutorial utilizes the Boston Housing dataset, a canonical regression problem that incorporates both numerical and categorical variables. This dataset provides an appropriate foundation for demonstrating Bayesian optimization techniques in a supervised learning context.</p>
+<p>This post uses the Boston Housing dataset — a canonical regression problem with both numerical and categorical variables, and a solid starting point for demonstrating Bayesian optimization.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the Boston Housing dataset</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the Boston Housing dataset</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"BostonHousing2"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick look at the data structure</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(BostonHousing2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(BostonHousing2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>'data.frame':   506 obs. of  19 variables:
  $ town   : Factor w/ 92 levels "Arlington","Ashland",..: 54 77 77 46 46 46 69 69 69 69 ...
@@ -319,7 +317,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </div>
 <p>XGBoost algorithms require numerical input features exclusively. Therefore, we employ the <code>recipes</code> package to systematically transform categorical variables through appropriate preprocessing techniques:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a recipe for preprocessing</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a recipe for preprocessing</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(cmedv <span class="sc">~</span> ., <span class="at">data =</span> BostonHousing2) <span class="sc">%&gt;%</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Collapse categories where population is &lt; 3%</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_other</span>(town, chas, <span class="at">threshold =</span> .<span class="dv">03</span>, <span class="at">other =</span> <span class="st">"Other"</span>) <span class="sc">%&gt;%</span> </span>
@@ -333,7 +331,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>model_df <span class="ot">&lt;-</span> <span class="fu">bake</span>(prep, <span class="at">new_data =</span> BostonHousing2)</span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the column names after one-hot encoding</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(model_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(model_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "tract"                  "lon"                    "lat"                   
  [4] "medv"                   "crim"                   "zn"                    
@@ -345,9 +343,9 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 [22] "town_Other"             "chas_X1"               </code></pre>
 </div>
 </div>
-<p>Subsequently, we partition the dataset into training and testing subsets to enable proper model evaluation and prevent data leakage:</p>
+<p>Let’s partition into training and testing sets:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a 70/30 train-test split</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a 70/30 train-test split</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>splits <span class="ot">&lt;-</span> rsample<span class="sc">::</span><span class="fu">initial_split</span>(model_df, <span class="at">prop =</span> <span class="fl">0.7</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>train_df <span class="ot">&lt;-</span> rsample<span class="sc">::</span><span class="fu">training</span>(splits)</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>test_df <span class="ot">&lt;-</span> rsample<span class="sc">::</span><span class="fu">testing</span>(splits)</span>
@@ -364,7 +362,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>folds <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">fold1 =</span> <span class="fu">as.integer</span>(<span class="fu">seq</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(X), <span class="at">by =</span> <span class="dv">5</span>)),</span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">fold2 =</span> <span class="fu">as.integer</span>(<span class="fu">seq</span>(<span class="dv">2</span>, <span class="fu">nrow</span>(X), <span class="at">by =</span> <span class="dv">5</span>))</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="bayesian-optimization-framework-implementation" class="level2">
@@ -375,7 +373,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <li><strong>Parameter Space Definition</strong>: The bounds and constraints that define the search space for optimization</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Our objective function takes hyperparameters as inputs</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Our objective function takes hyperparameters as inputs</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>obj_func <span class="ot">&lt;-</span> <span class="cf">function</span>(eta, max_depth, min_child_weight, subsample, lambda, alpha) {</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  param <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
@@ -422,14 +420,14 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">subsample =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="dv">1</span>),            <span class="co"># Subsampling range</span></span>
 <span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>  <span class="at">lambda =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>),                <span class="co"># L2 regularization range</span></span>
 <span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>  <span class="at">alpha =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">10</span>)                  <span class="co"># L1 regularization range</span></span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="executing-the-optimization-process" class="level2">
 <h2 class="anchored" data-anchor-id="executing-the-optimization-process">Executing the Optimization Process</h2>
 <p>The optimization procedure employs intelligent search strategies to systematically explore the hyperparameter space, utilizing Gaussian process modeling to predict promising parameter combinations:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>bayes_out <span class="ot">&lt;-</span> <span class="fu">bayesOpt</span>(</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">FUN =</span> obj_func,                    <span class="co"># Our objective function</span></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">bounds =</span> bounds,                   <span class="co"># Parameter bounds</span></span>
@@ -439,7 +437,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># View top results</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>bayes_out<span class="sc">$</span>scoreSummary[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="dv">3</span><span class="sc">:</span><span class="dv">8</span>, <span class="dv">13</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>bayes_out<span class="sc">$</span>scoreSummary[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="fu">c</span>(<span class="dv">3</span><span class="sc">:</span><span class="dv">8</span>, <span class="dv">13</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          eta max_depth min_child_weight subsample   lambda    alpha      Score
         &lt;num&gt;     &lt;num&gt;            &lt;num&gt;     &lt;num&gt;    &lt;num&gt;    &lt;num&gt;      &lt;num&gt;
@@ -449,9 +447,9 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 4: 0.08957707         4        12.534842 0.3844404 4.358837 1.788342 -0.1672395
 5: 0.02876388         4        36.586761 0.8107181 6.137100 6.039125 -0.3320015</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the best parameters</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the best parameters</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>best_params <span class="ot">&lt;-</span> <span class="fu">getBestPars</span>(bayes_out)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(best_params)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(best_params)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        eta max_depth min_child_weight subsample lambda    alpha
 1 0.1251447        10                1         1      1 5.905011</code></pre>
@@ -460,9 +458,9 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </section>
 <section id="final-model-development-and-evaluation" class="level2">
 <h2 class="anchored" data-anchor-id="final-model-development-and-evaluation">Final Model Development and Evaluation</h2>
-<p>Upon identification of optimal hyperparameter configurations, we proceed to train the final XGBoost model and evaluate its performance on the held-out test dataset.</p>
+<p>With the best parameters found by the optimizer, let’s train the final XGBoost model and evaluate it on the held-out test set.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine best params with base params</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine best params with base params</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>opt_params <span class="ot">&lt;-</span> <span class="fu">append</span>(</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">booster =</span> <span class="st">"gbtree"</span>, </span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">objective =</span> <span class="st">"reg:squarederror"</span>, </span>
@@ -506,7 +504,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate performance using Mean Absolute Percentage Error (MAPE)</span></span>
 <span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>mape <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">abs</span>(actuals <span class="sc">-</span> predicted)<span class="sc">/</span>actuals)</span>
-<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"MAPE on test set:"</span>, mape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"MAPE on test set:"</span>, mape)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>MAPE on test set: 0.006424492</code></pre>
 </div>
@@ -514,12 +512,11 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </section>
 <section id="key-advantages-of-bayesian-optimization" class="level2">
 <h2 class="anchored" data-anchor-id="key-advantages-of-bayesian-optimization">Key Advantages of Bayesian Optimization</h2>
-<p>Bayesian optimization demonstrates significant superiority over conventional hyperparameter tuning methodologies, particularly grid search approaches:</p>
+<p>Compared to grid or random search, Bayesian optimization has a few practical advantages:</p>
 <ol type="1">
-<li><strong>Computational Efficiency</strong>: Achieves optimal parameter identification through substantially fewer iterations</li>
-<li><strong>Adaptive Learning</strong>: Incorporates knowledge from previous evaluations to concentrate search efforts on promising parameter regions</li>
-<li><strong>Scalability</strong>: Maintains computational efficiency regardless of hyperparameter dimensionality</li>
-<li><strong>Time Optimization</strong>: Completes optimization procedures in significantly reduced timeframes while achieving equivalent or superior performance outcomes</li>
+<li><strong>Fewer evaluations</strong>: It uses a surrogate model to prioritise promising regions of the parameter space, so it typically needs fewer iterations to find good parameters</li>
+<li><strong>Adaptive search</strong>: Each new evaluation informs the next, rather than being chosen blindly</li>
+<li><strong>Scales reasonably well</strong>: Adding more hyperparameters doesn’t require an exponential increase in evaluations the way grid search does</li>
 </ol>
 <section id="practical-considerations" class="level3">
 <h3 class="anchored" data-anchor-id="practical-considerations">Practical Considerations</h3>
@@ -529,13 +526,12 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <section id="key-takeaways" class="level2">
 <h2 class="anchored" data-anchor-id="key-takeaways">Key Takeaways</h2>
 <ul>
-<li><strong>Gaussian process modeling enables intelligent parameter space exploration</strong> by learning from previous evaluations</li>
-<li><strong>Proper data preprocessing is critical</strong> for XGBoost implementation, particularly categorical variable encoding</li>
-<li><strong>Cross-validation integration ensures robust hyperparameter evaluation</strong> and prevents overfitting to specific data partitions</li>
-<li><strong>The methodology scales effectively</strong> to high-dimensional hyperparameter spaces without proportional computational increases</li>
-<li><strong>Production implementations benefit from increased iteration counts</strong> to ensure thorough parameter space exploration</li>
+<li><strong>Bayesian optimization builds a surrogate model</strong> of the objective function, using past results to guide future evaluations</li>
+<li><strong>Data preprocessing matters</strong> for XGBoost — categorical variables need encoding before the algorithm can use them</li>
+<li><strong>Cross-validation within the objective function</strong> gives a more reliable performance estimate for each parameter set</li>
+<li><strong>Increasing <code>iters.n</code></strong> gives the optimizer more chances to explore, which can help in high-dimensional parameter spaces</li>
 </ul>
-<p>This technique can extend beyond XGBoost to any machine learning algorithm requiring hyperparameter optimization, providing a foundation for efficient model development across diverse analytical contexts.</p>
+<p>The same approach applies to any model that needs hyperparameter tuning — not just XGBoost.</p>
 
 
 </section>
@@ -592,13 +588,14 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

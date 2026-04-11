@@ -1,0 +1,350 @@
+---
+title: "Machine Learning Frameworks in R"
+date: "2026-04-11"
+categories: [R, Machine Learning]
+image: "../images/ml-frameworks.png"
+execute:
+  echo: true
+  warning: false
+  message: false
+  eval: true
+  cache: true
+---
+
+R's ecosystem offers a rich selection of machine learning frameworks, each with distinct design philosophies and strengths. This post is a side-by-side comparison of five ML frameworks in R that provide **unified interfaces** over multiple algorithms, with runnable code examples on the same dataset so you can compare APIs directly. The focus is on packages that let you swap algorithms without rewriting your code. 
+
+## Frameworks at a Glance
+
+| Feature | tidymodels | caret | mlr3 | h2o | qeML | 
+|---|---|---|---|---|---|
+| **Built-in tuning** | ✅ (`tune`) | ✅ | ✅ (`mlr3tuning`) | ✅ (AutoML) | ✅ (`qeFT()`) |
+| **Preprocessing pipeline** | ✅ (`recipes`) | ✅ (`preProcess`) | ✅ (`mlr3pipelines`) | ✅ | ❌ |
+| **Model variety** | 200+ engines | 230+ methods | 100+ learners | GBM, GLM, DL, DRF | 20+ wrappers |
+| **Relative speed** | Moderate | Moderate | Moderate | Fast (distributed) | Depends on backend |
+| **Learning curve** | Medium | Low | High | Low | Very low |
+| **Active development** | ✅ | ⚠️ Maintenance mode | ✅ | ✅ | ✅ |
+| **Best for** | Production pipelines | Quick prototyping | Benchmarking | AutoML & scale | Teaching & exploration |
+
+## Setup and Data
+
+ALl examples below uses the `iris` classification task: predict `Species` from the four numeric measurements. A single train/test split is created up front so results are directly comparable.
+
+```{r}
+#| label: setup
+
+library(dplyr)
+
+# Reproducible train/test split (framework-agnostic)
+set.seed(42)
+n <- nrow(iris)
+train_idx <- sample(seq_len(n), size = floor(0.7 * n))
+
+train_data <- iris[train_idx, ]
+test_data  <- iris[-train_idx, ]
+
+# Store accuracy results for final comparison
+results <- data.frame(
+  Framework = character(),
+  Model = character(),
+  Accuracy = numeric(),
+  stringsAsFactors = FALSE
+)
+
+cat("Training set:", nrow(train_data), "observations\n")
+cat("Test set:    ", nrow(test_data), "observations\n")
+```
+
+------------------------------------------------------------------------
+
+## 1. tidymodels
+
+The [tidymodels](https://www.tidymodels.org/) ecosystem is the modern, tidyverse native approach to modeling in R. It provides a consistent grammar for specifying models (`parsnip`), preprocessing (`recipes`), composing workflows (`workflows`), and tuning hyperparameters (`tune`).
+
+```{r}
+#| label: tidymodels
+
+library(tidymodels)
+
+# Define a recipe (preprocessing)
+rec <- recipe(Species ~ ., data = train_data)
+
+# Define a model specification
+rf_spec <- rand_forest(trees = 500) %>%
+  set_engine("ranger") %>%
+  set_mode("classification")
+
+# Combine into a workflow
+rf_wf <- workflow() %>%
+  add_recipe(rec) %>%
+  add_model(rf_spec)
+
+# Fit the workflow
+rf_fit <- rf_wf %>% fit(data = train_data)
+
+# Predict on test set
+preds_tidy <- predict(rf_fit, test_data) %>%
+  bind_cols(test_data %>% select(Species))
+
+# Evaluate
+acc_tidy <- accuracy(preds_tidy, truth = Species, estimate = .pred_class)
+acc_tidy
+
+results <- rbind(results, data.frame(
+  Framework = "tidymodels",
+  Model = "Random Forest (ranger)",
+  Accuracy = acc_tidy$.estimate
+))
+```
+
+::: {.callout-tip}
+## Key Strengths
+- Composable pipeline: `recipe` + `model` + `workflow` is easy to extend
+- Swap engines with one line (`set_engine("xgboost")`)
+- Seamless cross-validation and hyperparameter tuning via `tune_grid()` / `tune_bayes()`
+- Deep integration with the tidyverse
+:::
+
+------------------------------------------------------------------------
+
+## 2. caret
+
+The [`caret`](https://topepo.github.io/caret/) package (Classification And REgression Training) was the de facto standard for ML in R for over a decade. It wraps 230+ models behind a single `train()` interface. While now in maintenance mode (its creator, Max Kuhn, leads `tidymodels`), it still remains widely used.
+
+```{r}
+#| label: caret
+
+library(caret)
+
+# Train a random forest with 5-fold CV
+ctrl <- trainControl(method = "cv", number = 5)
+
+rf_caret <- train(
+  Species ~ .,
+  data = train_data,
+  method = "rf",
+  trControl = ctrl,
+  tuneLength = 3  # Try 3 values of mtry
+)
+
+# Best tuning parameter
+rf_caret$bestTune
+
+# Predict on test set
+preds_caret <- predict(rf_caret, test_data)
+
+# Evaluate
+cm_caret <- confusionMatrix(preds_caret, test_data$Species)
+cm_caret$overall["Accuracy"]
+
+results <- rbind(results, data.frame(
+  Framework = "caret",
+  Model = "Random Forest (rf)",
+  Accuracy = as.numeric(cm_caret$overall["Accuracy"])
+))
+```
+
+::: {.callout-tip}
+## Key Strengths
+- Minimal API: a single `train()` call handles preprocessing, tuning, and fitting
+- 230+ model methods available out of the box
+- Built-in `confusionMatrix()` with extensive diagnostics
+- Massive community knowledge base and Stack Overflow coverage
+:::
+
+------------------------------------------------------------------------
+
+## 3. mlr3
+
+[`mlr3`](https://mlr3.mlr-org.com/) is a modern, object-oriented ML framework built on R6 classes. It excels at systematic benchmarking, composable pipelines, and reproducible experiments. The learning curve is steeper, but the payoff is a powerful, extensible architecture.
+
+```{r}
+#| label: mlr3
+#| cache: false
+
+library(mlr3)
+library(mlr3learners)
+
+# Define the task
+task <- TaskClassif$new(
+  id = "iris",
+  backend = train_data,
+  target = "Species"
+)
+
+# Define the learner
+learner <- lrn("classif.ranger", num.trees = 500)
+
+# Train
+learner$train(task)
+
+# Predict on test data — create a test task to avoid backend storage issues
+test_task <- TaskClassif$new(
+  id = "iris_test",
+  backend = test_data,
+  target = "Species"
+)
+pred_mlr3 <- learner$predict(test_task)
+
+# Evaluate
+acc_mlr3 <- pred_mlr3$score(msr("classif.acc"))
+acc_mlr3
+
+results <- rbind(results, data.frame(
+  Framework = "mlr3",
+  Model = "Random Forest (ranger)",
+  Accuracy = as.numeric(acc_mlr3)
+))
+```
+
+::: {.callout-tip}
+## Key Strengths
+- R6 object-oriented design — everything is an object with methods
+- First-class benchmarking: compare multiple learners on multiple tasks with `benchmark()`
+- Composable pipelines via `mlr3pipelines` (stacking, ensembling, feature engineering)
+- Built-in resampling strategies and performance measures
+:::
+
+------------------------------------------------------------------------
+
+## 4. h2o (AutoML)
+
+[`h2o`](https://docs.h2o.ai/h2o/latest-stable/h2o-r/docs/index.html) is a distributed machine learning platform with a powerful R interface. Its standout feature is `h2o.automl()` automatic model selection, hyperparameter tuning, and stacked ensemble creation with a single function call. It runs on a local JVM, so Java must be installed.
+
+::: {.callout-note}
+This section requires Java (JDK 8+) to be installed. `h2o` starts a local JVM-based server. If you don't have Java, skip to the results comparison — the other four frameworks cover the same ground without this dependency.
+:::
+
+```{r}
+#| label: h2o
+#| cache: false
+
+library(h2o)
+
+# Start a local h2o cluster (uses available cores)
+h2o.init(nthreads = -1, max_mem_size = "2G")
+h2o.no_progress()  # Suppress progress bars
+
+# Convert data to h2o frames
+train_h2o <- as.h2o(train_data)
+test_h2o  <- as.h2o(test_data)
+
+# Run AutoML — automatic model selection and stacking
+aml <- h2o.automl(
+  x = c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"),
+  y = "Species",
+  training_frame = train_h2o,
+  max_models = 10,
+  seed = 42
+)
+
+# Leaderboard — best models ranked by cross-validated performance
+h2o.get_leaderboard(aml) |> as.data.frame() |> head(5)
+
+# Predict with the best model
+preds_h2o <- h2o.predict(aml@leader, test_h2o)
+acc_h2o <- mean(as.vector(preds_h2o$predict) == as.vector(test_h2o$Species))
+cat("Accuracy:", acc_h2o, "\n")
+
+results <- rbind(results, data.frame(
+  Framework = "h2o",
+  Model = paste0("AutoML (", aml@leader@algorithm, ")"),
+  Accuracy = acc_h2o
+))
+
+# Shutdown h2o
+h2o.shutdown(prompt = FALSE)
+```
+
+::: {.callout-tip}
+## Key Strengths
+- `h2o.automl()` — fully automatic model selection, tuning, and stacked ensembles
+- Trains GBM, XGBoost, GLM, DRF, and deep learning models in one call
+- Distributed computing — scales to datasets larger than memory
+- Built-in leaderboard for model comparison
+- Production deployment via MOJO/POJO model export
+:::
+
+------------------------------------------------------------------------
+
+## 5. qeML
+
+[`qeML`](https://cran.r-project.org/package=qeML) (Quick and Easy Machine Learning) takes a different approach of minimizing boilerplate. Every algorithm — random forest, gradient boosting, SVM, KNN, LASSO, neural nets, and more is wrapped behind a one-line `qe*()` function with a consistent `(data, targetName)` signature. No formula objects, no matrix conversions, no separate predict calls just results. It's ideal for teaching, exploration, and quick model comparisons.
+
+```{r}
+#| label: qeml
+#| cache: false
+
+library(qeML)
+
+# qeML convention: pass full data + target name (string)
+# It handles train/test splitting internally via holdout
+# But to match our split, we'll train on train_data and predict on test_data
+# predict() expects new data WITHOUT the target column
+test_features <- test_data[, -which(names(test_data) == "Species")]
+
+# Random Forest (wraps randomForest)
+rf_qe <- qeRF(train_data, "Species")
+preds_rf_qe <- predict(rf_qe, test_features)
+acc_rf_qe <- mean(preds_rf_qe$predClasses == test_data$Species)
+cat("Random Forest accuracy:", acc_rf_qe, "\n")
+
+# Gradient Boosting (wraps gbm)
+gb_qe <- qeGBoost(train_data, "Species")
+preds_gb_qe <- predict(gb_qe, test_features)
+acc_gb_qe <- mean(preds_gb_qe$predClasses == test_data$Species)
+cat("Gradient Boosting accuracy:", acc_gb_qe, "\n")
+
+# SVM (wraps e1071)
+svm_qe <- qeSVM(train_data, "Species")
+preds_svm_qe <- predict(svm_qe, test_features)
+acc_svm_qe <- mean(preds_svm_qe$predClasses == test_data$Species)
+cat("SVM accuracy:", acc_svm_qe, "\n")
+
+# Use the best-performing qeML model for the results table
+best_acc_qe <- max(acc_rf_qe, acc_gb_qe, acc_svm_qe)
+best_model_qe <- c("Random Forest", "Gradient Boosting", "SVM")[
+  which.max(c(acc_rf_qe, acc_gb_qe, acc_svm_qe))
+]
+
+results <- rbind(results, data.frame(
+  Framework = "qeML",
+  Model = paste0(best_model_qe, " (qe wrapper)"),
+  Accuracy = best_acc_qe
+))
+```
+
+::: {.callout-tip}
+## Key Strengths
+- One-line model fitting: `qeRF(data, "target")` — no formula, no matrix, no recipe
+- 20+ algorithms behind a uniform `qe*()` interface (RF, GBM, SVM, KNN, LASSO, neural nets, and more)
+- `qeCompare()` lets you benchmark multiple methods in a single call
+- Built-in holdout evaluation
+- Lowest learning curve of any framework showcased here
+:::
+
+------------------------------------------------------------------------
+
+## Results Comparison
+
+All five frameworks were trained on the same 70/30 split of the `iris` dataset. Here's how they stack up:
+
+```{r}
+#| label: results-comparison
+
+library(knitr)
+
+results <- results %>% arrange(desc(Accuracy))
+kable(results, digits = 4, caption = "Test Set Accuracy by Framework")
+```
+
+On a clean, small dataset like `iris`, accuracy differences are minimal. The real differentiator is the API and workflow each framework provides. On real-world datasets the choice of framework matters more for how you structure your code than for raw accuracy.
+
+## Closing thoughts
+
+There is no single "best" ML framework in R and the right choice depends on the task at hand:
+
+-   **Start with `tidymodels`** for a modern, composable, production-ready pipeline.
+-   **Try `qeML`** for the fastest path from data to results.
+-   **Use `h2o`** for automatic model selection and stacking with minimal effort.
+-   **Consider `mlr3`** for rigorous benchmarking and advanced pipeline composition.
+-   **Stick with `caret`** if maintaining existing code or prefer its battle-tested simplicity.

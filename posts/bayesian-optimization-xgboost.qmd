@@ -11,13 +11,9 @@ execute:
   cache: true
 ---
 
-## Introduction
+Hyperparameter tuning is computationally intensive and time-consuming. In this post, let's use Bayesian optimization to search for good XGBoost hyperparameters — a systematic approach that typically requires far fewer evaluations than an exhaustive grid search.
 
-Hyperparameter tuning for machine learning models represents a computationally intensive and time-consuming process. This tutorial demonstrates the implementation of Bayesian optimization techniques to efficiently identify optimal XGBoost hyperparameters, thereby reducing computational overhead while enhancing model performance. The methodology presented provides a systematic approach to hyperparameter optimization that significantly outperforms traditional grid search methods.
-
-## Package Dependencies
-
-This tutorial requires several specialized R packages for machine learning, optimization, and data preprocessing. The following packages must be installed and loaded before proceeding with the implementation.
+## Required Packages
 
 ```{r}
 #| label: setup
@@ -35,7 +31,7 @@ library(rsample)
 
 ## Data Acquisition and Initial Processing
 
-This tutorial utilizes the Boston Housing dataset, a canonical regression problem that incorporates both numerical and categorical variables. This dataset provides an appropriate foundation for demonstrating Bayesian optimization techniques in a supervised learning context.
+This post uses the Boston Housing dataset — a canonical regression problem with both numerical and categorical variables, and a solid starting point for demonstrating Bayesian optimization.
 
 ```{r}
 #| label: data-load
@@ -69,7 +65,7 @@ model_df <- bake(prep, new_data = BostonHousing2)
 colnames(model_df)
 ```
 
-Subsequently, we partition the dataset into training and testing subsets to enable proper model evaluation and prevent data leakage:
+Let's partition into training and testing sets:
 
 ```{r}
 #| label: train-test-split
@@ -180,7 +176,7 @@ data.frame(best_params)
 
 ## Final Model Development and Evaluation
 
-Upon identification of optimal hyperparameter configurations, we proceed to train the final XGBoost model and evaluate its performance on the held-out test dataset.
+With the best parameters found by the optimizer, let's train the final XGBoost model and evaluate it on the held-out test set.
 
 ```{r}
 #| label: final-model
@@ -233,12 +229,11 @@ cat("MAPE on test set:", mape)
 ```
 ## Key Advantages of Bayesian Optimization
 
-Bayesian optimization demonstrates significant superiority over conventional hyperparameter tuning methodologies, particularly grid search approaches:
+Compared to grid or random search, Bayesian optimization has a few practical advantages:
 
-1. **Computational Efficiency**: Achieves optimal parameter identification through substantially fewer iterations
-2. **Adaptive Learning**: Incorporates knowledge from previous evaluations to concentrate search efforts on promising parameter regions
-3. **Scalability**: Maintains computational efficiency regardless of hyperparameter dimensionality
-4. **Time Optimization**: Completes optimization procedures in significantly reduced timeframes while achieving equivalent or superior performance outcomes
+1. **Fewer evaluations**: It uses a surrogate model to prioritise promising regions of the parameter space, so it typically needs fewer iterations to find good parameters
+2. **Adaptive search**: Each new evaluation informs the next, rather than being chosen blindly
+3. **Scales reasonably well**: Adding more hyperparameters doesn't require an exponential increase in evaluations the way grid search does
 
 ### Practical Considerations
 
@@ -246,10 +241,9 @@ This methodology becomes increasingly critical as model complexity and hyperpara
 
 ## Key Takeaways
 
-- **Gaussian process modeling enables intelligent parameter space exploration** by learning from previous evaluations
-- **Proper data preprocessing is critical** for XGBoost implementation, particularly categorical variable encoding
-- **Cross-validation integration ensures robust hyperparameter evaluation** and prevents overfitting to specific data partitions
-- **The methodology scales effectively** to high-dimensional hyperparameter spaces without proportional computational increases
-- **Production implementations benefit from increased iteration counts** to ensure thorough parameter space exploration
+- **Bayesian optimization builds a surrogate model** of the objective function, using past results to guide future evaluations
+- **Data preprocessing matters** for XGBoost — categorical variables need encoding before the algorithm can use them
+- **Cross-validation within the objective function** gives a more reliable performance estimate for each parameter set
+- **Increasing `iters.n`** gives the optimizer more chances to explore, which can help in high-dimensional parameter spaces
 
-This technique can extend beyond XGBoost to any machine learning algorithm requiring hyperparameter optimization, providing a foundation for efficient model development across diverse analytical contexts.
+The same approach applies to any model that needs hyperparameter tuning — not just XGBoost.

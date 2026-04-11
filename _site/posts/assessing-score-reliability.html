@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.9.35">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -10,6 +10,9 @@
 
 <title>Assessing Credit Score Prediction Reliability Using Bootstrap Resampling – R’tichoke</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -72,10 +75,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7e58e3368124f49f6e3733161a9b089d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-9e41006022cc14e6bca310783a21a71f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-658c2336f25e20434af7fb9caa8b0f44.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-af1142a47761cd6f12b407da64115aad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -221,8 +224,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#theoretical-foundation-understanding-estimation-variance" id="toc-theoretical-foundation-understanding-estimation-variance" class="nav-link" data-scroll-target="#theoretical-foundation-understanding-estimation-variance">Theoretical Foundation: Understanding Estimation Variance</a></li>
+  <li><a href="#theoretical-foundation-understanding-estimation-variance" id="toc-theoretical-foundation-understanding-estimation-variance" class="nav-link active" data-scroll-target="#theoretical-foundation-understanding-estimation-variance">Theoretical Foundation: Understanding Estimation Variance</a></li>
   <li><a href="#data-acquisition-and-preprocessing" id="toc-data-acquisition-and-preprocessing" class="nav-link" data-scroll-target="#data-acquisition-and-preprocessing">Data Acquisition and Preprocessing</a></li>
   <li><a href="#implementing-bootstrap-resampling-strategy" id="toc-implementing-bootstrap-resampling-strategy" class="nav-link" data-scroll-target="#implementing-bootstrap-resampling-strategy">Implementing Bootstrap Resampling Strategy</a></li>
   <li><a href="#developing-the-predictive-model-framework" id="toc-developing-the-predictive-model-framework" class="nav-link" data-scroll-target="#developing-the-predictive-model-framework">Developing the Predictive Model Framework</a></li>
@@ -270,15 +272,12 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </header>
 
 
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>Credit scoring models demonstrate optimal performance within the central regions of the score distribution, yet exhibit diminished reliability at the distribution extremes where data becomes sparse. This tutorial provides a comprehensive methodology for employing bootstrap resampling techniques to quantify prediction variability across different score ranges, thereby enabling practitioners to identify regions where their models demonstrate the highest degree of dependability.</p>
-</section>
+<p>Credit scoring models tend to perform well in the middle of the score distribution — but reliability drops at the extremes, where data thins out. In this post, let’s use bootstrap resampling to measure how much predictions vary across score ranges and pinpoint where a model can and can’t be fully trusted.</p>
 <section id="theoretical-foundation-understanding-estimation-variance" class="level2">
 <h2 class="anchored" data-anchor-id="theoretical-foundation-understanding-estimation-variance">Theoretical Foundation: Understanding Estimation Variance</h2>
-<p>Reduced sample sizes inherently result in increased variance in statistical estimates, particularly for extreme values within a distribution. While central tendency measures such as means demonstrate relative stability when estimated from limited data, tail percentiles (95th, 99th) exhibit substantially greater volatility. This phenomenon is of critical importance in credit scoring applications, where extremely high and low scores correspond to these unstable tail regions of the distribution.</p>
+<p>Smaller sample sizes mean more variance in statistical estimates — especially for extreme values. Central measures like the mean stay relatively stable even with limited data, but tail percentiles (95th, 99th) can swing considerably. In credit scoring, this matters because the highest and lowest scores are precisely the ones living in those unstable tails.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of samples to be drawn from a probability distribution</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of samples to be drawn from a probability distribution</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>n_samples <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of times, sampling should be repeated</span></span>
@@ -304,19 +303,19 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>sample_99_quantile <span class="ot">&lt;-</span> <span class="fu">apply</span>(samples, <span class="dv">1</span>, quantile, <span class="at">p =</span> <span class="fl">0.99</span>)</span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare coefficient of variation</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(sample_means)<span class="sc">/</span><span class="fu">mean</span>(sample_means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(sample_means)<span class="sc">/</span><span class="fu">mean</span>(sample_means)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01010032</code></pre>
+<pre><code>[1] 0.01017773</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(sample_75_quantile)<span class="sc">/</span><span class="fu">mean</span>(sample_75_quantile)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(sample_75_quantile)<span class="sc">/</span><span class="fu">mean</span>(sample_75_quantile)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.0126477</code></pre>
+<pre><code>[1] 0.01287054</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(sample_95_quantile)<span class="sc">/</span><span class="fu">mean</span>(sample_75_quantile)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(sample_95_quantile)<span class="sc">/</span><span class="fu">mean</span>(sample_75_quantile)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01925887</code></pre>
+<pre><code>[1] 0.01884669</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the distributions</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the distributions</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>combined_vec <span class="ot">&lt;-</span> <span class="fu">c</span>(sample_means, sample_75_quantile, sample_95_quantile, sample_99_quantile)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(sample_means), </span>
@@ -334,7 +333,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, </span>
 <span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">"#6F69AC"</span>, <span class="st">"#95DAC1"</span>, <span class="st">"#FFEBA1"</span>, <span class="st">"#FD6F96"</span>), </span>
 <span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Mean"</span>, <span class="st">"75% Quantile"</span>, <span class="st">"95% Quantile"</span>, <span class="st">"99% Quantile"</span>), </span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">cex =</span> <span class="fl">0.7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">cex =</span> <span class="fl">0.7</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -343,20 +342,20 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </div>
 </div>
 </div>
-<p>The visualization demonstrates the substantial increase in uncertainty when estimating extreme values compared to central tendencies. The distribution corresponding to the mean (purple) exhibits considerably narrower dispersion than that of the 99th percentile (pink). This statistical principle directly applies to credit scoring applications, where scores at the extremes of the distribution inherently possess greater uncertainty.</p>
+<p>The chart makes the point clearly — the mean distribution (purple) is much tighter than the 99th percentile (pink). The same principle applies in credit scoring: scores at the extremes carry more uncertainty, almost by definition.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(magrittr)</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rsample)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="data-acquisition-and-preprocessing" class="level2">
 <h2 class="anchored" data-anchor-id="data-acquisition-and-preprocessing">Data Acquisition and Preprocessing</h2>
-<p>In this tutorial, we will utilize a sample from the Lending Club dataset. Loans classified as “Charged Off” will be designated as defaults. The observed class imbalance represents a typical characteristic of credit portfolios and contributes significantly to prediction challenges at distribution extremes.</p>
+<p>In this post, let’s use a sample from the Lending Club dataset. Loans classified as “Charged Off” are treated as defaults. The class imbalance here is typical of real credit portfolios and is a key reason predictions become less reliable at the score extremes.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load sample data (sample of the lending club data)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load sample data (sample of the lending club data)</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>sample <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"http://bit.ly/42ypcnJ"</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Mark which loan status will be tagged as default</span></span>
@@ -369,7 +368,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>sample[<span class="fu">is.na</span>(sample)] <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">1</span></span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Get summary tally</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(sample<span class="sc">$</span>bad_flag)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(sample<span class="sc">$</span>bad_flag)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
    0    1 
@@ -379,44 +378,44 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </section>
 <section id="implementing-bootstrap-resampling-strategy" class="level2">
 <h2 class="anchored" data-anchor-id="implementing-bootstrap-resampling-strategy">Implementing Bootstrap Resampling Strategy</h2>
-<p>This section demonstrates the creation of 100 bootstrap samples to quantify the variation in model predictions across different score ranges. Bootstrap resampling is a statistical technique that generates multiple simulated datasets to measure prediction uncertainty without requiring additional data collection.</p>
+<p>Let’s create 100 bootstrap samples to measure how much model predictions vary across score ranges. Bootstrap resampling generates multiple simulated datasets from the original data, so we can quantify prediction uncertainty without collecting any additional observations.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create 100 samples</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create 100 samples</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>boot_sample <span class="ot">&lt;-</span> <span class="fu">bootstraps</span>(<span class="at">data =</span> sample, <span class="at">times =</span> <span class="dv">100</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(boot_sample, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(boot_sample, <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 2
   splits               id          
   &lt;list&gt;               &lt;chr&gt;       
-1 &lt;split [10000/3652]&gt; Bootstrap001
-2 &lt;split [10000/3712]&gt; Bootstrap002
-3 &lt;split [10000/3692]&gt; Bootstrap003</code></pre>
+1 &lt;split [10000/3640]&gt; Bootstrap001
+2 &lt;split [10000/3670]&gt; Bootstrap002
+3 &lt;split [10000/3660]&gt; Bootstrap003</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Each row represents a separate bootstrapped sample with an analysis set and assessment set</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>boot_sample<span class="sc">$</span>splits[[<span class="dv">1</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Each row represents a separate bootstrapped sample with an analysis set and assessment set</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>boot_sample<span class="sc">$</span>splits[[<span class="dv">1</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;Analysis/Assess/Total&gt;
-&lt;10000/3652/10000&gt;</code></pre>
+&lt;10000/3640/10000&gt;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the first 5 rows and 5 columns of the first sample</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">analysis</span>(boot_sample<span class="sc">$</span>splits[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> .[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the first 5 rows and 5 columns of the first sample</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">analysis</span>(boot_sample<span class="sc">$</span>splits[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> .[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     V1        id member_id loan_amnt funded_amnt
-1 10086  70212864        -1     23000       23000
-2 26035 121241887        -1     34000       34000
-3 39215  90400998        -1     16000       16000
-4 51533 134782414        -1     25000       25000
-5 39313 116265481        -1     30000       30000</code></pre>
+1 36670  67798765        -1     12000       12000
+2 47857   1243964        -1      2225        2225
+3 57237  95173569        -1      4000        4000
+4 56986 141865899        -1      1600        1600
+5 12547  74505751        -1     18000       18000</code></pre>
 </div>
 </div>
 <p>Each bootstrap sample consists of random draws with replacement from the original dataset, creating controlled variations that effectively reveal model sensitivity to different data compositions.</p>
 </section>
 <section id="developing-the-predictive-model-framework" class="level2">
 <h2 class="anchored" data-anchor-id="developing-the-predictive-model-framework">Developing the Predictive Model Framework</h2>
-<p>This tutorial employs logistic regression as the predictive modeling technique. Logistic regression represents the industry standard for credit risk modeling due to its interpretability and regulatory acceptance. The model specification incorporates typical credit variables including loan amount, income, and credit history metrics.</p>
+<p>This post uses logistic regression — the industry standard for credit risk modeling, valued for its interpretability and regulatory acceptance. The model includes typical credit variables: loan amount, income, and credit history metrics.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>glm_model <span class="ot">&lt;-</span> <span class="cf">function</span>(df){</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>glm_model <span class="ot">&lt;-</span> <span class="cf">function</span>(df){</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Fit a simple model with a set specification</span></span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  mdl <span class="ot">&lt;-</span> <span class="fu">glm</span>(bad_flag <span class="sc">~</span></span>
@@ -438,9 +437,9 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">&lt;-</span> <span class="fu">glm_model</span>(train)</span>
 <span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Check output</span></span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(pred)  <span class="co"># Output is on log odds scale</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(pred)  <span class="co"># Output is on log odds scale</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -75.700183   1.100072</code></pre>
+<pre><code>[1] -25.956219   1.301621</code></pre>
 </div>
 </div>
 <p>The function returns predictions in log-odds format, which will subsequently be transformed to a more intuitive credit score scale in later steps.</p>
@@ -448,7 +447,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <section id="iterative-model-training-and-prediction-collection" class="level2">
 <h2 class="anchored" data-anchor-id="iterative-model-training-and-prediction-collection">Iterative Model Training and Prediction Collection</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># First apply the glm fitting function to each of the sample</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># First apply the glm fitting function to each of the sample</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note the use of lapply</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">lapply</span>(boot_sample<span class="sc">$</span>splits, <span class="cf">function</span>(x){</span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  train <span class="ot">&lt;-</span> <span class="fu">analysis</span>(x)</span>
@@ -459,11 +458,11 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Collate all predictions into a vector </span></span>
 <span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>boot_preds <span class="ot">&lt;-</span> <span class="fu">do.call</span>(c, output)</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(boot_preds)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(boot_preds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -124.065500    4.388731</code></pre>
+<pre><code>[1] -140.233643    4.938884</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get outliers</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get outliers</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>q_high <span class="ot">&lt;-</span> <span class="fu">quantile</span>(boot_preds, <span class="fl">0.99</span>)</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>q_low <span class="ot">&lt;-</span> <span class="fu">quantile</span>(boot_preds, <span class="fl">0.01</span>)</span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -472,31 +471,31 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>boot_preds[boot_preds <span class="sc">&gt;</span> q_high] <span class="ot">&lt;-</span> q_high</span>
 <span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>boot_preds[boot_preds <span class="sc">&lt;</span> q_low] <span class="ot">&lt;-</span> q_low</span>
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(boot_preds)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(boot_preds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -5.0849895 -0.2114957</code></pre>
+<pre><code>[1] -5.0709351 -0.2214304</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to a data frame</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to a data frame</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>boot_preds <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">pred =</span> boot_preds, </span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">id =</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(boot_sample<span class="sc">$</span>splits), <span class="at">each =</span> <span class="fu">nrow</span>(sample)))</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(boot_preds)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(boot_preds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>        pred id
-1 -2.6206229  1
-2 -0.9742723  1
-3 -2.8550002  1
-4 -0.7690863  1
-5 -3.7163709  1
-6 -3.1800940  1</code></pre>
+<pre><code>       pred id
+1 -2.498278  1
+2 -1.439371  1
+3 -2.728261  1
+4 -1.522470  1
+5 -2.924104  1
+6 -2.831498  1</code></pre>
 </div>
 </div>
-<p>In this step, we apply the logistic regression model to each bootstrap sample and systematically collect the resulting predictions. Subsequently, we truncate extreme values (beyond the 1st and 99th percentiles) to remove outliers—a procedure analogous to capping techniques commonly employed in production credit models.</p>
+<p>Here, let’s apply the logistic regression model to each bootstrap sample and collect the resulting predictions. Extreme values beyond the 1st and 99th percentiles are then truncated to remove outliers — the same capping approach used in production credit models.</p>
 </section>
 <section id="transforming-predictions-to-credit-score-scale" class="level2">
 <h2 class="anchored" data-anchor-id="transforming-predictions-to-credit-score-scale">Transforming Predictions to Credit Score Scale</h2>
-<p>This section demonstrates the conversion of log-odds predictions to a recognizable credit score format using the industry-standard Points to Double Odds (PDO) methodology. By employing parameters consistent with real-world credit systems (PDO=30, Anchor=700), we transform the model predictions into intuitive scores where higher numerical values indicate lower credit risk.</p>
+<p>Let’s convert the log-odds predictions into a familiar credit score format using the industry-standard Points to Double Odds (PDO) methodology. With parameters typical of real-world credit systems (PDO=30, Anchor=700), scores are scaled so that higher values indicate lower credit risk.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>scaling_func <span class="ot">&lt;-</span> <span class="cf">function</span>(vec, <span class="at">PDO =</span> <span class="dv">30</span>, <span class="at">OddsAtAnchor =</span> <span class="dv">5</span>, <span class="at">Anchor =</span> <span class="dv">700</span>){</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>scaling_func <span class="ot">&lt;-</span> <span class="cf">function</span>(vec, <span class="at">PDO =</span> <span class="dv">30</span>, <span class="at">OddsAtAnchor =</span> <span class="dv">5</span>, <span class="at">Anchor =</span> <span class="dv">700</span>){</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  beta <span class="ot">&lt;-</span> PDO <span class="sc">/</span> <span class="fu">log</span>(<span class="dv">2</span>)</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  alpha <span class="ot">&lt;-</span> Anchor <span class="sc">-</span> PDO <span class="sc">*</span> OddsAtAnchor</span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  </span>
@@ -518,7 +517,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Predictions from bootstrapped samples"</span>, </span>
 <span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Density function"</span>, </span>
 <span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Predictions (Log odds)"</span>, </span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Density"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Density"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -530,9 +529,9 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </section>
 <section id="quantifying-prediction-uncertainty-across-score-ranges" class="level2">
 <h2 class="anchored" data-anchor-id="quantifying-prediction-uncertainty-across-score-ranges">Quantifying Prediction Uncertainty Across Score Ranges</h2>
-<p>This section provides a methodology to directly measure prediction reliability variation across different score ranges through the calculation of standard deviation within each score bin. This approach enables precise quantification of uncertainty at different score levels.</p>
+<p>Let’s measure prediction reliability directly by calculating the standard deviation of scores within each bin — a straightforward way to see where the model is stable and where it isn’t.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create bins using quantiles</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create bins using quantiles</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>breaks <span class="ot">&lt;-</span> <span class="fu">quantile</span>(boot_preds<span class="sc">$</span>scores, <span class="at">probs =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">20</span>))</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>boot_preds<span class="sc">$</span>bins <span class="ot">&lt;-</span> <span class="fu">cut</span>(boot_preds<span class="sc">$</span>scores, <span class="at">breaks =</span> <span class="fu">unique</span>(breaks), <span class="at">include.lowest =</span> T, <span class="at">right =</span> T)</span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -548,7 +547,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Variability in model predictions across samples"</span>, </span>
 <span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"(measured using standard deviation)"</span>, </span>
 <span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Score Range"</span>, </span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Standard Deviation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Standard Deviation"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -571,9 +570,9 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <section id="advanced-methodology-isolating-training-data-effects" class="level2">
 <h2 class="anchored" data-anchor-id="advanced-methodology-isolating-training-data-effects">Advanced Methodology: Isolating Training Data Effects</h2>
 <p><em>Credit: Richard Warnung</em></p>
-<p>For enhanced analytical control, this section presents an alternative approach where models are trained on bootstrap samples while being evaluated on a consistent validation set. This methodology effectively isolates the impact of training data variation on model predictions.</p>
+<p>For tighter analytical control, let’s try an alternative approach: train models on bootstrap samples, but evaluate them on a fixed validation set. This isolates the effect of training data variation on predictions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>Vs <span class="ot">&lt;-</span> <span class="cf">function</span>(boot_split){</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>Vs <span class="ot">&lt;-</span> <span class="cf">function</span>(boot_split){</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Train model on the bootstrapped data</span></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  train <span class="ot">&lt;-</span> <span class="fu">analysis</span>(boot_split)</span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  </span>
@@ -590,11 +589,11 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return predictions</span></span>
 <span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(validate_preds)</span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>This methodology provides enhanced insight into how variations in training data composition affect model predictions, which proves valuable when evaluating model updates in production environments.</p>
+<p>This approach gives clearer insight into how training data variation affects predictions — particularly useful when evaluating model updates in production.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create overall training and testing datasets </span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create overall training and testing datasets </span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>id <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(sample), <span class="at">size =</span> <span class="fu">nrow</span>(sample)<span class="sc">*</span><span class="fl">0.8</span>, <span class="at">replace =</span> F)</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>train_data <span class="ot">&lt;-</span> sample[id,]</span>
@@ -624,7 +623,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>  pred <span class="ot">&lt;-</span> <span class="fu">glm_model</span>(train, test_data)</span>
 <span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(pred)</span>
-<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="key-takeaways" class="level2">
@@ -693,13 +692,14 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

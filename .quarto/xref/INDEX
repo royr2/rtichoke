@@ -193,5 +193,11 @@
   },
   "posts/text-analytics-rag-pipeline-in-r.qmd": {
     "text-analytics-rag-pipeline-in-r.html": "6a09aec5"
+  },
+  "posts/ml-frameworks-in-r.qmd": {
+    "ml-frameworks-in-r.html": "b6b4411e"
+  },
+  "posts/ml-frameworks-ready-reckoner.qmd": {
+    "ml-frameworks-ready-reckoner.html": "55a60103"
   }
 }

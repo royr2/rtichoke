@@ -10,11 +10,9 @@ execute:
   eval: true
 ---
 
-## Introduction
+R has plenty of visualization options, but `ggplot2` stands out for its flexibility, quality, and composability. In this post, let's build reusable custom charting functions on top of `ggplot2` — the kind you can drop straight into a production analytics workflow.
 
-While R provides numerous options for two-dimensional graphics and data visualization, `ggplot2` offers great functionality, features, and visual quality. This tutorial shows how to develop customized charting functions for specific visualization types, utilizing `ggplot2` as the foundational visualization engine. The approach enables the creation of reusable, standardized visualization components suitable for production environments and analytical workflows.
-
-## Package Dependencies
+## Required Packages
 
 ```{r}
 #| label: setup
@@ -30,7 +28,7 @@ library(stringr)
 
 ## Dataset Acquisition and Preparation
 
-This tutorial utilizes a summarized version of the COVID-19 Data Repository maintained by [Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19) to demonstrate custom charting function development.
+Let's use a summarized version of the COVID-19 Data Repository from [Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19) to build and test the custom charts.
 
 ```{r}
 #| label: data-load
@@ -48,7 +46,7 @@ top_countries <- df %>%
 print(top_countries)
 ```
 
-Subsequently, we prepare the dataset for visualization by calculating a 7-day centered moving average of daily confirmed cases for the identified top five countries:
+Let's calculate a 7-day centered moving average of daily confirmed cases for these five countries:
 
 ```{r}
 #| label: data-prep
@@ -99,7 +97,7 @@ line_chart(plotdf,
 
 ## Custom Theme Development
 
-Having established the methodology for encapsulating `ggplot2` calls within intuitive function wrappers, we proceed to develop a customized theme framework for our visualizations. This approach ensures consistent styling across all chart types and can be universally applied to any `ggplot2` object.
+Now let's build a custom theme on top of those chart functions. Because `custom_theme()` returns a standard `ggplot2` object, it can be applied to any chart type — making it straightforward to keep a consistent look across a report or dashboard.
 
 ```{r}
 #| label: custom-theme-basic
@@ -277,7 +275,7 @@ The development of custom charting functions utilizing ggplot2 provides substant
 
 1. **Visual Consistency**: Ensures uniform appearance and styling across all visualizations within reports or analytical dashboards.
 
-2. **Development Efficiency**: Significantly reduces code volume required for frequently utilized chart types and configurations.
+2. **Less repetition**: Wrapping common chart patterns into a function means less boilerplate code each time you need that chart type.
 
 3. **Maintenance Optimization**: Facilitates centralized style updates through single function modifications, propagating changes across all implementations.
 

@@ -2,15 +2,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.9.35">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Riddhiman Roy">
 <meta name="dcterms.date" content="2026-03-15">
 
 <title>Text Analytics in R: Dense embeddings and RAG pipeline with ragnar and ellmer – R'tichoke</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -73,10 +75,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7e58e3368124f49f6e3733161a9b089d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-9e41006022cc14e6bca310783a21a71f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-658c2336f25e20434af7fb9caa8b0f44.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-af1142a47761cd6f12b407da64115aad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -223,7 +225,6 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
    
   <ul>
   <li><a href="#required-packages" id="toc-required-packages" class="nav-link active" data-scroll-target="#required-packages">Required Packages</a></li>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
   <li><a href="#the-problem-with-tf-idf-cosine-similarity" id="toc-the-problem-with-tf-idf-cosine-similarity" class="nav-link" data-scroll-target="#the-problem-with-tf-idf-cosine-similarity">The Problem with tf-idf + Cosine Similarity</a></li>
   <li><a href="#dense-embeddings---same-metric-but-better-representation" id="toc-dense-embeddings---same-metric-but-better-representation" class="nav-link" data-scroll-target="#dense-embeddings---same-metric-but-better-representation">Dense Embeddings - Same Metric But Better Representation</a></li>
   <li><a href="#document-corpus" id="toc-document-corpus" class="nav-link" data-scroll-target="#document-corpus">Document Corpus</a></li>
@@ -262,12 +263,6 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Riddhiman Roy </p>
-          </div>
-  </div>
     
     <div>
     <div class="quarto-title-meta-heading">Published</div>
@@ -287,17 +282,14 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <section id="required-packages" class="level2">
 <h2 class="anchored" data-anchor-id="required-packages">Required Packages</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c("ragnar", "ellmer", "dplyr", "ggplot2", "tibble"))</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c("ragnar", "ellmer", "dplyr", "ggplot2", "tibble"))</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ragnar)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ellmer)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>This <a href="../posts/text-analytics-quanteda.html">earlier post</a>, explored building a text analytics pipeline using <code>quanteda</code>. We created a Document Feature Matrix (DFM), weighted it with TF-IDF, and measured document similarity using <strong>cosine similarity</strong>.</p>
+<p>This <a href="../posts/text-analytics-quanteda.html">earlier post</a> explored building a text analytics pipeline using <code>quanteda</code>. We created a Document Feature Matrix (DFM), weighted it with TF-IDF, and measured document similarity using <strong>cosine similarity</strong>.</p>
 <p>It worked, but we also ran into a limitation - <code>cosine similarity alone might not be enough since the top most similar document did not match the document's sentiment</code></p>
 <p>The root cause is not cosine similarity but the fact that we are measuring the cosine similarity of sparse TF-IDF vectors that encode word overlap, not meaning.</p>
 <p>As an example, consider these sentences:</p>
@@ -307,7 +299,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </ul>
 <p>After stopword removal, they share zero vocabulary, producing near-zero TF-IDF cosine similarity. However, any analyst would consider these sentences semantically identical.</p>
 <p>One fix is to use <strong>dense embeddings</strong> - neural representations where similar meanings map to nearby vectors. With dense embeddings, we should be able to capture semantic similarity between two sentences, even when they share no words.</p>
-<p>In this post, we’ll explore how to build a Retrieval Augmented Generation (RAG) pipeline in R using <code>ragnar</code> and <code>ellmer</code> to demonstrate the power of dense embeddings for retrieval and generation. The RAG pipeline would look like so:</p>
+<p>In this post, let’s build a Retrieval Augmented Generation (RAG) pipeline in R using <code>ragnar</code> and <code>ellmer</code> to demonstrate the power of dense embeddings for retrieval and generation. The RAG pipeline would look like so:</p>
 <pre><code>Documents → Chunk → Embed → Store → [Query] → Retrieve → Generate Answer</code></pre>
 <p>We will build this using <a href="https://ragnar.tidyverse.org/"><code>ragnar</code></a> for the retrieval store and <a href="https://ellmer.tidyverse.org/"><code>ellmer</code></a> for LLM interaction.</p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -328,23 +320,23 @@ Note
 <li>Download and install Ollama from <a href="https://ollama.com/">ollama.com</a></li>
 <li>Open a terminal and start the server:</li>
 </ol>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> serve</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> serve</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ol start="3" type="1">
 <li>Pull the two models used in this post:</li>
 </ol>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> pull nomic-embed-text</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> pull llama3.1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> pull nomic-embed-text</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> pull llama3.1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ol start="4" type="1">
 <li>Verify the server is running:</li>
 </ol>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:11434</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected response: Ollama is running</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:11434</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected response: Ollama is running</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <hr>
 </section>
 <section id="the-problem-with-tf-idf-cosine-similarity" class="level2">
 <h2 class="anchored" data-anchor-id="the-problem-with-tf-idf-cosine-similarity">The Problem with tf-idf + Cosine Similarity</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(quanteda)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(quanteda)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(quanteda.textstats)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Two semantically identical sentences with no shared vocabulary</span></span>
@@ -364,7 +356,7 @@ Note
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dfm_tfidf</span>() <span class="sc">|&gt;</span></span>
 <span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">textstat_simil</span>(<span class="at">method =</span> <span class="st">"cosine"</span>, <span class="at">margin =</span> <span class="st">"documents"</span>)</span>
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="fu">as.matrix</span>(sim_tfidf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="fu">as.matrix</span>(sim_tfidf)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     doc1 doc2 doc3
 doc1    1    0    1
@@ -379,7 +371,7 @@ doc3    1    0    1</code></pre>
 <h2 class="anchored" data-anchor-id="dense-embeddings---same-metric-but-better-representation">Dense Embeddings - Same Metric But Better Representation</h2>
 <p>Dense embeddings replace each document with a fixed-length numeric vector produced by a neural network model. The embedding model is trained to place semantically similar texts close together in the vector space, even if they share no words.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Embed the same three sentences using a local Ollama model</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Embed the same three sentences using a local Ollama model</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>embed_fn <span class="ot">&lt;-</span> <span class="fu">embed_ollama</span>(<span class="at">model =</span> <span class="st">"nomic-embed-text"</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>embeddings <span class="ot">&lt;-</span> <span class="fu">embed_fn</span>(<span class="fu">as.character</span>(sentences))</span>
@@ -395,7 +387,7 @@ doc3    1    0    1</code></pre>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"doc1 vs doc3 (identical)"</span>),</span>
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">tfidf_cosine =</span> <span class="fu">c</span>(<span class="fl">0.000</span>, <span class="fl">1.000</span>),</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">dense_cosine =</span> <span class="fu">round</span>(<span class="fu">c</span>(sim_12, sim_13), <span class="dv">3</span>)</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 3
   pair                                         tfidf_cosine dense_cosine
@@ -412,7 +404,7 @@ doc3    1    0    1</code></pre>
 <h2 class="anchored" data-anchor-id="document-corpus">Document Corpus</h2>
 <p>We will use a synthetic set of credit policy and regulatory excerpts, the kind of text that lives in internal model documentation, IFRS 9 frameworks, and Basel III guidance.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>credit_docs <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>credit_docs <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">source =</span> <span class="fu">c</span>(</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rep</span>(<span class="st">"IFRS 9"</span>, <span class="dv">5</span>),</span>
@@ -443,7 +435,7 @@ doc3    1    0    1</code></pre>
 <span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>credit_docs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>credit_docs</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 15 × 3
       id source        text                                                     
@@ -472,7 +464,7 @@ doc3    1    0    1</code></pre>
 <p>Documents are typically large (PDFs, reports) and must be split into smaller, retrievable chunks. The <code>ragnar</code> package provides functionality for heading aware chunking, but the principle applies to any chunking strategy (sentences, paragraphs, sliding windows).</p>
 <p>For our corpus, the sentences are already granular, so we can treat each row as one chunk.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In practice with larger documents:</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In practice with larger documents:</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># doc_text |&gt; ragnar::markdown_chunk(level = 2)  # split on ## headings</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># For our corpus, add chunk metadata</span></span>
@@ -482,7 +474,7 @@ doc3    1    0    1</code></pre>
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">char_count =</span> <span class="fu">nchar</span>(text)</span>
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>chunks <span class="sc">|&gt;</span> <span class="fu">select</span>(chunk_id, source, char_count, text)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>chunks <span class="sc">|&gt;</span> <span class="fu">select</span>(chunk_id, source, char_count, text)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 15 × 4
    chunk_id source        char_count text                                       
@@ -512,7 +504,7 @@ doc3    1    0    1</code></pre>
 <p>We need to be able to store the chunks and their embeddings, and efficiently retrieve relevant ones when needed. A vector store provides this functionality, often with built-in support for both dense vector similarity (VSS) and sparse term frequency (BM25) retrieval. Read more about VSS and BM25 here <a href="https://ragnar.tidyverse.org/articles/vss-vs-bm25.html">VSS vs BM25</a>.</p>
 <p><code>ragnar</code> uses DuckDB with the VSS extension as its backing store and allows us to create the store, embed chunks, and build the index in just a few lines.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an in-memory store (use a file path for persistence)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an in-memory store (use a file path for persistence)</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>store <span class="ot">&lt;-</span> <span class="fu">ragnar_store_create</span>(</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">location =</span> <span class="st">":memory:"</span>,</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">embed    =</span> <span class="fu">embed_ollama</span>(<span class="at">model =</span> <span class="st">"nomic-embed-text"</span>),</span>
@@ -526,13 +518,13 @@ doc3    1    0    1</code></pre>
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Build the vector index</span></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ragnar_store_build_index</span>(store)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ragnar_store_build_index</span>(store)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="visualising-the-embedding-space" class="level3">
 <h3 class="anchored" data-anchor-id="visualising-the-embedding-space">Visualising the Embedding Space</h3>
 <p>Before performing any retrieval, it might be useful to visually understand the embedding space.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Retrieve all stored chunks directly from DuckDB</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Retrieve all stored chunks directly from DuckDB</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>all_embeddings <span class="ot">&lt;-</span> DBI<span class="sc">::</span><span class="fu">dbReadTable</span>(store<span class="sc">@</span>con, <span class="st">"chunks"</span>)</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># PCA projection to 2D</span></span>
@@ -553,7 +545,7 @@ doc3    1    0    1</code></pre>
 <span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"PCA projection of nomic-embed-text embeddings"</span>,</span>
 <span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour   =</span> <span class="st">"Source"</span></span>
 <span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -596,7 +588,7 @@ doc3    1    0    1</code></pre>
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>query <span class="ot">&lt;-</span> <span class="st">"What triggers a move to Stage 2 under IFRS 9?"</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>query <span class="ot">&lt;-</span> <span class="st">"What triggers a move to Stage 2 under IFRS 9?"</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Combined (VSS + BM25)</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>results_hybrid <span class="ot">&lt;-</span> <span class="fu">ragnar_retrieve</span>(store, query, <span class="at">top_k =</span> <span class="dv">2</span>)</span>
@@ -613,7 +605,7 @@ doc3    1    0    1</code></pre>
 <span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  results_hybrid <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">method =</span> <span class="st">"Hybrid"</span>, <span class="at">rank =</span> <span class="fu">row_number</span>())</span>
 <span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
 <span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(method, rank, origin, text) <span class="sc">|&gt;</span></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(method, rank)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(method, rank)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 7 × 4
   method  rank origin        text                                               
@@ -634,7 +626,7 @@ doc3    1    0    1</code></pre>
 <h2 class="anchored" data-anchor-id="generating-grounded-answers-with-ellmer">Generating Grounded Answers with <code>ellmer</code></h2>
 <p>With retrieval now working, we can use this retrieved context to generate grounded answers to specific questions. The <code>ellmer</code> package provides an easy to use interface for building LLM applications in R. The <code>ragnar_register_tool_retrieve()</code> function registers the store as a tool the LLM can call, enabling the LLM to pull relevant context before answering.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialise the chat (local Ollama)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialise the chat (local Ollama)</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_ollama</span>(</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">model  =</span> <span class="st">"llama3.1"</span>,</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">system =</span> <span class="st">"You are a credit risk analyst. Answer questions using only the</span></span>
@@ -643,56 +635,77 @@ doc3    1    0    1</code></pre>
 <span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Register the vector store as a retrieval tool</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ragnar_register_tool_retrieve</span>(chat, store)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ragnar_register_tool_retrieve</span>(chat, store)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="comparing-rag-vs-no-rag" class="level3">
 <h3 class="anchored" data-anchor-id="comparing-rag-vs-no-rag">Comparing RAG vs No-RAG</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>query <span class="ot">&lt;-</span> <span class="st">"What triggers a loan to move to Stage 2 under IFRS 9?"</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>query <span class="ot">&lt;-</span> <span class="st">"What triggers a loan to move to Stage 2 under IFRS 9?"</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># With RAG (retrieval tool registered)</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>answer_rag <span class="ot">&lt;-</span> chat<span class="sc">$</span><span class="fu">chat</span>(query)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>answer_rag <span class="ot">&lt;-</span> chat<span class="sc">$</span><span class="fu">chat</span>(query)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>The information retrieved does not specifically provide what triggers a loan to
-move to Stage 2 under IFRS 9. However, it suggests that the criteria for moving
-to Stage 2 might be closely related to an increase in default likelihood, as 
-stated in one of the search results referencing "a significant increase in 
-credit risk relative to initial recognition".
-
-Based solely on this result we cannot definitively state what triggers a loan 
-under Stage 2 yet.</code></pre>
+<pre><code>Based on the retrieved information, a loan moves to Stage 2 under IFRS 9 when 
+there is a significant increase in credit risk relative to initial recognition.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Without RAG (fresh chat, no tools, no context)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Without RAG (fresh chat, no tools, no context)</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>chat_naive   <span class="ot">&lt;-</span> <span class="fu">chat_ollama</span>(<span class="at">model =</span> <span class="st">"llama3.1"</span>)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>answer_naive <span class="ot">&lt;-</span> chat_naive<span class="sc">$</span><span class="fu">chat</span>(query)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>answer_naive <span class="ot">&lt;-</span> chat_naive<span class="sc">$</span><span class="fu">chat</span>(query)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Under International Financial Reporting Standards (IFRS) 9, a loan is 
-classified as an impaired asset and moved to Stage 2 when it experiences a 
-significant increase in credit risk since the initial recognition of the loan.
+<pre><code>Under the International Financial Reporting Standard (IFRS) 9, a loan is 
+considered impaired and would be classified as a credit impairment stage if 
+there are specific events or conditions that affect its estimated future cash 
+flows. The trigger for a loan to move to Stage 2, also known as Probable 
+Default, under IFRS 9 can include several key factors:
 
-To be specific, a loan moves to Stage 2 if there are indicators that suggest a 
-significant deterioration in the debtor's ability to repay the loan, which is 
-considered to be more than insignificant. This can be due to various factors 
-such as:
+1. **Significant Increase in Credit Risk** - A significant increase in credit 
+risk due to specific economic or industry circumstances, affecting the debtor’s
+creditworthiness.
 
-* A decline in payments or any other sign that the borrower may default
-* A material increase in off-balance-sheet credit risk, such as a guarantee 
-from a high-risk counterparty
-* A significant fall in credit ratings of the debtor
+2. **Default or Commitment by the Borrower** - If there has been a commitment 
+for default or a sign of deliberate default such as failing to meet the 
+repayment schedule or failing one payment and it is reasonable that they will 
+not be able to make payments in accordance with their contractual terms, this 
+would typically move the loan into Stage 2.
 
-Stage 2 is also known as "probable losses" (under IFRS 9) or "substandard 
-loans" under many banking regulator's rules.</code></pre>
+3. **Other Adverse Changes** - If there are other significant adverse changes 
+related to the borrower’s creditworthiness (eg., loss of assets, significant 
+financial difficulties) these can also trigger the move to Stage 2.
+
+4. **Material Decrease in Value of The Collateral** – A material decrease in 
+the value of any collateral offered to secure the loan may impact its repayment
+prospects and thus require reclassification under IFRS9.
+
+5. **Events Indicative of a Probability of Default**: This includes, but is not
+limited to, specific indicators that point towards the borrower’s reduced 
+ability to fulfill their obligations, which can arise from internal factors 
+(within management or control) or external ones (such as a negative change in 
+industry conditions). Events might include significant changes in operational 
+capabilities, a significant loss on a key asset, or even the debtor leaving the
+business.
+
+The classification under IFRS 9 focuses on identifying when there is evidence 
+of impaired credit. It emphasizes the assessment of whether there has been an 
+objective decrease in estimated recoverability based on external confirmation 
+like default rates, industry averages and also by evaluating internal 
+assessments through credit professionals as to likely impact on cash flows over
+a term consistent with its maturity.
+
+The move from Stage 1 (performing) to Stage 2 under IFRS 9 signifies that 
+there’s evidence that the loan is more likely than not to enter into default 
+within a specific time period, which can vary based on the specific conditions 
+of each loan and market averages.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">approach =</span> <span class="fu">c</span>(<span class="st">"RAG (grounded)"</span>, <span class="st">"No RAG (naive)"</span>),</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">answer   =</span> <span class="fu">c</span>(answer_rag, answer_naive)</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 2
   approach       answer                                                         
   &lt;chr&gt;          &lt;chr&gt;                                                          
-1 RAG (grounded) "The information retrieved does not specifically provide what …
-2 No RAG (naive) "Under International Financial Reporting Standards (IFRS) 9, a…</code></pre>
+1 RAG (grounded) "Based on the retrieved information, a loan moves to Stage 2 u…
+2 No RAG (naive) "Under the International Financial Reporting Standard (IFRS) 9…</code></pre>
 </div>
 </div>
 <p>The RAG answer cites the specific IFRS 9 trigger from the corpus. The naive answer while broadly correct lacks grounding, and for certain edge cases could hallucinate and quote triggers that might not exist. Grounding the LLM with retrieved context helps keep it aligned with the source material.</p>
@@ -703,7 +716,7 @@ loans" under many banking regulator's rules.</code></pre>
 <h2 class="anchored" data-anchor-id="real-world-application-to-model-documentation">Real World Application to Model Documentation</h2>
 <p>A practical use case of this setup could be to build an internal Q&amp;A tool to query model documentation, regulatory frameworks, and policy manuals. The RAG pipeline would retrieve relevant context and generate concise answers to specific questions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>questions <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>questions <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"What triggers an IFRS 9 Stage 2 migration?"</span>,</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"When is a loan classified as non-performing?"</span>,</span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"What is the Capital Conservation Buffer requirement?"</span>,</span>
@@ -724,31 +737,35 @@ loans" under many banking regulator's rules.</code></pre>
 <span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>qa_results <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
 <span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">question =</span> questions,</span>
 <span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">answer   =</span> purrr<span class="sc">::</span><span class="fu">map_chr</span>(questions, ask_rag)</span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>A significant increase in credit risk relative to initial recognition triggers 
-an IFRS 9 Stage 2 migration.</code></pre>
+<pre><code>An IFRS 9 Stage 2 migration is triggered when there is a significant increase 
+in credit risk relative to initial recognition, even if no actual default has 
+occurred. This can be due to various factors such as changes in the credit 
+scorecard or shifts in the applicant population and macroeconomic conditions.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>According to the information retrieved, a loan is classified as non-performing 
-when it has a payment that is more than 90 days past due.</code></pre>
+<pre><code>A loan is classified as non-performing when it has been past due for more than 
+90 days.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>The Capital Conservation Buffer requirement is to hold a minimum Common Equity 
-Tier 1 ratio of 2.5% above the regulatory minimum, as per Basel III 
-regulations. This means that banks must maintain a strong capital base to 
-mitigate risks and ensure their financial stability.</code></pre>
+<pre><code>The Capital Conservation Buffer requires banks to hold a minimum Common Equity 
+Tier 1 ratio of 2.5% above the regulatory minimum. This requirement is part of 
+the Basel III framework, which aims to strengthen capital regulations for banks
+globally. The buffer serves as an additional layer of protection against 
+potential financial crises by requiring banks to maintain higher levels of 
+equity in relation to their risk-weighted assets.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>The credit scorecard is recalibrated quarterly.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>qa_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>qa_results</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 2
   question                                             answer                   
   &lt;chr&gt;                                                &lt;chr&gt;                    
-1 What triggers an IFRS 9 Stage 2 migration?           A significant increase i…
-2 When is a loan classified as non-performing?         According to the informa…
+1 What triggers an IFRS 9 Stage 2 migration?           An IFRS 9 Stage 2 migrat…
+2 When is a loan classified as non-performing?         A loan is classified as …
 3 What is the Capital Conservation Buffer requirement? The Capital Conservation…
 4 How often is the credit scorecard recalibrated?      The credit scorecard is …</code></pre>
 </div>
@@ -819,13 +836,14 @@ mitigate risks and ensure their financial stability.</code></pre>
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

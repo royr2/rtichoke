@@ -16,7 +16,7 @@ Portfolio optimization represents a critical task in investment management, wher
 
 2. For additional information on particle swarm optimisation, refer to [this post](/posts/building-particle-swarm-optimizer.qmd) on 
 
-## Libraries
+## Required Packages
 
 ```{r}
 # Load required packages

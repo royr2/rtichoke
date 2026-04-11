@@ -15,7 +15,7 @@ This post focuses on how to implement monotonic binning, a method that groups va
 1. **Enhanced Model Stability**: Monotonic relationships strengthen model robustness by reducing overfitting and ensuring reliable performance in production environments
 2. **Improved Interpretability**: Monotonic constraints facilitate clear explanations by maintaining logical, consistent relationships between predictors and outcomes
 
-## Prerequisites and Required Libraries
+## Required Packages
 
 ```{r}
 library(recipes)  # For data preprocessing
@@ -26,7 +26,7 @@ library(ggplot2)  # For visualization
 
 ## Dataset Overview and Loading
 
-This tutorial demonstrates the methodology using a sample from the Lending Club dataset, which provides comprehensive loan information including default indicators. 
+Let's use a sample from the Lending Club dataset, which includes loan information and default indicators. 
 
 ```{r}
 # Load sample data from Lending Club dataset

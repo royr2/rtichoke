@@ -10,7 +10,7 @@ execute:
   eval: true
 ---
 
-The tidymodels framework provides a cohesive set of packages for modeling and machine learning in R, following tidyverse principles. In this post, we'll build a realistic credit scoring model using tidymodels.
+The tidymodels framework provides a cohesive set of packages for modeling and machine learning in R, following tidyverse principles. In this post, let's build a realistic credit scoring model using tidymodels.
 
 Credit scoring models are used by financial institutions to assess the creditworthiness of borrowers. These models predict the probability of default (failure to repay a loan) based on borrower characteristics and loan attributes. A good credit scoring model should effectively discriminate between high-risk and low-risk borrowers, be well-calibrated, and provide interpretable insights.
 
@@ -30,7 +30,7 @@ library(corrplot)   # For correlation visualization
 
 ## Synthetic Data Generation
 
-This tutorial uses a simulated credit dataset incorporating realistic variable distributions commonly encountered in credit scoring applications. The synthetic data includes demographic information, loan characteristics, and credit history variables with appropriate statistical relationships.
+This post uses a simulated credit dataset with realistic variable distributions. The data covers demographics, loan characteristics, and credit history — all with appropriate statistical relationships.
 
 ```{r}
 set.seed(123)
@@ -257,7 +257,7 @@ table(recipe_data$default)
 
 ## Model Architecture and Hyperparameter Optimization
 
-This section implements both traditional (logistic regression) and modern (XGBoost) algorithms. Logistic regression provides interpretability required for regulatory compliance, while XGBoost offers superior predictive performance. Both models undergo systematic hyperparameter tuning using cross-validation.
+This section fits both a logistic regression and an XGBoost model. Logistic regression is interpretable and commonly required for regulatory compliance; XGBoost often achieves stronger predictive performance. Comparing both on the same validation set gives a grounded basis for choosing between them.
 
 ```{r}
 # Define the logistic regression model
@@ -430,7 +430,7 @@ xgb_cal
 
 ##  Test Set Evaluation
 
-The final evaluation employs the optimal model (XGBoost) on the held-out test dataset to provide an unbiased assessment of generalization performance and operational effectiveness.
+Let's evaluate the better-performing model (XGBoost based on validation results) on the held-out test set to get an unbiased estimate of how it generalises.
 
 ```{r}
 #| label: final-evaluation
@@ -491,5 +491,5 @@ ggplot(gains_table, aes(x = pct_accounts, y = lift)) +
 - **Domain knowledge integration is critical** for effective feature engineering 
 - **Comparative modeling approaches enhance decision-making** by balancing interpretability requirements with predictive performance needs
 - **Systematic hyperparameter optimization improves model performance** while preventing overfitting through cross-validation techniques
-- **Comprehensive evaluation frameworks ensure robust assessment** of model generalization and operational effectiveness
+- **Evaluating on a held-out test set** gives a less biased view of how the model will perform on new data
 - **Model interpretability analysis supports regulatory compliance** and business decision-making in financial applications

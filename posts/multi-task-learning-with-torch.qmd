@@ -12,8 +12,6 @@ execute:
 
 Multi-task learning (MTL) is an approach where a single neural network model is trained to perform multiple related tasks simultaneously. This methodology can improve model generalization, reduce overfitting, and leverage shared information across tasks. This post explores  how to implement a multi-task learning model using the `torch` package in R.
 
-## Introduction
-
 Multi-task learning operates by sharing representations between related tasks, enabling models to generalize more effectively. Instead of training separate models for each task, this approach develops a single model with:
 
 - **Shared layers** that learn common features across tasks
@@ -22,7 +20,7 @@ Multi-task learning operates by sharing representations between related tasks, e
 
 This approach is particularly valuable when dealing with related prediction problems that can benefit from shared feature representations.
 
-## Packages
+## Required Packages
 
 ```{r}
 #| label: installation

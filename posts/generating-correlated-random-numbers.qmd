@@ -10,9 +10,7 @@ execute:
   eval: true
 ---
 
-## Introduction
-
-The generation of random data with specified correlation patterns can be useful in statistical simulation and this tutorial provides a  methodology for creating correlated random numbers in R. The techniques presented enable the development of realistic synthetic datasets with precisely controlled correlation structures, essential for robust statistical analysis and model validation.
+Generating random data with a specific correlation structure is a common need in statistical simulation. In this post, let's walk through how to do it in R using matrix decomposition methods.
 
 ## The Cholesky Decomposition Method
 
@@ -99,7 +97,7 @@ When input data contains pre-existing correlation patterns, the Cholesky method 
 
 ### Distribution Consistency
 
-Optimal results require consistent probability distributions across all variables in the transformation:
+The method works best when all variables share the same marginal distribution. Mixing distributions (e.g. normal with chi-squared) can produce unexpected results:
 
 ```{r}
 #| label: distribution-comparison
@@ -181,7 +179,7 @@ round(cor(x), 3)
 
 - **Cholesky decomposition provides a mathematical foundation** for transforming uncorrelated data into correlated structures through matrix operations
 - **Input data independence is critical** for successful correlation induction; pre-existing correlations compromise the transformation effectiveness
-- **Distribution consistency across variables ensures optimal results** and prevents unexpected correlation artifacts
+- **Distribution consistency across variables** produces more predictable results — mixing different distributions can lead to unexpected correlation artefacts
 - **The transformation process can alter fundamental data properties**, requiring careful consideration of distributional characteristics
 - **The mvtnorm package offers production-ready solutions** for multivariate normal data generation with specified correlation structures
 - **Method selection depends on specific requirements**: Cholesky for educational and custom applications, mvtnorm for operational efficiency

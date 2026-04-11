@@ -55,3 +55,8 @@
 @keyframes shimmer {
   100% {-webkit-mask-position:left}
 }
+
+/* White text for inline code on dark background */
+p code, li code, td code {
+  color: #ffffff;
+}

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.9.35">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -10,6 +10,9 @@
 
 <title>Evaluating Binary Classification Models Using Gains Tables – R’tichoke</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -72,10 +75,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7e58e3368124f49f6e3733161a9b089d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-9e41006022cc14e6bca310783a21a71f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-658c2336f25e20434af7fb9caa8b0f44.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-af1142a47761cd6f12b407da64115aad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -221,8 +224,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#package-dependencies" id="toc-package-dependencies" class="nav-link" data-scroll-target="#package-dependencies">Package Dependencies</a></li>
+  <li><a href="#required-packages" id="toc-required-packages" class="nav-link active" data-scroll-target="#required-packages">Required Packages</a></li>
   <li><a href="#dataset-preparation" id="toc-dataset-preparation" class="nav-link" data-scroll-target="#dataset-preparation">Dataset Preparation</a></li>
   <li><a href="#target-definition" id="toc-target-definition" class="nav-link" data-scroll-target="#target-definition">Target Definition</a></li>
   <li><a href="#model-development" id="toc-model-development" class="nav-link" data-scroll-target="#model-development">Model Development</a></li>
@@ -275,30 +277,27 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </header>
 
 
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>In credit risk modeling and binary classification applications, analysts employ gains tables (also known as KS tables) as a fundamental tool for measuring and quantifying model performance. This tutorial dives into the construction and interpretion of gains tables using R. ## Theoretical Foundation: Understanding Gains Tables</p>
+<p>Gains tables (also known as KS tables) are a go-to tool for evaluating binary classification models in credit risk. In this post, let’s build one from scratch in R and unpack what each metric tells us. ## Theoretical Foundation: Understanding Gains Tables</p>
 <p>A gains table systematically discretizes the population (typically a validation or test dataset) into groups based on the model’s output predictions (probability scores, log odds, or risk scores). Each group conventionally represents 10% of the total population (deciles), though alternative binning strategies may be employed. The output presents summary statistics for each group and analyzes the cumulative distributions of events (defaults) and non-events to quantify the model’s discriminatory performance.</p>
-</section>
-<section id="package-dependencies" class="level2">
-<h2 class="anchored" data-anchor-id="package-dependencies">Package Dependencies</h2>
+<section id="required-packages" class="level2">
+<h2 class="anchored" data-anchor-id="required-packages">Required Packages</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(magrittr)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="dataset-preparation" class="level2">
 <h2 class="anchored" data-anchor-id="dataset-preparation">Dataset Preparation</h2>
-<p>This tutorial utilizes a sample from the Lending Club dataset, which contains comprehensive loan information and associated outcomes suitable for credit risk modeling applications.</p>
+<p>Let’s use a sample from the Lending Club dataset, which has loan characteristics, borrower details, and repayment outcomes — exactly what we need.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the sample data</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the sample data</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sample <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://bit.ly/42ypcnJ"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check dimensions</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(sample)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(sample)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 10000   153</code></pre>
 </div>
@@ -306,10 +305,10 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </section>
 <section id="target-definition" class="level2">
 <h2 class="anchored" data-anchor-id="target-definition">Target Definition</h2>
-<p>The initial step requires the creation of a binary target variable for modeling purposes. In this credit risk application, we identify borrowers who defaulted on their loan obligations.</p>
+<p>First, let’s create a binary target variable that flags borrowers who defaulted on their loans.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check unique loan statuses</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sample<span class="sc">$</span>loan_status)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check unique loan statuses</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sample<span class="sc">$</span>loan_status)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Fully Paid"                                         
 [2] "Current"                                            
@@ -320,7 +319,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 [7] "Does not meet the credit policy. Status:Fully Paid" 
 [8] "Does not meet the credit policy. Status:Charged Off"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define "bad" loans as those that are charged off</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define "bad" loans as those that are charged off</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>codes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Charged Off"</span>, <span class="st">"Does not meet the credit policy. Status:Charged Off"</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a binary flag for defaults</span></span>
@@ -330,7 +329,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>sample <span class="sc">%&gt;%</span> </span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">events =</span> <span class="fu">sum</span>(bad_flag <span class="sc">==</span> <span class="dv">1</span>), </span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">non_events =</span> <span class="fu">sum</span>(bad_flag <span class="sc">==</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(            <span class="at">event_rate =</span> events<span class="sc">/</span>(events <span class="sc">+</span> non_events))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(            <span class="at">event_rate =</span> events<span class="sc">/</span>(events <span class="sc">+</span> non_events))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  events non_events event_rate
 1   1162       8838     0.1162</code></pre>
@@ -339,9 +338,9 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </section>
 <section id="model-development" class="level2">
 <h2 class="anchored" data-anchor-id="model-development">Model Development</h2>
-<p>Subsequently, we develop a logistic regression model to generate predictions that will serve as the foundation for gains table construction.</p>
+<p>Let’s fit a simple logistic regression model to generate predicted scores.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace NA values with a default value</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace NA values with a default value</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>sample[<span class="fu">is.na</span>(sample)] <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">1</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean the data</span></span>
@@ -356,10 +355,10 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Train-test split (70-30)</span></span>
 <span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(sample), <span class="at">size =</span> <span class="fl">0.7</span> <span class="sc">*</span> <span class="fu">nrow</span>(sample), <span class="at">replace =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> sample[idx,]</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> sample[<span class="sc">-</span>idx,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> sample[<span class="sc">-</span>idx,]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build a logistic regression model</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build a logistic regression model</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>mdl <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> bad_flag <span class="sc">~</span> </span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    loan_amnt <span class="sc">+</span> term <span class="sc">+</span> mths_since_last_delinq <span class="sc">+</span> total_pymnt <span class="sc">+</span> </span>
@@ -373,16 +372,16 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate predictions on the test set</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>test<span class="sc">$</span>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(mdl, <span class="at">newdata =</span> test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>test<span class="sc">$</span>pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(mdl, <span class="at">newdata =</span> test)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="gains-table-construction" class="level2">
 <h2 class="anchored" data-anchor-id="gains-table-construction">Gains Table Construction</h2>
-<p>The following section demonstrates the step-by-step construction of a comprehensive gains table through systematic binning and statistical analysis.</p>
+<p>Let’s now build the gains table step by step — binning the population and computing the key metrics in each group.</p>
 <section id="population-discretization-into-bins" class="level3">
 <h3 class="anchored" data-anchor-id="population-discretization-into-bins">Population Discretization into Bins</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create deciles based on model predictions</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create deciles based on model predictions</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>q <span class="ot">&lt;-</span> <span class="fu">quantile</span>(test<span class="sc">$</span>pred, <span class="at">probs =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">11</span>))</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Add bins to test dataset</span></span>
@@ -390,18 +389,18 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">right =</span> <span class="cn">TRUE</span>, <span class="at">ordered_result =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the bin levels (note they're in increasing order)</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(test<span class="sc">$</span>bins)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(test<span class="sc">$</span>bins)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] "[-6.66,-3.4]"  "(-3.4,-2.94]"  "(-2.94,-2.66]" "(-2.66,-2.44]"
- [5] "(-2.44,-2.22]" "(-2.22,-2.03]" "(-2.03,-1.84]" "(-1.84,-1.59]"
- [9] "(-1.59,-1.23]" "(-1.23,0.66]" </code></pre>
+<pre><code> [1] "[-5.48,-3.36]" "(-3.36,-2.92]" "(-2.92,-2.66]" "(-2.66,-2.44]"
+ [5] "(-2.44,-2.25]" "(-2.25,-2.04]" "(-2.04,-1.84]" "(-1.84,-1.58]"
+ [9] "(-1.58,-1.23]" "(-1.23,1.87]" </code></pre>
 </div>
 </div>
 </section>
 <section id="basic-statistical-measures-by-segment" class="level3">
 <h3 class="anchored" data-anchor-id="basic-statistical-measures-by-segment">Basic Statistical Measures by Segment</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create initial gains table with counts</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create initial gains table with counts</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>gains_table <span class="ot">&lt;-</span> test <span class="sc">%&gt;%</span> </span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(bins) <span class="sc">%&gt;%</span> </span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total =</span> <span class="fu">n</span>(), </span>
@@ -413,7 +412,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">event_rate =</span> <span class="fu">percent</span>(events <span class="sc">/</span> total, <span class="fl">0.1</span>, <span class="dv">100</span>))</span>
 <span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the table</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(gains_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(gains_table)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
@@ -427,74 +426,74 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">[-6.66,-3.4]</td>
+<td style="text-align: left;">[-5.48,-3.36]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">296</td>
-<td style="text-align: left;">1.3%</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">295</td>
+<td style="text-align: left;">1.7%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-3.4,-2.94]</td>
+<td style="text-align: left;">(-3.36,-2.92]</td>
 <td style="text-align: right;">300</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">290</td>
 <td style="text-align: left;">3.3%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.94,-2.66]</td>
+<td style="text-align: left;">(-2.92,-2.66]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">286</td>
-<td style="text-align: left;">4.7%</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">291</td>
+<td style="text-align: left;">3.0%</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">(-2.66,-2.44]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">16</td>
-<td style="text-align: right;">284</td>
-<td style="text-align: left;">5.3%</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">285</td>
+<td style="text-align: left;">5.0%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.44,-2.22]</td>
+<td style="text-align: left;">(-2.44,-2.25]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">21</td>
-<td style="text-align: right;">279</td>
-<td style="text-align: left;">7.0%</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">6.0%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.22,-2.03]</td>
+<td style="text-align: left;">(-2.25,-2.04]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">38</td>
-<td style="text-align: right;">262</td>
-<td style="text-align: left;">12.7%</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">270</td>
+<td style="text-align: left;">10.0%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.03,-1.84]</td>
+<td style="text-align: left;">(-2.04,-1.84]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">47</td>
-<td style="text-align: right;">253</td>
-<td style="text-align: left;">15.7%</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">248</td>
+<td style="text-align: left;">17.3%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.84,-1.59]</td>
+<td style="text-align: left;">(-1.84,-1.58]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">61</td>
-<td style="text-align: right;">239</td>
-<td style="text-align: left;">20.3%</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">246</td>
+<td style="text-align: left;">18.0%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-1.59,-1.23]</td>
+<td style="text-align: left;">(-1.58,-1.23]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">60</td>
-<td style="text-align: right;">240</td>
-<td style="text-align: left;">20.0%</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">238</td>
+<td style="text-align: left;">20.7%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.23,0.66]</td>
+<td style="text-align: left;">(-1.23,1.87]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">61</td>
-<td style="text-align: right;">239</td>
-<td style="text-align: left;">20.3%</td>
+<td style="text-align: right;">69</td>
+<td style="text-align: right;">231</td>
+<td style="text-align: left;">23.0%</td>
 </tr>
 </tbody>
 </table>
@@ -504,7 +503,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <section id="cumulative-distribution" class="level3">
 <h3 class="anchored" data-anchor-id="cumulative-distribution">Cumulative Distribution</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add population percentage and cumulative distributions</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add population percentage and cumulative distributions</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>gains_table <span class="sc">%&lt;&gt;%</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pop_pct =</span> <span class="fu">percent</span>(total<span class="sc">/</span><span class="fu">sum</span>(total), <span class="fl">0.1</span>, <span class="dv">100</span>), </span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>         </span>
@@ -513,7 +512,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">c.non_events_pct =</span> <span class="fu">cumsum</span>(non_events) <span class="sc">/</span> <span class="fu">sum</span>(non_events))</span>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the updated table</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(gains_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(gains_table)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
@@ -540,101 +539,101 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">[-6.66,-3.4]</td>
+<td style="text-align: left;">[-5.48,-3.36]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">296</td>
-<td style="text-align: left;">1.3%</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">295</td>
+<td style="text-align: left;">1.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.0120482</td>
-<td style="text-align: right;">0.1109445</td>
+<td style="text-align: right;">0.0154321</td>
+<td style="text-align: right;">0.1102392</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-3.4,-2.94]</td>
+<td style="text-align: left;">(-3.36,-2.92]</td>
 <td style="text-align: right;">300</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">290</td>
 <td style="text-align: left;">3.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.0421687</td>
-<td style="text-align: right;">0.2196402</td>
+<td style="text-align: right;">0.0462963</td>
+<td style="text-align: right;">0.2186099</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.94,-2.66]</td>
+<td style="text-align: left;">(-2.92,-2.66]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">286</td>
-<td style="text-align: left;">4.7%</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">291</td>
+<td style="text-align: left;">3.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.0843373</td>
-<td style="text-align: right;">0.3268366</td>
+<td style="text-align: right;">0.0740741</td>
+<td style="text-align: right;">0.3273543</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">(-2.66,-2.44]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">16</td>
-<td style="text-align: right;">284</td>
-<td style="text-align: left;">5.3%</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">285</td>
+<td style="text-align: left;">5.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.1325301</td>
-<td style="text-align: right;">0.4332834</td>
+<td style="text-align: right;">0.1203704</td>
+<td style="text-align: right;">0.4338565</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.44,-2.22]</td>
+<td style="text-align: left;">(-2.44,-2.25]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">21</td>
-<td style="text-align: right;">279</td>
-<td style="text-align: left;">7.0%</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">6.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.1957831</td>
-<td style="text-align: right;">0.5378561</td>
+<td style="text-align: right;">0.1759259</td>
+<td style="text-align: right;">0.5392377</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.22,-2.03]</td>
+<td style="text-align: left;">(-2.25,-2.04]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">38</td>
-<td style="text-align: right;">262</td>
-<td style="text-align: left;">12.7%</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">270</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.3102410</td>
-<td style="text-align: right;">0.6360570</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: right;">0.2685185</td>
+<td style="text-align: right;">0.6401345</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.03,-1.84]</td>
+<td style="text-align: left;">(-2.04,-1.84]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">47</td>
-<td style="text-align: right;">253</td>
-<td style="text-align: left;">15.7%</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">248</td>
+<td style="text-align: left;">17.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.4518072</td>
-<td style="text-align: right;">0.7308846</td>
+<td style="text-align: right;">0.4290123</td>
+<td style="text-align: right;">0.7328102</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.84,-1.59]</td>
+<td style="text-align: left;">(-1.84,-1.58]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">61</td>
-<td style="text-align: right;">239</td>
-<td style="text-align: left;">20.3%</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">246</td>
+<td style="text-align: left;">18.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.6355422</td>
-<td style="text-align: right;">0.8204648</td>
+<td style="text-align: right;">0.5956790</td>
+<td style="text-align: right;">0.8247384</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-1.59,-1.23]</td>
+<td style="text-align: left;">(-1.58,-1.23]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">60</td>
-<td style="text-align: right;">240</td>
-<td style="text-align: left;">20.0%</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">238</td>
+<td style="text-align: left;">20.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: right;">0.8162651</td>
-<td style="text-align: right;">0.9104198</td>
+<td style="text-align: right;">0.7870370</td>
+<td style="text-align: right;">0.9136771</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.23,0.66]</td>
+<td style="text-align: left;">(-1.23,1.87]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">61</td>
-<td style="text-align: right;">239</td>
-<td style="text-align: left;">20.3%</td>
+<td style="text-align: right;">69</td>
+<td style="text-align: right;">231</td>
+<td style="text-align: left;">23.0%</td>
 <td style="text-align: left;">10.0%</td>
 <td style="text-align: right;">1.0000000</td>
 <td style="text-align: right;">1.0000000</td>
@@ -647,7 +646,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <section id="performance-metrics" class="level3">
 <h3 class="anchored" data-anchor-id="performance-metrics">Performance Metrics</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add KS statistic, capture rate, and cumulative event rate</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add KS statistic, capture rate, and cumulative event rate</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>gains_table <span class="sc">%&lt;&gt;%</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># KS statistic (difference between cumulative distributions)</span></span>
@@ -664,7 +663,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">c.non_events_pct =</span> <span class="fu">percent</span>(c.non_events_pct, <span class="fl">0.1</span>, <span class="dv">100</span>))</span>
 <span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the final table</span></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(gains_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(gains_table)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
@@ -697,134 +696,134 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">[-6.66,-3.4]</td>
+<td style="text-align: left;">[-5.48,-3.36]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">296</td>
-<td style="text-align: left;">1.3%</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">295</td>
+<td style="text-align: left;">1.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">1.2%</td>
-<td style="text-align: left;">11.1%</td>
-<td style="text-align: right;">0.10</td>
-<td style="text-align: left;">1%</td>
-<td style="text-align: left;">1.3%</td>
+<td style="text-align: left;">1.5%</td>
+<td style="text-align: left;">11.0%</td>
+<td style="text-align: right;">0.09</td>
+<td style="text-align: left;">2%</td>
+<td style="text-align: left;">1.7%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-3.4,-2.94]</td>
+<td style="text-align: left;">(-3.36,-2.92]</td>
 <td style="text-align: right;">300</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">290</td>
 <td style="text-align: left;">3.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">4.2%</td>
-<td style="text-align: left;">22.0%</td>
-<td style="text-align: right;">0.18</td>
-<td style="text-align: left;">4%</td>
-<td style="text-align: left;">2.3%</td>
+<td style="text-align: left;">4.6%</td>
+<td style="text-align: left;">21.9%</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: left;">5%</td>
+<td style="text-align: left;">2.5%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.94,-2.66]</td>
+<td style="text-align: left;">(-2.92,-2.66]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">286</td>
-<td style="text-align: left;">4.7%</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">291</td>
+<td style="text-align: left;">3.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">8.4%</td>
+<td style="text-align: left;">7.4%</td>
 <td style="text-align: left;">32.7%</td>
-<td style="text-align: right;">0.24</td>
-<td style="text-align: left;">8%</td>
-<td style="text-align: left;">3.1%</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: left;">7%</td>
+<td style="text-align: left;">2.7%</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">(-2.66,-2.44]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">16</td>
-<td style="text-align: right;">284</td>
-<td style="text-align: left;">5.3%</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">285</td>
+<td style="text-align: left;">5.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">13.3%</td>
-<td style="text-align: left;">43.3%</td>
+<td style="text-align: left;">12.0%</td>
+<td style="text-align: left;">43.4%</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: left;">12%</td>
+<td style="text-align: left;">3.2%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-2.44,-2.25]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">6.0%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">17.6%</td>
+<td style="text-align: left;">53.9%</td>
+<td style="text-align: right;">0.36</td>
+<td style="text-align: left;">18%</td>
+<td style="text-align: left;">3.8%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">(-2.25,-2.04]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">270</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">26.9%</td>
+<td style="text-align: left;">64.0%</td>
+<td style="text-align: right;">0.37</td>
+<td style="text-align: left;">27%</td>
+<td style="text-align: left;">4.8%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-2.04,-1.84]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">248</td>
+<td style="text-align: left;">17.3%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">42.9%</td>
+<td style="text-align: left;">73.3%</td>
 <td style="text-align: right;">0.30</td>
-<td style="text-align: left;">13%</td>
-<td style="text-align: left;">3.7%</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">(-2.44,-2.22]</td>
-<td style="text-align: right;">300</td>
-<td style="text-align: right;">21</td>
-<td style="text-align: right;">279</td>
-<td style="text-align: left;">7.0%</td>
-<td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">19.6%</td>
-<td style="text-align: left;">53.8%</td>
-<td style="text-align: right;">0.34</td>
-<td style="text-align: left;">20%</td>
-<td style="text-align: left;">4.3%</td>
+<td style="text-align: left;">43%</td>
+<td style="text-align: left;">6.6%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.22,-2.03]</td>
+<td style="text-align: left;">(-1.84,-1.58]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">38</td>
-<td style="text-align: right;">262</td>
-<td style="text-align: left;">12.7%</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">246</td>
+<td style="text-align: left;">18.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">31.0%</td>
-<td style="text-align: left;">63.6%</td>
-<td style="text-align: right;">0.33</td>
-<td style="text-align: left;">31%</td>
-<td style="text-align: left;">5.7%</td>
+<td style="text-align: left;">59.6%</td>
+<td style="text-align: left;">82.5%</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: left;">60%</td>
+<td style="text-align: left;">8.0%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.03,-1.84]</td>
+<td style="text-align: left;">(-1.58,-1.23]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">47</td>
-<td style="text-align: right;">253</td>
-<td style="text-align: left;">15.7%</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">238</td>
+<td style="text-align: left;">20.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">45.2%</td>
-<td style="text-align: left;">73.1%</td>
-<td style="text-align: right;">0.28</td>
-<td style="text-align: left;">45%</td>
-<td style="text-align: left;">7.1%</td>
+<td style="text-align: left;">78.7%</td>
+<td style="text-align: left;">91.4%</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: left;">79%</td>
+<td style="text-align: left;">9.4%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.84,-1.59]</td>
+<td style="text-align: left;">(-1.23,1.87]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">61</td>
-<td style="text-align: right;">239</td>
-<td style="text-align: left;">20.3%</td>
-<td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">63.6%</td>
-<td style="text-align: left;">82.0%</td>
-<td style="text-align: right;">0.18</td>
-<td style="text-align: left;">64%</td>
-<td style="text-align: left;">8.8%</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">(-1.59,-1.23]</td>
-<td style="text-align: right;">300</td>
-<td style="text-align: right;">60</td>
-<td style="text-align: right;">240</td>
-<td style="text-align: left;">20.0%</td>
-<td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">81.6%</td>
-<td style="text-align: left;">91.0%</td>
-<td style="text-align: right;">0.09</td>
-<td style="text-align: left;">82%</td>
-<td style="text-align: left;">10.0%</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">(-1.23,0.66]</td>
-<td style="text-align: right;">300</td>
-<td style="text-align: right;">61</td>
-<td style="text-align: right;">239</td>
-<td style="text-align: left;">20.3%</td>
+<td style="text-align: right;">69</td>
+<td style="text-align: right;">231</td>
+<td style="text-align: left;">23.0%</td>
 <td style="text-align: left;">10.0%</td>
 <td style="text-align: left;">100.0%</td>
 <td style="text-align: left;">100.0%</td>
 <td style="text-align: right;">0.00</td>
 <td style="text-align: left;">100%</td>
-<td style="text-align: left;">11.1%</td>
+<td style="text-align: left;">10.8%</td>
 </tr>
 </tbody>
 </table>
@@ -836,7 +835,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <h2 class="anchored" data-anchor-id="reusable-function">Reusable Function</h2>
 <p>The following implementation encapsulates the gains table construction process within a comprehensive, reusable function suitable for any binary classification model evaluation:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>gains_table <span class="ot">&lt;-</span> <span class="cf">function</span>(act, pred, <span class="at">increasing =</span> <span class="cn">TRUE</span>, <span class="at">nBins =</span> <span class="dv">10</span>) {</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>gains_table <span class="ot">&lt;-</span> <span class="cf">function</span>(act, pred, <span class="at">increasing =</span> <span class="cn">TRUE</span>, <span class="at">nBins =</span> <span class="dv">10</span>) {</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create bins based on predictions</span></span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  q <span class="ot">&lt;-</span> <span class="fu">quantile</span>(pred, <span class="at">probs =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> nBins <span class="sc">+</span> <span class="dv">1</span>))</span>
@@ -868,14 +867,14 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>           <span class="at">c_event_rate =</span> <span class="fu">percent</span>(<span class="fu">cumsum</span>(events)<span class="sc">/</span><span class="fu">cumsum</span>(total), <span class="fl">0.1</span>, <span class="dv">100</span>), </span>
 <span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>           <span class="at">c.events_pct =</span> <span class="fu">percent</span>(c.events_pct, <span class="fl">0.1</span>, <span class="dv">100</span>),</span>
 <span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>           <span class="at">c.non_events_pct =</span> <span class="fu">percent</span>(c.non_events_pct, <span class="fl">0.1</span>, <span class="dv">100</span>))</span>
-<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="function-implementation" class="level3">
 <h3 class="anchored" data-anchor-id="function-implementation">Function Implementation</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate a gains table with bins in descending order</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate a gains table with bins in descending order</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">gains_table</span>(test<span class="sc">$</span>bad_flag, test<span class="sc">$</span>pred, <span class="cn">FALSE</span>, <span class="dv">10</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(tab)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(tab)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
@@ -908,134 +907,134 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">(-1.23,0.66]</td>
+<td style="text-align: left;">(-1.23,1.87]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">61</td>
-<td style="text-align: right;">239</td>
-<td style="text-align: left;">20.3%</td>
+<td style="text-align: right;">69</td>
+<td style="text-align: right;">231</td>
+<td style="text-align: left;">23.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">18.4%</td>
-<td style="text-align: left;">9.0%</td>
-<td style="text-align: right;">0.09</td>
-<td style="text-align: left;">18%</td>
-<td style="text-align: left;">20.3%</td>
+<td style="text-align: left;">21.3%</td>
+<td style="text-align: left;">8.6%</td>
+<td style="text-align: right;">0.13</td>
+<td style="text-align: left;">21%</td>
+<td style="text-align: left;">23.0%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-1.59,-1.23]</td>
+<td style="text-align: left;">(-1.58,-1.23]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">60</td>
-<td style="text-align: right;">240</td>
-<td style="text-align: left;">20.0%</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">238</td>
+<td style="text-align: left;">20.7%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">36.4%</td>
+<td style="text-align: left;">40.4%</td>
+<td style="text-align: left;">17.5%</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: left;">40%</td>
+<td style="text-align: left;">21.8%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">(-1.84,-1.58]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">246</td>
 <td style="text-align: left;">18.0%</td>
-<td style="text-align: right;">0.18</td>
-<td style="text-align: left;">36%</td>
-<td style="text-align: left;">20.2%</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">(-1.84,-1.59]</td>
-<td style="text-align: right;">300</td>
-<td style="text-align: right;">61</td>
-<td style="text-align: right;">239</td>
-<td style="text-align: left;">20.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">54.8%</td>
-<td style="text-align: left;">26.9%</td>
-<td style="text-align: right;">0.28</td>
-<td style="text-align: left;">55%</td>
-<td style="text-align: left;">20.2%</td>
+<td style="text-align: left;">57.1%</td>
+<td style="text-align: left;">26.7%</td>
+<td style="text-align: right;">0.30</td>
+<td style="text-align: left;">57%</td>
+<td style="text-align: left;">20.6%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.03,-1.84]</td>
+<td style="text-align: left;">(-2.04,-1.84]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">47</td>
-<td style="text-align: right;">253</td>
-<td style="text-align: left;">15.7%</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">248</td>
+<td style="text-align: left;">17.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">69.0%</td>
-<td style="text-align: left;">36.4%</td>
-<td style="text-align: right;">0.33</td>
-<td style="text-align: left;">69%</td>
-<td style="text-align: left;">19.1%</td>
+<td style="text-align: left;">73.1%</td>
+<td style="text-align: left;">36.0%</td>
+<td style="text-align: right;">0.37</td>
+<td style="text-align: left;">73%</td>
+<td style="text-align: left;">19.8%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-2.22,-2.03]</td>
+<td style="text-align: left;">(-2.25,-2.04]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">38</td>
-<td style="text-align: right;">262</td>
-<td style="text-align: left;">12.7%</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">270</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">80.4%</td>
-<td style="text-align: left;">46.2%</td>
-<td style="text-align: right;">0.34</td>
-<td style="text-align: left;">80%</td>
+<td style="text-align: left;">10.0%</td>
+<td style="text-align: left;">82.4%</td>
+<td style="text-align: left;">46.1%</td>
+<td style="text-align: right;">0.36</td>
+<td style="text-align: left;">82%</td>
 <td style="text-align: left;">17.8%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.44,-2.22]</td>
+<td style="text-align: left;">(-2.44,-2.25]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">21</td>
-<td style="text-align: right;">279</td>
-<td style="text-align: left;">7.0%</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">6.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">86.7%</td>
-<td style="text-align: left;">56.7%</td>
-<td style="text-align: right;">0.30</td>
-<td style="text-align: left;">87%</td>
-<td style="text-align: left;">16.0%</td>
+<td style="text-align: left;">88.0%</td>
+<td style="text-align: left;">56.6%</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: left;">88%</td>
+<td style="text-align: left;">15.8%</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">(-2.66,-2.44]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">16</td>
-<td style="text-align: right;">284</td>
-<td style="text-align: left;">5.3%</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">285</td>
+<td style="text-align: left;">5.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">91.6%</td>
+<td style="text-align: left;">92.6%</td>
 <td style="text-align: left;">67.3%</td>
-<td style="text-align: right;">0.24</td>
-<td style="text-align: left;">92%</td>
-<td style="text-align: left;">14.5%</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: left;">93%</td>
+<td style="text-align: left;">14.3%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">(-2.94,-2.66]</td>
+<td style="text-align: left;">(-2.92,-2.66]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">14</td>
-<td style="text-align: right;">286</td>
-<td style="text-align: left;">4.7%</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">291</td>
+<td style="text-align: left;">3.0%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">95.8%</td>
-<td style="text-align: left;">78.0%</td>
-<td style="text-align: right;">0.18</td>
-<td style="text-align: left;">96%</td>
-<td style="text-align: left;">13.2%</td>
+<td style="text-align: left;">95.4%</td>
+<td style="text-align: left;">78.1%</td>
+<td style="text-align: right;">0.17</td>
+<td style="text-align: left;">95%</td>
+<td style="text-align: left;">12.9%</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">(-3.4,-2.94]</td>
+<td style="text-align: left;">(-3.36,-2.92]</td>
 <td style="text-align: right;">300</td>
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">290</td>
 <td style="text-align: left;">3.3%</td>
 <td style="text-align: left;">10.0%</td>
-<td style="text-align: left;">98.8%</td>
-<td style="text-align: left;">88.9%</td>
-<td style="text-align: right;">0.10</td>
-<td style="text-align: left;">99%</td>
-<td style="text-align: left;">12.1%</td>
+<td style="text-align: left;">98.5%</td>
+<td style="text-align: left;">89.0%</td>
+<td style="text-align: right;">0.09</td>
+<td style="text-align: left;">98%</td>
+<td style="text-align: left;">11.8%</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">[-6.66,-3.4]</td>
+<td style="text-align: left;">[-5.48,-3.36]</td>
 <td style="text-align: right;">300</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">296</td>
-<td style="text-align: left;">1.3%</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">295</td>
+<td style="text-align: left;">1.7%</td>
 <td style="text-align: left;">10.0%</td>
 <td style="text-align: left;">100.0%</td>
 <td style="text-align: left;">100.0%</td>
 <td style="text-align: right;">0.00</td>
 <td style="text-align: left;">100%</td>
-<td style="text-align: left;">11.1%</td>
+<td style="text-align: left;">10.8%</td>
 </tr>
 </tbody>
 </table>
@@ -1119,13 +1118,14 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy
