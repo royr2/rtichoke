@@ -15,7 +15,6 @@ Want to use Python's powerful libraries without leaving R? The reticulate packag
 ## Install reticulate
 
 ```{r}
-#| label: install-reticulate
 
 install.packages("reticulate")
 library(reticulate)
@@ -26,7 +25,6 @@ library(reticulate)
 The easiest approach is to let reticulate handle Python installation for you:
 
 ```{r}
-#| label: install-miniconda
 
 install_miniconda(path = "c:/miniconda")
 ```
@@ -36,7 +34,6 @@ install_miniconda(path = "c:/miniconda")
 Reticulate creates a default environment called `r-reticulate`. Let's connect to it:
 
 ```{r}
-#| label: use-conda-env
 
 # Check available environments
 conda_list()
@@ -50,7 +47,6 @@ use_condaenv("r-reticulate")
 Now you can install any Python packages you need:
 
 ```{r}
-#| label: install-python-packages
 
 py_install(c("pandas", "scikit-learn", "matplotlib"))
 ```
@@ -60,7 +56,6 @@ py_install(c("pandas", "scikit-learn", "matplotlib"))
 ### 1. Import Python Modules Directly
 
 ```{r}
-#| label: python-in-r
 
 # Import pandas and use it like any R package
 pd <- import("pandas")
@@ -78,7 +73,6 @@ np$mean(c(1:100))  # Calculate mean using numpy
 You can mix R and Python code in the same document by using Python code chunks:
 
 ```{python}
-#| label: python-chunk
 
 # This is Python code!
 import pandas as pd
@@ -98,7 +92,6 @@ print(df.describe())
 The most powerful approach is using Python's machine learning libraries within R:
 
 ```{r}
-#| label: sklearn-example
 
 # Import scikit-learn
 sk <- import("sklearn.linear_model")

@@ -18,7 +18,6 @@ A gains table systematically discretizes the population (typically a validation 
 ## Required Packages
 
 ```{r}
-#| label: setup
 
 # Load required packages
 library(dplyr)
@@ -32,7 +31,6 @@ library(scales)
 Let's use a sample from the Lending Club dataset, which has loan characteristics, borrower details, and repayment outcomes — exactly what we need.
 
 ```{r}
-#| label: data-load
 
 # Load the sample data
 sample <- read.csv("https://bit.ly/42ypcnJ")
@@ -46,7 +44,6 @@ dim(sample)
 First, let's create a binary target variable that flags borrowers who defaulted on their loans.
 
 ```{r}
-#| label: target-definition
 
 # Check unique loan statuses
 unique(sample$loan_status)
@@ -69,7 +66,6 @@ sample %>%
 Let's fit a simple logistic regression model to generate predicted scores.
 
 ```{r}
-#| label: data-prep
 
 # Replace NA values with a default value
 sample[is.na(sample)] <- -1
@@ -90,7 +86,6 @@ test <- sample[-idx,]
 ```
 
 ```{r}
-#| label: model-building
 
 # Build a logistic regression model
 mdl <- glm(
@@ -116,7 +111,6 @@ Let's now build the gains table step by step — binning the population and comp
 ### Population Discretization into Bins
 
 ```{r}
-#| label: binning
 
 # Create deciles based on model predictions
 q <- quantile(test$pred, probs = seq(0, 1, length.out = 11))
@@ -132,7 +126,6 @@ levels(test$bins)
 ### Basic Statistical Measures by Segment
 
 ```{r}
-#| label: basic-stats
 
 # Create initial gains table with counts
 gains_table <- test %>% 
@@ -152,7 +145,6 @@ kable(gains_table)
 ### Cumulative Distribution
 
 ```{r}
-#| label: distribution-metrics
 
 # Add population percentage and cumulative distributions
 gains_table %<>%
@@ -169,7 +161,6 @@ kable(gains_table)
 ### Performance Metrics
 
 ```{r}
-#| label: performance-metrics
 
 # Add KS statistic, capture rate, and cumulative event rate
 gains_table %<>%
@@ -196,7 +187,6 @@ kable(gains_table)
 The following implementation encapsulates the gains table construction process within a comprehensive, reusable function suitable for any binary classification model evaluation:
 
 ```{r}
-#| label: gains-function
 
 gains_table <- function(act, pred, increasing = TRUE, nBins = 10) {
   
@@ -236,7 +226,6 @@ gains_table <- function(act, pred, increasing = TRUE, nBins = 10) {
 ### Function Implementation
 
 ```{r}
-#| label: function-demo
 
 # Generate a gains table with bins in descending order
 tab <- gains_table(test$bad_flag, test$pred, FALSE, 10)

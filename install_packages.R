@@ -1,10 +1,3 @@
-# Script to install required packages for rtichoke blog posts
-install_if_missing <- function(pkg) {
-  if (!require(pkg, character.only = TRUE)) {
-    install.packages(pkg)
-  }
-}
-
 # List of required packages
 packages <- c(
   # Core data manipulation
@@ -36,8 +29,16 @@ packages <- c(
   "vip",        # Variable importance plots
   "probably",   # Tools for post-processing predictions
   "ROSE",       # Random over-sampling examples (for imbalanced data)
-  "ParBayesianOptimization", # Bayesian optimization
   "mlbench",    # Machine learning benchmark problems
+  "caret",      # Classification and regression training
+  "mlr3",       # Machine learning framework
+  "mlr3learners", # Additional learners for mlr3
+  "h2o",        # Scalable machine learning platform
+  "qeML",      # Quick and easy machine learning
+  "ranger",     # Fast random forests
+  "mvtnorm",    # Multivariate normal distribution
+  "rBayesianOptimization",
+  "randomForest",
   
   # Data import and handling
   "readxl",     # Read Excel files
@@ -52,6 +53,8 @@ packages <- c(
   # Financial and optimization
   "pso",        # Particle swarm optimization
   "quantmod",   # Quantitative financial modeling
+  "purrr",      # Functional programming tools
+  "slider",     # Sliding window functions
   
   # Text analytics
   "quanteda",           # Quantitative analysis of textual data
@@ -65,6 +68,14 @@ packages <- c(
   # Other utilities
   "devtools",   # Tools to make developing R packages easier
   "pROC",       # ROC curve analysis. 
+  "DT",         # Interactive data tables for R
+  "foreach",    # Foreach looping construct
+  "doParallel", # Parallel backend for foreach
+  "tictoc",     # Timing functions
+  "RSQLite",    # SQLite interface for R
+  "pacman",     # Package management tool
+  "pak",        # Package installation tools
+  "renv",       # Reproducible environments
   
   # Add more packages as needed for future posts
   "ggrepel",    # Non-overlapping text labels for ggplot2
@@ -73,10 +84,5 @@ packages <- c(
   "ragnar"     # Retrieval-augmented generation store (DuckDB + VSS)
 )
 
-# Install packages if they're not already installed
-sapply(packages, install_if_missing)
-
-# Print confirmation message
-cat("\nPackage installation complete.\n")
-cat("The following packages were processed:\n")
-cat(paste(packages, collapse = ", "), "\n")
+if(!require(pak)) install.packages("pak")
+pak::pkg_install(packages)

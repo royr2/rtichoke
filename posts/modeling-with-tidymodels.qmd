@@ -345,7 +345,6 @@ log_reg_results %>% filter(.metric == "roc_auc") %>% arrange(desc(mean)) %>% hea
 This section focuses on finalizing both models using their optimal hyperparameters and evaluating model performance on the validation dataset.
 
 ```{r}
-#| label: model-evaluation
 
 # Select best hyperparameters based on ROC AUC
 best_log_reg_params <- select_best(log_reg_tuned, metric = "roc_auc")
@@ -395,7 +394,6 @@ print(xgb_val_metrics)
 Understanding feature contributions to prediction outcomes represents a critical requirement for credit scoring models, particularly for regulatory compliance and business decision-making.
 
 ```{r}
-#| label: feature-importance
 #| fig-width: 10
 #| fig-height: 12
 
@@ -433,7 +431,6 @@ xgb_cal
 Let's evaluate the better-performing model (XGBoost based on validation results) on the held-out test set to get an unbiased estimate of how it generalises.
 
 ```{r}
-#| label: final-evaluation
 
 # Make predictions on the test set with the XGBoost model
 test_results <- final_xgb_model %>%

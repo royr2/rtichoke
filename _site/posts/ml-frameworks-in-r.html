@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.35">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-04-06">
+<meta name="dcterms.date" content="2026-04-12">
 
-<title>Choosing a Machine Learning Framework in R: A Practical Comparison – R’tichoke</title>
+<title>Machine Learning Frameworks in R – R’tichoke</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-9e41006022cc14e6bca310783a21a71f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-494df7ee9f4d3fbed323cea6af7dcc0b.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-af1142a47761cd6f12b407da64115aad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -224,18 +224,15 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#the-common-problem" id="toc-the-common-problem" class="nav-link active" data-scroll-target="#the-common-problem">The Common Problem</a></li>
-  <li><a href="#unifiedml-minimal-wrapper-maximum-flexibility" id="toc-unifiedml-minimal-wrapper-maximum-flexibility" class="nav-link" data-scroll-target="#unifiedml-minimal-wrapper-maximum-flexibility">1. <code>unifiedml</code>: Minimal Wrapper, Maximum Flexibility</a></li>
-  <li><a href="#caret-the-battle-tested-veteran" id="toc-caret-the-battle-tested-veteran" class="nav-link" data-scroll-target="#caret-the-battle-tested-veteran">2. <code>caret</code>: The Battle-Tested Veteran</a></li>
-  <li><a href="#tidymodels-the-tidyverse-native-ecosystem" id="toc-tidymodels-the-tidyverse-native-ecosystem" class="nav-link" data-scroll-target="#tidymodels-the-tidyverse-native-ecosystem">3. <code>tidymodels</code>: The Tidyverse-Native Ecosystem</a></li>
-  <li><a href="#mlr3-the-object-oriented-powerhouse" id="toc-mlr3-the-object-oriented-powerhouse" class="nav-link" data-scroll-target="#mlr3-the-object-oriented-powerhouse">4. <code>mlr3</code>: The Object-Oriented Powerhouse</a></li>
-  <li><a href="#superlearner-when-you-want-an-optimal-ensemble" id="toc-superlearner-when-you-want-an-optimal-ensemble" class="nav-link" data-scroll-target="#superlearner-when-you-want-an-optimal-ensemble">5. <code>SuperLearner</code>: When You Want an Optimal Ensemble</a></li>
-  <li><a href="#h2o-scalable-automl" id="toc-h2o-scalable-automl" class="nav-link" data-scroll-target="#h2o-scalable-automl">6. <code>h2o</code>: Scalable AutoML</a></li>
-  <li><a href="#comparison-at-a-glance" id="toc-comparison-at-a-glance" class="nav-link" data-scroll-target="#comparison-at-a-glance">Comparison at a Glance</a></li>
-  <li><a href="#lines-of-code-comparison" id="toc-lines-of-code-comparison" class="nav-link" data-scroll-target="#lines-of-code-comparison">Lines of Code Comparison</a></li>
-  <li><a href="#decision-guide" id="toc-decision-guide" class="nav-link" data-scroll-target="#decision-guide">Decision Guide</a></li>
-  <li><a href="#the-hybrid-workflow" id="toc-the-hybrid-workflow" class="nav-link" data-scroll-target="#the-hybrid-workflow">The Hybrid Workflow</a></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#frameworks-at-a-glance" id="toc-frameworks-at-a-glance" class="nav-link active" data-scroll-target="#frameworks-at-a-glance">Frameworks at a Glance</a></li>
+  <li><a href="#setup-and-data" id="toc-setup-and-data" class="nav-link" data-scroll-target="#setup-and-data">Setup and Data</a></li>
+  <li><a href="#tidymodels" id="toc-tidymodels" class="nav-link" data-scroll-target="#tidymodels">1. tidymodels</a></li>
+  <li><a href="#caret" id="toc-caret" class="nav-link" data-scroll-target="#caret">2. caret</a></li>
+  <li><a href="#mlr3" id="toc-mlr3" class="nav-link" data-scroll-target="#mlr3">3. mlr3</a></li>
+  <li><a href="#h2o-automl" id="toc-h2o-automl" class="nav-link" data-scroll-target="#h2o-automl">4. h2o (AutoML)</a></li>
+  <li><a href="#qeml" id="toc-qeml" class="nav-link" data-scroll-target="#qeml">5. qeML</a></li>
+  <li><a href="#results-comparison" id="toc-results-comparison" class="nav-link" data-scroll-target="#results-comparison">Results Comparison</a></li>
+  <li><a href="#closing-thoughts" id="toc-closing-thoughts" class="nav-link" data-scroll-target="#closing-thoughts">Closing thoughts</a></li>
   </ul>
 </nav>
     </div>
@@ -244,14 +241,10 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Choosing a Machine Learning Framework in R: A Practical Comparison</h1>
+<h1 class="title">Machine Learning Frameworks in R</h1>
   <div class="quarto-categories">
     <div class="quarto-category">R</div>
     <div class="quarto-category">Machine Learning</div>
-    <div class="quarto-category">tidymodels</div>
-    <div class="quarto-category">mlr3</div>
-    <div class="quarto-category">caret</div>
-    <div class="quarto-category">unifiedml</div>
   </div>
   </div>
 
@@ -263,7 +256,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 6, 2026</p>
+      <p class="date">April 12, 2026</p>
     </div>
   </div>
   
@@ -275,359 +268,305 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 </header>
 
 
-<p>R has multiple mature frameworks for machine learning, each with its own design philosophy: <code>caret</code>, <code>tidymodels</code>, <code>mlr3</code>, <code>SuperLearner</code>, <code>h2o</code>, and the newer <code>unifiedml</code>. Choosing between them can be genuinely confusing.</p>
-<p>In this post, let’s solve the same problem with each one: predicting house prices on a held-out test set using 5-fold cross-validation. The side-by-side code makes it straightforward to compare the frameworks and pick the one that fits your workflow best.</p>
-<section id="the-common-problem" class="level2">
-<h2 class="anchored" data-anchor-id="the-common-problem">The Common Problem</h2>
-<p>We’ll use the classic <strong>Boston Housing</strong> dataset (available through <code>MASS</code>) throughout. A ridge regression (<code>glmnet</code>) and a random forest will be our two models, since every framework supports both.</p>
+<p>R’s ecosystem offers a rich selection of machine learning frameworks, each with distinct design philosophies and strengths. This post is a side-by-side comparison of five ML frameworks in R that provide <strong>unified interfaces</strong> over multiple algorithms, with runnable code examples on the same dataset so you can compare APIs directly. The focus is on packages that let you swap algorithms without rewriting your code.</p>
+<section id="frameworks-at-a-glance" class="level2">
+<h2 class="anchored" data-anchor-id="frameworks-at-a-glance">Frameworks at a Glance</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th>tidymodels</th>
+<th>caret</th>
+<th>mlr3</th>
+<th>h2o</th>
+<th>qeML</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Built-in tuning</strong></td>
+<td>✅ (<code>tune</code>)</td>
+<td>✅</td>
+<td>✅ (<code>mlr3tuning</code>)</td>
+<td>✅ (AutoML)</td>
+<td>✅ (<code>qeFT()</code>)</td>
+</tr>
+<tr class="even">
+<td><strong>Preprocessing pipeline</strong></td>
+<td>✅ (<code>recipes</code>)</td>
+<td>✅ (<code>preProcess</code>)</td>
+<td>✅ (<code>mlr3pipelines</code>)</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr class="odd">
+<td><strong>Model variety</strong></td>
+<td>200+ engines</td>
+<td>230+ methods</td>
+<td>100+ learners</td>
+<td>GBM, GLM, DL, DRF</td>
+<td>20+ wrappers</td>
+</tr>
+<tr class="even">
+<td><strong>Relative speed</strong></td>
+<td>Moderate</td>
+<td>Moderate</td>
+<td>Moderate</td>
+<td>Fast (distributed)</td>
+<td>Depends on backend</td>
+</tr>
+<tr class="odd">
+<td><strong>Learning curve</strong></td>
+<td>Medium</td>
+<td>Low</td>
+<td>High</td>
+<td>Low</td>
+<td>Very low</td>
+</tr>
+<tr class="even">
+<td><strong>Active development</strong></td>
+<td>✅</td>
+<td>⚠️ Maintenance mode</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr class="odd">
+<td><strong>Best for</strong></td>
+<td>Production pipelines</td>
+<td>Quick prototyping</td>
+<td>Benchmarking</td>
+<td>AutoML &amp; scale</td>
+<td>Teaching &amp; exploration</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="setup-and-data" class="level2">
+<h2 class="anchored" data-anchor-id="setup-and-data">Setup and Data</h2>
+<p>ALl examples below uses the <code>iris</code> classification task: predict <code>Species</code> from the four numeric measurements. A single train/test split is created up front so results are directly comparable.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(Boston)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>idx   <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">nrow</span>(Boston), <span class="fl">0.8</span> <span class="sc">*</span> <span class="fu">nrow</span>(Boston))</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> Boston[idx,  ]</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>test  <span class="ot">&lt;-</span> Boston[<span class="sc">-</span>idx, ]</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Reproducible train/test split (framework-agnostic)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(iris)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>train_idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">seq_len</span>(n), <span class="at">size =</span> <span class="fu">floor</span>(<span class="fl">0.7</span> <span class="sc">*</span> n))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>train_data <span class="ot">&lt;-</span> iris[train_idx, ]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>test_data  <span class="ot">&lt;-</span> iris[<span class="sc">-</span>train_idx, ]</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>X_train <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(train[, <span class="sc">-</span><span class="dv">14</span>])</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>y_train <span class="ot">&lt;-</span> train<span class="sc">$</span>medv</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>X_test  <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(test[, <span class="sc">-</span><span class="dv">14</span>])</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>y_test  <span class="ot">&lt;-</span> test<span class="sc">$</span>medv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Store accuracy results for final comparison</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">Framework =</span> <span class="fu">character</span>(),</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">character</span>(),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">Accuracy =</span> <span class="fu">numeric</span>(),</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Training set:"</span>, <span class="fu">nrow</span>(train_data), <span class="st">"observations</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Training set: 105 observations</code></pre>
 </div>
-<p>All models answer the same two questions:</p>
-<ul>
-<li>What is the <strong>test RMSE</strong> for ridge regression and random forest?</li>
-<li>What is the <strong>mean 5-fold CV RMSE</strong> for each?</li>
-</ul>
-<hr>
-</section>
-<section id="unifiedml-minimal-wrapper-maximum-flexibility" class="level2">
-<h2 class="anchored" data-anchor-id="unifiedml-minimal-wrapper-maximum-flexibility">1. <code>unifiedml</code>: Minimal Wrapper, Maximum Flexibility</h2>
-<p><a href="https://CRAN.R-project.org/package=unifiedml"><code>unifiedml</code></a> (v0.2.1, released April 2026) is the newest entry. It provides a single R6 class, <code>Model</code>, that wraps any R modeling function following standard conventions, with automatic task detection and built-in interpretability.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"unifiedml"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(unifiedml)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Ridge Regression ---</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>mod_ridge <span class="ot">&lt;-</span> Model<span class="sc">$</span><span class="fu">new</span>(glmnet<span class="sc">::</span>glmnet)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>mod_ridge<span class="sc">$</span><span class="fu">fit</span>(X_train, y_train, <span class="at">alpha =</span> <span class="dv">0</span>, <span class="at">lambda =</span> <span class="fl">0.1</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>preds_ridge <span class="ot">&lt;-</span> mod_ridge<span class="sc">$</span><span class="fu">predict</span>(X_test)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>rmse_ridge  <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((preds_ridge <span class="sc">-</span> y_test)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Ridge test RMSE:"</span>, <span class="fu">round</span>(rmse_ridge, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 5-fold CV</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>cv_ridge <span class="ot">&lt;-</span> <span class="fu">cross_val_score</span>(mod_ridge, X_train, y_train, <span class="at">cv =</span> <span class="dv">5</span>L)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Ridge mean CV RMSE:"</span>, <span class="fu">round</span>(<span class="fu">mean</span>(cv_ridge), <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(randomForest)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Random Forest ---</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>mod_rf <span class="ot">&lt;-</span> Model<span class="sc">$</span><span class="fu">new</span>(randomForest<span class="sc">::</span>randomForest)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>mod_rf<span class="sc">$</span><span class="fu">fit</span>(X_train, y_train, <span class="at">ntree =</span> <span class="dv">500</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>preds_rf <span class="ot">&lt;-</span> mod_rf<span class="sc">$</span><span class="fu">predict</span>(X_test)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>rmse_rf  <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((preds_rf <span class="sc">-</span> y_test)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"RF test RMSE:"</span>, <span class="fu">round</span>(rmse_rf, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 5-fold CV</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>cv_rf <span class="ot">&lt;-</span> <span class="fu">cross_val_score</span>(mod_rf, X_train, y_train, <span class="at">cv =</span> <span class="dv">5</span>L)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"RF mean CV RMSE:"</span>, <span class="fu">round</span>(<span class="fu">mean</span>(cv_rf), <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Built-in feature importance via numerical derivatives</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>mod_rf<span class="sc">$</span><span class="fu">summary</span>()</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Partial dependence plot (no extra packages needed)</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>mod_rf<span class="sc">$</span><span class="fu">plot</span>(<span class="at">feature =</span> <span class="st">"rm"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p><strong>What stands out:</strong> The interface is identical for both models. Only <code>Model$new(fn)</code> changes. Auto-detects regression from the numeric <code>y</code>. The <code>$summary()</code> and <code>$plot()</code> interpretability tools work on any model without additional packages.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p><code>unifiedml</code> intentionally has no preprocessing or tuning built in. It’s designed for rapid prototyping and exploration, not production pipelines.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Test set:    "</span>, <span class="fu">nrow</span>(test_data), <span class="st">"observations</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Test set:     45 observations</code></pre>
 </div>
 </div>
 <hr>
 </section>
-<section id="caret-the-battle-tested-veteran" class="level2">
-<h2 class="anchored" data-anchor-id="caret-the-battle-tested-veteran">2. <code>caret</code>: The Battle-Tested Veteran</h2>
-<p><a href="https://CRAN.R-project.org/package=caret"><code>caret</code></a> (Classification And REgression Training) was the first serious attempt at a unified ML interface in R, written by Max Kuhn in 2007. It wraps over 200 algorithms behind a single <code>train()</code> function and handles cross-validation and tuning in one call. It is now in soft-maintenance mode (Kuhn moved on to build <code>tidymodels</code>) but is still widely used in production systems.</p>
+<section id="tidymodels" class="level2">
+<h2 class="anchored" data-anchor-id="tidymodels">1. tidymodels</h2>
+<p>The <a href="https://www.tidymodels.org/">tidymodels</a> ecosystem is the modern, tidyverse native approach to modeling in R. It provides a consistent grammar for specifying models (<code>parsnip</code>), preprocessing (<code>recipes</code>), composing workflows (<code>workflows</code>), and tuning hyperparameters (<code>tune</code>).</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"caret"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a recipe (preprocessing)</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(Species <span class="sc">~</span> ., <span class="at">data =</span> train_data)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a model specification</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>rf_spec <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">trees =</span> <span class="dv">500</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"ranger"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine into a workflow</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>rf_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec) <span class="sc">%&gt;%</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(rf_spec)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the workflow</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>rf_fit <span class="ot">&lt;-</span> rf_wf <span class="sc">%&gt;%</span> <span class="fu">fit</span>(<span class="at">data =</span> train_data)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict on test set</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>preds_tidy <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_fit, test_data) <span class="sc">%&gt;%</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(test_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(Species))</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>acc_tidy <span class="ot">&lt;-</span> <span class="fu">accuracy</span>(preds_tidy, <span class="at">truth =</span> Species, <span class="at">estimate =</span> .pred_class)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>acc_tidy</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  .metric  .estimator .estimate
+  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+1 accuracy multiclass     0.978</code></pre>
 </div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">number =</span> <span class="dv">5</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Ridge Regression ---</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>fit_ridge <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  medv <span class="sc">~</span> ., <span class="at">data =</span> train,</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">method    =</span> <span class="st">"glmnet"</span>,</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> ctrl,</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid  =</span> <span class="fu">expand.grid</span>(<span class="at">alpha =</span> <span class="dv">0</span>, <span class="at">lambda =</span> <span class="fl">0.1</span>)</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>preds_ridge <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_ridge, <span class="at">newdata =</span> test)</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>rmse_ridge  <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((preds_ridge <span class="sc">-</span> test<span class="sc">$</span>medv)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Ridge test RMSE:"</span>, <span class="fu">round</span>(rmse_ridge, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Ridge mean CV RMSE:"</span>, <span class="fu">round</span>(<span class="fu">min</span>(fit_ridge<span class="sc">$</span>results<span class="sc">$</span>RMSE), <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Framework =</span> <span class="st">"tidymodels"</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="st">"Random Forest (ranger)"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Accuracy =</span> acc_tidy<span class="sc">$</span>.estimate</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Random Forest ---</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>fit_rf <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  medv <span class="sc">~</span> ., <span class="at">data =</span> train,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">method    =</span> <span class="st">"rf"</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> ctrl,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid  =</span> <span class="fu">data.frame</span>(<span class="at">mtry =</span> <span class="dv">4</span>),</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">ntree     =</span> <span class="dv">500</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>preds_rf <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_rf, <span class="at">newdata =</span> test)</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>rmse_rf  <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((preds_rf <span class="sc">-</span> test<span class="sc">$</span>medv)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"RF test RMSE:"</span>, <span class="fu">round</span>(rmse_rf, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"RF mean CV RMSE:"</span>, <span class="fu">round</span>(<span class="fu">min</span>(fit_rf<span class="sc">$</span>results<span class="sc">$</span>RMSE), <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Variable importance (model-specific)</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">varImp</span>(fit_rf)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p><strong>What stands out:</strong> Everything goes through <code>train()</code>. You specify the algorithm by a character string (<code>method = "rf"</code>) from caret’s built-in registry. Preprocessing (<code>preProcess</code>) and tuning (<code>tuneGrid</code>) bolt on naturally. The downside: the algorithm registry means you must look up caret’s specific string name for each model.</p>
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Warning
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p><code>caret</code> is no longer actively developed for new features. New projects are better served by <code>tidymodels</code> (the official successor) or <code>mlr3</code>.</p>
-</div>
-</div>
-<hr>
-</section>
-<section id="tidymodels-the-tidyverse-native-ecosystem" class="level2">
-<h2 class="anchored" data-anchor-id="tidymodels-the-tidyverse-native-ecosystem">3. <code>tidymodels</code>: The Tidyverse-Native Ecosystem</h2>
-<p><a href="https://www.tidymodels.org/"><code>tidymodels</code></a> is a collection of packages (<code>parsnip</code>, <code>recipes</code>, <code>rsample</code>, <code>tune</code>, <code>yardstick</code>, <code>workflows</code>, and more) built by the same team as <code>caret</code> and deeply integrated with the tidyverse. It separates model specification, preprocessing, CV, and evaluation into distinct, composable steps.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"tidymodels"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to tibble (tidyverse convention)</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>train_tbl <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(train)</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>test_tbl  <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(test)</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Resampling strategy ---</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(train_tbl, <span class="at">v =</span> <span class="dv">5</span>)</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Preprocessing recipe ---</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(medv <span class="sc">~</span> ., <span class="at">data =</span> train_tbl) <span class="sc">%&gt;%</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>())</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Ridge model specification ---</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>ridge_spec <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">penalty =</span> <span class="fl">0.1</span>, <span class="at">mixture =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"glmnet"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Workflow: bundle recipe + model ---</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>ridge_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec) <span class="sc">%&gt;%</span></span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(ridge_spec)</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Fit + CV ---</span></span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>ridge_res <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(ridge_wf, <span class="at">resamples =</span> folds,</span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>                           <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse))</span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(ridge_res)  <span class="co"># Mean CV RMSE</span></span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Final fit and test evaluation ---</span></span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>ridge_fit   <span class="ot">&lt;-</span> <span class="fu">fit</span>(ridge_wf, <span class="at">data =</span> train_tbl)</span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>ridge_preds <span class="ot">&lt;-</span> <span class="fu">predict</span>(ridge_fit, <span class="at">new_data =</span> test_tbl)</span>
-<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="fu">rmse_vec</span>(<span class="at">truth =</span> test_tbl<span class="sc">$</span>medv, <span class="at">estimate =</span> ridge_preds<span class="sc">$</span>.pred)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ranger)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Random Forest ---</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>rf_spec <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">trees =</span> <span class="dv">500</span>, <span class="at">mtry =</span> <span class="dv">4</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"ranger"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>rf_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(<span class="fu">recipe</span>(medv <span class="sc">~</span> ., <span class="at">data =</span> train_tbl)) <span class="sc">%&gt;%</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(rf_spec)</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>rf_res <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(rf_wf, <span class="at">resamples =</span> folds,</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>                        <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse))</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(rf_res)</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>rf_fit   <span class="ot">&lt;-</span> <span class="fu">fit</span>(rf_wf, <span class="at">data =</span> train_tbl)</span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>rf_preds <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_fit, <span class="at">new_data =</span> test_tbl)</span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="fu">rmse_vec</span>(<span class="at">truth =</span> test_tbl<span class="sc">$</span>medv, <span class="at">estimate =</span> rf_preds<span class="sc">$</span>.pred)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hyperparameter tuning (where tidymodels truly shines)</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ridge_tune_spec <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"glmnet"</span>)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>ridge_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">1</span>)), <span class="at">levels =</span> <span class="dv">20</span>)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>tuned <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> <span class="fu">add_recipe</span>(rec) <span class="sc">%&gt;%</span> <span class="fu">add_model</span>(ridge_tune_spec),</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> folds,</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid      =</span> ridge_grid,</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics   =</span> <span class="fu">metric_set</span>(rmse)</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(tuned, <span class="at">metric =</span> <span class="st">"rmse"</span>)</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(tuned)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p><strong>What stands out:</strong> The real power of <code>tidymodels</code> is composability. Swap <code>set_engine("glmnet")</code> for <code>set_engine("ranger")</code> and everything else stays unchanged: the recipe, the CV loop, and the metrics. The <code>tune()</code> placeholder makes hyperparameter search first-class. The tradeoff is the steeper ramp-up: you need to understand <code>parsnip</code>, <code>recipes</code>, <code>workflows</code>, <code>rsample</code>, and <code>yardstick</code> as distinct concepts.</p>
-<hr>
-</section>
-<section id="mlr3-the-object-oriented-powerhouse" class="level2">
-<h2 class="anchored" data-anchor-id="mlr3-the-object-oriented-powerhouse">4. <code>mlr3</code>: The Object-Oriented Powerhouse</h2>
-<p><a href="https://mlr3.mlr-org.com/"><code>mlr3</code></a> is the R6-based successor to the original <code>mlr</code> package, developed by a team at LMU Munich. It favors explicit object composition over function pipelines. Every concept (task, learner, resampling, measure) is a first-class R6 object you can inspect, modify, and combine.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">"mlr3"</span>, <span class="st">"mlr3learners"</span>, <span class="st">"mlr3verse"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mlr3)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mlr3learners)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Define the task ---</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>task <span class="ot">&lt;-</span> <span class="fu">as_task_regr</span>(train, <span class="at">target =</span> <span class="st">"medv"</span>, <span class="at">id =</span> <span class="st">"boston"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Ridge Regression ---</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>learner_ridge <span class="ot">&lt;-</span> <span class="fu">lrn</span>(<span class="st">"regr.glmnet"</span>, <span class="at">alpha =</span> <span class="dv">0</span>, <span class="at">lambda =</span> <span class="fl">0.1</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>resampling <span class="ot">&lt;-</span> <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">5</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>rr_ridge   <span class="ot">&lt;-</span> <span class="fu">resample</span>(task, learner_ridge, resampling, <span class="at">store_models =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># CV RMSE</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>rr_ridge<span class="sc">$</span><span class="fu">aggregate</span>(<span class="fu">msr</span>(<span class="st">"regr.rmse"</span>))</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Test RMSE</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>learner_ridge<span class="sc">$</span><span class="fu">train</span>(task)</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>pred_ridge <span class="ot">&lt;-</span> learner_ridge<span class="sc">$</span><span class="fu">predict_newdata</span>(test)</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>pred_ridge<span class="sc">$</span><span class="fu">score</span>(<span class="fu">msr</span>(<span class="st">"regr.rmse"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Random Forest ---</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>learner_rf <span class="ot">&lt;-</span> <span class="fu">lrn</span>(<span class="st">"regr.ranger"</span>, <span class="at">num.trees =</span> <span class="dv">500</span>, <span class="at">mtry =</span> <span class="dv">4</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>rr_rf <span class="ot">&lt;-</span> <span class="fu">resample</span>(task, learner_rf, resampling, <span class="at">store_models =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>rr_rf<span class="sc">$</span><span class="fu">aggregate</span>(<span class="fu">msr</span>(<span class="st">"regr.rmse"</span>))</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>learner_rf<span class="sc">$</span><span class="fu">train</span>(task)</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>pred_rf <span class="ot">&lt;-</span> learner_rf<span class="sc">$</span><span class="fu">predict_newdata</span>(test)</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>pred_rf<span class="sc">$</span><span class="fu">score</span>(<span class="fu">msr</span>(<span class="st">"regr.rmse"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Benchmark multiple learners at once (a core mlr3 strength)</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>design <span class="ot">&lt;-</span> <span class="fu">benchmark_grid</span>(</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">tasks     =</span> task,</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">learners  =</span> <span class="fu">list</span>(learner_ridge, learner_rf, <span class="fu">lrn</span>(<span class="st">"regr.featureless"</span>)),</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamplings =</span> resampling</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>bmr     <span class="ot">&lt;-</span> <span class="fu">benchmark</span>(design)</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>bmr<span class="sc">$</span><span class="fu">aggregate</span>(<span class="fu">msr</span>(<span class="st">"regr.rmse"</span>))[, .(learner_id, regr.rmse)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tuning with mlr3tuning</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mlr3tuning)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>learner_tune <span class="ot">&lt;-</span> <span class="fu">lrn</span>(<span class="st">"regr.glmnet"</span>,</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">alpha  =</span> <span class="dv">0</span>,</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">lambda =</span> <span class="fu">to_tune</span>(<span class="fl">1e-3</span>, <span class="dv">10</span>, <span class="at">logscale =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>at <span class="ot">&lt;-</span> <span class="fu">auto_tuner</span>(</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuner     =</span> <span class="fu">tnr</span>(<span class="st">"grid_search"</span>, <span class="at">resolution =</span> <span class="dv">15</span>),</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">learner   =</span> learner_tune,</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">resampling =</span> <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">5</span>),</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">measure   =</span> <span class="fu">msr</span>(<span class="st">"regr.rmse"</span>)</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>at<span class="sc">$</span><span class="fu">train</span>(task)</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>at<span class="sc">$</span>tuning_result</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p><strong>What stands out:</strong> <code>mlr3</code> is the most explicit framework. The task type, the learner, the resampling, and the measure are all stated explicitly via string IDs. This verbosity is also a strength: you can inspect any object (<code>learner$param_set</code>, <code>task$feature_names</code>) and swap components without rewriting surrounding code. The <code>benchmark()</code> function makes multi-model comparison effortless.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Tip
+<span class="screen-reader-only">Tip</span>Key Strengths
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The <code>mlr3verse</code> meta-package installs the full ecosystem: <code>mlr3tuning</code>, <code>mlr3pipelines</code>, <code>mlr3viz</code>, and more. It’s the fastest way to get started.</p>
+<ul>
+<li>Composable pipeline: <code>recipe</code> + <code>model</code> + <code>workflow</code> is easy to extend</li>
+<li>Swap engines with one line (<code>set_engine("xgboost")</code>)</li>
+<li>Seamless cross-validation and hyperparameter tuning via <code>tune_grid()</code> / <code>tune_bayes()</code></li>
+<li>Deep integration with the tidyverse</li>
+</ul>
 </div>
 </div>
 <hr>
 </section>
-<section id="superlearner-when-you-want-an-optimal-ensemble" class="level2">
-<h2 class="anchored" data-anchor-id="superlearner-when-you-want-an-optimal-ensemble">5. <code>SuperLearner</code>: When You Want an Optimal Ensemble</h2>
-<p><a href="https://CRAN.R-project.org/package=SuperLearner"><code>SuperLearner</code></a> implements the <em>super learner</em> algorithm: it fits a library of base learners, then learns the optimal weighted combination using cross-validation.</p>
+<section id="caret" class="level2">
+<h2 class="anchored" data-anchor-id="caret">2. caret</h2>
+<p>The <a href="https://topepo.github.io/caret/"><code>caret</code></a> package (Classification And REgression Training) was the de facto standard for ML in R for over a decade. It wraps 230+ models behind a single <code>train()</code> interface. While now in maintenance mode (its creator, Max Kuhn, leads <code>tidymodels</code>), it still remains widely used.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"SuperLearner"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Train a random forest with 5-fold CV</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">number =</span> <span class="dv">5</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>rf_caret <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  Species <span class="sc">~</span> .,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> train_data,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"rf"</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> ctrl,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneLength =</span> <span class="dv">3</span>  <span class="co"># Try 3 values of mtry</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Best tuning parameter</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>rf_caret<span class="sc">$</span>bestTune</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  mtry
+1    2</code></pre>
 </div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict on test set</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>preds_caret <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_caret, test_data)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>cm_caret <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(preds_caret, test_data<span class="sc">$</span>Species)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>cm_caret<span class="sc">$</span>overall[<span class="st">"Accuracy"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Accuracy 
+0.9555556 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Framework =</span> <span class="st">"caret"</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="st">"Random Forest (rf)"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Accuracy =</span> <span class="fu">as.numeric</span>(cm_caret<span class="sc">$</span>overall[<span class="st">"Accuracy"</span>])</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Key Strengths
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Minimal API: a single <code>train()</code> call handles preprocessing, tuning, and fitting</li>
+<li>230+ model methods available out of the box</li>
+<li>Built-in <code>confusionMatrix()</code> with extensive diagnostics</li>
+<li>Massive community knowledge base and Stack Overflow coverage</li>
+</ul>
+</div>
+</div>
+<hr>
+</section>
+<section id="mlr3" class="level2">
+<h2 class="anchored" data-anchor-id="mlr3">3. mlr3</h2>
+<p><a href="https://mlr3.mlr-org.com/"><code>mlr3</code></a> is a modern, object-oriented ML framework built on R6 classes. It excels at systematic benchmarking, composable pipelines, and reproducible experiments. The learning curve is steeper, but the payoff is a powerful, extensible architecture.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SuperLearner)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(randomForest)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co"># SuperLearner expects named wrapper functions (SL.*)</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>fit_sl <span class="ot">&lt;-</span> <span class="fu">SuperLearner</span>(</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y         =</span> y_train,</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">X         =</span> <span class="fu">as.data.frame</span>(X_train),</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">SL.library =</span> <span class="fu">c</span>(<span class="st">"SL.glmnet"</span>, <span class="st">"SL.randomForest"</span>, <span class="st">"SL.mean"</span>),</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">family    =</span> <span class="fu">gaussian</span>(),</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> <span class="dv">5</span>)   <span class="co"># 5-fold internal CV</span></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>fit_sl          <span class="co"># Shows the learner weights</span></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>fit_sl<span class="sc">$</span>coef     <span class="co"># Optimal combination coefficients</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mlr3)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mlr3learners)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the task</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>task <span class="ot">&lt;-</span> TaskClassif<span class="sc">$</span><span class="fu">new</span>(</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="st">"iris"</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">backend =</span> train_data,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">target =</span> <span class="st">"Species"</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the learner</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>learner <span class="ot">&lt;-</span> <span class="fu">lrn</span>(<span class="st">"classif.ranger"</span>, <span class="at">num.trees =</span> <span class="dv">500</span>)</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Train</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>learner<span class="sc">$</span><span class="fu">train</span>(task)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict on test data — create a test task to avoid backend storage issues</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>test_task <span class="ot">&lt;-</span> TaskClassif<span class="sc">$</span><span class="fu">new</span>(</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="st">"iris_test"</span>,</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">backend =</span> test_data,</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">target =</span> <span class="st">"Species"</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>pred_mlr3 <span class="ot">&lt;-</span> learner<span class="sc">$</span><span class="fu">predict</span>(test_task)</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>acc_mlr3 <span class="ot">&lt;-</span> pred_mlr3<span class="sc">$</span><span class="fu">score</span>(<span class="fu">msr</span>(<span class="st">"classif.acc"</span>))</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>acc_mlr3</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>classif.acc 
+  0.9555556 </code></pre>
 </div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>preds_sl <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_sl, <span class="at">newdata =</span> <span class="fu">as.data.frame</span>(X_test))</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>rmse_sl  <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((preds_sl<span class="sc">$</span>pred <span class="sc">-</span> y_test)<span class="sc">^</span><span class="dv">2</span>))</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"SuperLearner ensemble test RMSE:"</span>, <span class="fu">round</span>(rmse_sl, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Framework =</span> <span class="st">"mlr3"</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="st">"Random Forest (ranger)"</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Accuracy =</span> <span class="fu">as.numeric</span>(acc_mlr3)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cross-validated SuperLearner: honest estimate of ensemble performance</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>cv_sl <span class="ot">&lt;-</span> <span class="fu">CV.SuperLearner</span>(</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y         =</span> y_train,</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">X         =</span> <span class="fu">as.data.frame</span>(X_train),</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">SL.library =</span> <span class="fu">c</span>(<span class="st">"SL.glmnet"</span>, <span class="st">"SL.randomForest"</span>),</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">family    =</span> <span class="fu">gaussian</span>(),</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">V         =</span> <span class="dv">5</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(cv_sl)</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cv_sl)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<p><strong>What stands out:</strong> SuperLearner’s key idea is that instead of picking <em>one</em> best algorithm, you let cross-validation figure out the optimal blend. In practice this nearly always matches or beats any single learner. The interface is deliberately simple, with most of the complexity hidden inside the ensemble logic. It’s particularly popular in biostatistics and causal inference, since it integrates directly with <code>tmle</code> and <code>AIPW</code>.</p>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Key Strengths
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>R6 object-oriented design — everything is an object with methods</li>
+<li>First-class benchmarking: compare multiple learners on multiple tasks with <code>benchmark()</code></li>
+<li>Composable pipelines via <code>mlr3pipelines</code> (stacking, ensembling, feature engineering)</li>
+<li>Built-in resampling strategies and performance measures</li>
+</ul>
+</div>
+</div>
+<hr>
+</section>
+<section id="h2o-automl" class="level2">
+<h2 class="anchored" data-anchor-id="h2o-automl">4. h2o (AutoML)</h2>
+<p><a href="https://docs.h2o.ai/h2o/latest-stable/h2o-r/docs/index.html"><code>h2o</code></a> is a distributed machine learning platform with a powerful R interface. Its standout feature is <code>h2o.automl()</code> automatic model selection, hyperparameter tuning, and stacked ensemble creation with a single function call. It runs on a local JVM, so Java must be installed.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -638,343 +577,244 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>SuperLearner has no built-in preprocessing or feature engineering. All transformations must happen before passing <code>X</code> to <code>SuperLearner()</code>.</p>
+<p>This section requires Java (JDK 8+) to be installed. <code>h2o</code> starts a local JVM-based server. If you don’t have Java, skip to the results comparison — the other four frameworks cover the same ground without this dependency.</p>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(h2o)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Start a local h2o cluster (uses available cores)</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">h2o.init</span>(<span class="at">nthreads =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">max_mem_size =</span> <span class="st">"2G"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+H2O is not running yet, starting it now...
+
+Note:  In case of errors look at the following log files:
+    C:\Users\RIDDHI~1\AppData\Local\Temp\Rtmp8G4u9C\filec0caad7dcc/h2o_Riddhiman_Roy_started_from_r.out
+    C:\Users\RIDDHI~1\AppData\Local\Temp\Rtmp8G4u9C\filec0c1660783f/h2o_Riddhiman_Roy_started_from_r.err
+
+
+Starting H2O JVM and connecting:  Connection successful!
+
+R is connected to the H2O cluster: 
+    H2O cluster uptime:         2 seconds 276 milliseconds 
+    H2O cluster timezone:       Asia/Kolkata 
+    H2O data parsing timezone:  UTC 
+    H2O cluster version:        3.44.0.3 
+    H2O cluster version age:    2 years, 3 months and 23 days 
+    H2O cluster name:           H2O_started_from_R_Riddhiman_Roy_axb153 
+    H2O cluster total nodes:    1 
+    H2O cluster total memory:   1.98 GB 
+    H2O cluster total cores:    24 
+    H2O cluster allowed cores:  24 
+    H2O cluster healthy:        TRUE 
+    H2O Connection ip:          localhost 
+    H2O Connection port:        54321 
+    H2O Connection proxy:       NA 
+    H2O Internal Security:      FALSE 
+    R Version:                  R version 4.5.3 (2026-03-11 ucrt) </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">h2o.no_progress</span>()  <span class="co"># Suppress progress bars</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert data to h2o frames</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>train_h2o <span class="ot">&lt;-</span> <span class="fu">as.h2o</span>(train_data)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>test_h2o  <span class="ot">&lt;-</span> <span class="fu">as.h2o</span>(test_data)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Run AutoML — automatic model selection and stacking</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>aml <span class="ot">&lt;-</span> <span class="fu">h2o.automl</span>(</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">c</span>(<span class="st">"Sepal.Length"</span>, <span class="st">"Sepal.Width"</span>, <span class="st">"Petal.Length"</span>, <span class="st">"Petal.Width"</span>),</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="st">"Species"</span>,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">training_frame =</span> train_h2o,</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_models =</span> <span class="dv">10</span>,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+22:11:38.3: AutoML: XGBoost is not available; skipping it.
+22:11:39.171: _min_rows param, The dataset size is too small to split for min_rows=100.0: must have at least 200.0 (weighted) rows, but have only 105.0.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Leaderboard — best models ranked by cross-validated performance</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">h2o.get_leaderboard</span>(aml) <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                                 model_id mean_per_class_error
+1    DeepLearning_grid_1_AutoML_1_20260412_221137_model_1           0.03988095
+2                          GBM_2_AutoML_1_20260412_221137           0.05029762
+3                          GLM_1_AutoML_1_20260412_221137           0.05029762
+4    StackedEnsemble_AllModels_1_AutoML_1_20260412_221137           0.05982143
+5 StackedEnsemble_BestOfFamily_1_AutoML_1_20260412_221137           0.05982143
+     logloss      rmse        mse
+1 0.10262590 0.1802887 0.03250400
+2 0.13688347 0.1981121 0.03924839
+3 0.09073184 0.1736624 0.03015862
+4 0.12933104 0.2002635 0.04010548
+5 0.11828660 0.1921656 0.03692762</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict with the best model</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>preds_h2o <span class="ot">&lt;-</span> <span class="fu">h2o.predict</span>(aml<span class="sc">@</span>leader, test_h2o)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>acc_h2o <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">as.vector</span>(preds_h2o<span class="sc">$</span>predict) <span class="sc">==</span> <span class="fu">as.vector</span>(test_h2o<span class="sc">$</span>Species))</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Accuracy:"</span>, acc_h2o, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Accuracy: 0.9777778 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Framework =</span> <span class="st">"h2o"</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">paste0</span>(<span class="st">"AutoML ("</span>, aml<span class="sc">@</span>leader<span class="sc">@</span>algorithm, <span class="st">")"</span>),</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Accuracy =</span> acc_h2o</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Shutdown h2o</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="fu">h2o.shutdown</span>(<span class="at">prompt =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Key Strengths
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><code>h2o.automl()</code> — fully automatic model selection, tuning, and stacked ensembles</li>
+<li>Trains GBM, XGBoost, GLM, DRF, and deep learning models in one call</li>
+<li>Distributed computing — scales to datasets larger than memory</li>
+<li>Built-in leaderboard for model comparison</li>
+<li>Production deployment via MOJO/POJO model export</li>
+</ul>
 </div>
 </div>
 <hr>
 </section>
-<section id="h2o-scalable-automl" class="level2">
-<h2 class="anchored" data-anchor-id="h2o-scalable-automl">6. <code>h2o</code>: Scalable AutoML</h2>
-<p><a href="https://CRAN.R-project.org/package=h2o"><code>h2o</code></a> runs a local Java server and exposes parallelized implementations of GLM, GBM, XGBoost, Random Forest, Deep Learning, and fully automatic <strong>AutoML</strong>. It’s the right tool when data doesn’t fit comfortably in memory, or when you want a fully automated model search.</p>
+<section id="qeml" class="level2">
+<h2 class="anchored" data-anchor-id="qeml">5. qeML</h2>
+<p><a href="https://cran.r-project.org/package=qeML"><code>qeML</code></a> (Quick and Easy Machine Learning) takes a different approach of minimizing boilerplate. Every algorithm — random forest, gradient boosting, SVM, KNN, LASSO, neural nets, and more is wrapped behind a one-line <code>qe*()</code> function with a consistent <code>(data, targetName)</code> signature. No formula objects, no matrix conversions, no separate predict calls just results. It’s ideal for teaching, exploration, and quick model comparisons.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"h2o"</span>)  <span class="co"># Requires Java &gt;= 8</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(qeML)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># qeML convention: pass full data + target name (string)</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># It handles train/test splitting internally via holdout</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co"># But to match our split, we'll train on train_data and predict on test_data</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co"># predict() expects new data WITHOUT the target column</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>test_features <span class="ot">&lt;-</span> test_data[, <span class="sc">-</span><span class="fu">which</span>(<span class="fu">names</span>(test_data) <span class="sc">==</span> <span class="st">"Species"</span>)]</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Random Forest (wraps randomForest)</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>rf_qe <span class="ot">&lt;-</span> <span class="fu">qeRF</span>(train_data, <span class="st">"Species"</span>)</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>preds_rf_qe <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_qe, test_features)</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>acc_rf_qe <span class="ot">&lt;-</span> <span class="fu">mean</span>(preds_rf_qe<span class="sc">$</span>predClasses <span class="sc">==</span> test_data<span class="sc">$</span>Species)</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Random Forest accuracy:"</span>, acc_rf_qe, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Random Forest accuracy: 0.9777778 </code></pre>
 </div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(h2o)</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">h2o.init</span>(<span class="at">nthreads =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">max_mem_size =</span> <span class="st">"4g"</span>)   <span class="co"># Uses all available cores</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>train_h2o <span class="ot">&lt;-</span> <span class="fu">as.h2o</span>(train)</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>test_h2o  <span class="ot">&lt;-</span> <span class="fu">as.h2o</span>(test)</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>x_cols <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(<span class="fu">names</span>(train), <span class="st">"medv"</span>)</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>y_col  <span class="ot">&lt;-</span> <span class="st">"medv"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gradient Boosting (wraps gbm)</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>gb_qe <span class="ot">&lt;-</span> <span class="fu">qeGBoost</span>(train_data, <span class="st">"Species"</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>preds_gb_qe <span class="ot">&lt;-</span> <span class="fu">predict</span>(gb_qe, test_features)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>acc_gb_qe <span class="ot">&lt;-</span> <span class="fu">mean</span>(preds_gb_qe<span class="sc">$</span>predClasses <span class="sc">==</span> test_data<span class="sc">$</span>Species)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Gradient Boosting accuracy:"</span>, acc_gb_qe, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Gradient Boosting accuracy: 0.9555556 </code></pre>
 </div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Ridge Regression ---</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>fit_ridge <span class="ot">&lt;-</span> <span class="fu">h2o.glm</span>(</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x             =</span> x_cols,</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">y             =</span> y_col,</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">training_frame =</span> train_h2o,</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">alpha         =</span> <span class="dv">0</span>,</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">lambda        =</span> <span class="fl">0.1</span>,</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">nfolds        =</span> <span class="dv">5</span>,</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">keep_cross_validation_predictions =</span> <span class="cn">TRUE</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="fu">h2o.rmse</span>(fit_ridge, <span class="at">xval =</span> <span class="cn">TRUE</span>)   <span class="co"># 5-fold CV RMSE</span></span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="fu">h2o.rmse</span>(<span class="fu">h2o.performance</span>(fit_ridge, <span class="at">newdata =</span> test_h2o))  <span class="co"># Test RMSE</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># SVM (wraps e1071)</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>svm_qe <span class="ot">&lt;-</span> <span class="fu">qeSVM</span>(train_data, <span class="st">"Species"</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>preds_svm_qe <span class="ot">&lt;-</span> <span class="fu">predict</span>(svm_qe, test_features)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>acc_svm_qe <span class="ot">&lt;-</span> <span class="fu">mean</span>(preds_svm_qe<span class="sc">$</span>predClasses <span class="sc">==</span> test_data<span class="sc">$</span>Species)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"SVM accuracy:"</span>, acc_svm_qe, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>SVM accuracy: 0.9555556 </code></pre>
 </div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Random Forest ---</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>fit_rf <span class="ot">&lt;-</span> <span class="fu">h2o.randomForest</span>(</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x              =</span> x_cols,</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">y              =</span> y_col,</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">training_frame =</span> train_h2o,</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">ntrees         =</span> <span class="dv">500</span>,</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">nfolds         =</span> <span class="dv">5</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="fu">h2o.rmse</span>(fit_rf, <span class="at">xval =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="fu">h2o.rmse</span>(<span class="fu">h2o.performance</span>(fit_rf, <span class="at">newdata =</span> test_h2o))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the best-performing qeML model for the results table</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>best_acc_qe <span class="ot">&lt;-</span> <span class="fu">max</span>(acc_rf_qe, acc_gb_qe, acc_svm_qe)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>best_model_qe <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Random Forest"</span>, <span class="st">"Gradient Boosting"</span>, <span class="st">"SVM"</span>)[</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">which.max</span>(<span class="fu">c</span>(acc_rf_qe, acc_gb_qe, acc_svm_qe))</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(results, <span class="fu">data.frame</span>(</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">Framework =</span> <span class="st">"qeML"</span>,</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">paste0</span>(best_model_qe, <span class="st">" (qe wrapper)"</span>),</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Accuracy =</span> best_acc_qe</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- AutoML: fully automated model search ---</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>aml <span class="ot">&lt;-</span> <span class="fu">h2o.automl</span>(</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x              =</span> x_cols,</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">y              =</span> y_col,</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">training_frame =</span> train_h2o,</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_models     =</span> <span class="dv">20</span>,</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed           =</span> <span class="dv">42</span>,</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">nfolds         =</span> <span class="dv">5</span></span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Leaderboard: ranked by cross-validated RMSE</span></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>aml<span class="sc">@</span>leaderboard</span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Best model</span></span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>best <span class="ot">&lt;-</span> aml<span class="sc">@</span>leader</span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="fu">h2o.rmse</span>(<span class="fu">h2o.performance</span>(best, <span class="at">newdata =</span> test_h2o))</span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Explanation dashboard (SHAP, partial dependence, etc.)</span></span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="fu">h2o.explain</span>(best, test_h2o)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<p><strong>What stands out:</strong> <code>h2o.automl()</code> requires essentially zero modeling decisions. It trains dozens of models, stacks the best ones, and returns a ranked leaderboard. The <code>h2o.explain()</code> dashboard gives SHAP values, partial dependence plots, and a full leaderboard in one call. The cost is setup complexity (Java dependency, <code>h2o.init()</code>) and that you’re locked into h2o’s own implementations rather than arbitrary R functions.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">h2o.shutdown</span>(<span class="at">prompt =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Key Strengths
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>One-line model fitting: <code>qeRF(data, "target")</code> — no formula, no matrix, no recipe</li>
+<li>20+ algorithms behind a uniform <code>qe*()</code> interface (RF, GBM, SVM, KNN, LASSO, neural nets, and more)</li>
+<li><code>qeCompare()</code> lets you benchmark multiple methods in a single call</li>
+<li>Built-in holdout evaluation</li>
+<li>Lowest learning curve of any framework showcased here</li>
+</ul>
+</div>
 </div>
 <hr>
 </section>
-<section id="comparison-at-a-glance" class="level2">
-<h2 class="anchored" data-anchor-id="comparison-at-a-glance">Comparison at a Glance</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 9%">
-<col style="width: 15%">
-<col style="width: 15%">
-<col style="width: 15%">
-<col style="width: 15%">
-<col style="width: 15%">
-<col style="width: 15%">
-</colgroup>
+<section id="results-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="results-comparison">Results Comparison</h2>
+<p>All five frameworks were trained on the same 70/30 split of the <code>iris</code> dataset. Here’s how they stack up:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> results <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(Accuracy))</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(results, <span class="at">digits =</span> <span class="dv">4</span>, <span class="at">caption =</span> <span class="st">"Test Set Accuracy by Framework"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Test Set Accuracy by Framework</caption>
 <thead>
 <tr class="header">
-<th></th>
-<th style="text-align: center;"><code>unifiedml</code></th>
-<th style="text-align: center;"><code>caret</code></th>
-<th style="text-align: center;"><code>tidymodels</code></th>
-<th style="text-align: center;"><code>mlr3</code></th>
-<th style="text-align: center;"><code>SuperLearner</code></th>
-<th style="text-align: center;"><code>h2o</code></th>
+<th style="text-align: left;">Framework</th>
+<th style="text-align: left;">Model</th>
+<th style="text-align: right;">Accuracy</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>Models supported</strong></td>
-<td style="text-align: center;">Any R fn</td>
-<td style="text-align: center;">200+ (named)</td>
-<td style="text-align: center;">100+ (engines)</td>
-<td style="text-align: center;">100+ (IDs)</td>
-<td style="text-align: center;">Named wrappers</td>
-<td style="text-align: center;">Built-in set</td>
+<td style="text-align: left;">tidymodels</td>
+<td style="text-align: left;">Random Forest (ranger)</td>
+<td style="text-align: right;">0.9778</td>
 </tr>
 <tr class="even">
-<td><strong>Auto task detection</strong></td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">✅ (AutoML)</td>
+<td style="text-align: left;">h2o</td>
+<td style="text-align: left;">AutoML (deeplearning)</td>
+<td style="text-align: right;">0.9778</td>
 </tr>
 <tr class="odd">
-<td><strong>Preprocessing</strong></td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;"><code>preProcess</code></td>
-<td style="text-align: center;"><code>recipes</code></td>
-<td style="text-align: center;"><code>mlr3pipelines</code></td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">Built-in</td>
+<td style="text-align: left;">qeML</td>
+<td style="text-align: left;">Random Forest (qe wrapper)</td>
+<td style="text-align: right;">0.9778</td>
 </tr>
 <tr class="even">
-<td><strong>Hyperparameter tuning</strong></td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">Grid/random</td>
-<td style="text-align: center;"><code>tune_grid</code> / Bayes</td>
-<td style="text-align: center;"><code>mlr3tuning</code></td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">AutoML</td>
+<td style="text-align: left;">caret</td>
+<td style="text-align: left;">Random Forest (rf)</td>
+<td style="text-align: right;">0.9556</td>
 </tr>
 <tr class="odd">
-<td><strong>Ensembling</strong></td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;"><code>stacks</code></td>
-<td style="text-align: center;"><code>mlr3stackr</code></td>
-<td style="text-align: center;">✅ Core feature</td>
-<td style="text-align: center;">✅ Stacked</td>
-</tr>
-<tr class="even">
-<td><strong>Built-in interpretability</strong></td>
-<td style="text-align: center;">✅ Derivatives + PDP</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">Via extensions</td>
-<td style="text-align: center;">Via extensions</td>
-<td style="text-align: center;">❌</td>
-<td style="text-align: center;">✅ SHAP + PDP</td>
-</tr>
-<tr class="odd">
-<td><strong>Parallel CV</strong></td>
-<td style="text-align: center;">Partial</td>
-<td style="text-align: center;">✅ <code>doParallel</code></td>
-<td style="text-align: center;">✅ <code>future</code></td>
-<td style="text-align: center;">✅ <code>future</code></td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">✅ Distributed</td>
-</tr>
-<tr class="even">
-<td><strong>Data format</strong></td>
-<td style="text-align: center;">matrix / data.frame</td>
-<td style="text-align: center;">data.frame</td>
-<td style="text-align: center;">tibble</td>
-<td style="text-align: center;">data.table</td>
-<td style="text-align: center;">data.frame</td>
-<td style="text-align: center;">H2OFrame</td>
-</tr>
-<tr class="odd">
-<td><strong>Setup overhead</strong></td>
-<td style="text-align: center;">None</td>
-<td style="text-align: center;">Low</td>
-<td style="text-align: center;">Low</td>
-<td style="text-align: center;">Low</td>
-<td style="text-align: center;">Low</td>
-<td style="text-align: center;">High (Java)</td>
-</tr>
-<tr class="even">
-<td><strong>Learning curve</strong></td>
-<td style="text-align: center;">Very low</td>
-<td style="text-align: center;">Medium</td>
-<td style="text-align: center;">Medium–High</td>
-<td style="text-align: center;">High</td>
-<td style="text-align: center;">Medium</td>
-<td style="text-align: center;">Medium</td>
-</tr>
-<tr class="odd">
-<td><strong>Active development</strong></td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">🟡 Maintenance</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">✅</td>
-<td style="text-align: center;">🟡 Stable</td>
-<td style="text-align: center;">✅</td>
-</tr>
-<tr class="even">
-<td><strong>Best for</strong></td>
-<td style="text-align: center;">Quick prototyping</td>
-<td style="text-align: center;">Legacy code</td>
-<td style="text-align: center;">Production tidyverse</td>
-<td style="text-align: center;">Research / benchmarking</td>
-<td style="text-align: center;">Ensembles / causal</td>
-<td style="text-align: center;">Big data / AutoML</td>
+<td style="text-align: left;">mlr3</td>
+<td style="text-align: left;">Random Forest (ranger)</td>
+<td style="text-align: right;">0.9556</td>
 </tr>
 </tbody>
 </table>
-<hr>
-</section>
-<section id="lines-of-code-comparison" class="level2">
-<h2 class="anchored" data-anchor-id="lines-of-code-comparison">Lines of Code Comparison</h2>
-<p>Fitting ridge regression + 5-fold CV (same model, same data):</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="do">## unifiedml (4 lines)</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> Model<span class="sc">$</span><span class="fu">new</span>(glmnet<span class="sc">::</span>glmnet)</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>mod<span class="sc">$</span><span class="fu">fit</span>(X_train, y_train, <span class="at">alpha =</span> <span class="dv">0</span>, <span class="at">lambda =</span> <span class="fl">0.1</span>)</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>cv  <span class="ot">&lt;-</span> <span class="fu">cross_val_score</span>(mod, X_train, y_train, <span class="at">cv =</span> <span class="dv">5</span>L)</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(cv)</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="do">## caret (5 lines)</span></span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>ctrl    <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"cv"</span>, <span class="at">number =</span> <span class="dv">5</span>)</span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>fit     <span class="ot">&lt;-</span> <span class="fu">train</span>(medv <span class="sc">~</span> ., <span class="at">data =</span> train, <span class="at">method =</span> <span class="st">"glmnet"</span>,</span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>                 <span class="at">trControl =</span> ctrl, <span class="at">tuneGrid =</span> <span class="fu">data.frame</span>(<span class="at">alpha=</span><span class="dv">0</span>, <span class="at">lambda=</span><span class="fl">0.1</span>))</span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="fu">min</span>(fit<span class="sc">$</span>results<span class="sc">$</span>RMSE)</span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="do">## tidymodels (11 lines)</span></span>
-<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>rec  <span class="ot">&lt;-</span> <span class="fu">recipe</span>(medv <span class="sc">~</span> ., <span class="at">data =</span> train_tbl) <span class="sc">%&gt;%</span> <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>())</span>
-<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>spec <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">penalty =</span> <span class="fl">0.1</span>, <span class="at">mixture =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> <span class="fu">set_engine</span>(<span class="st">"glmnet"</span>) <span class="sc">%&gt;%</span> <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
-<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>wf   <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> <span class="fu">add_recipe</span>(rec) <span class="sc">%&gt;%</span> <span class="fu">add_model</span>(spec)</span>
-<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>res  <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(wf, <span class="at">resamples =</span> <span class="fu">vfold_cv</span>(train_tbl, <span class="at">v =</span> <span class="dv">5</span>), <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse))</span>
-<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(res)</span>
-<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a><span class="do">## mlr3 (6 lines)</span></span>
-<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>task    <span class="ot">&lt;-</span> <span class="fu">as_task_regr</span>(train, <span class="at">target =</span> <span class="st">"medv"</span>)</span>
-<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>learner <span class="ot">&lt;-</span> <span class="fu">lrn</span>(<span class="st">"regr.glmnet"</span>, <span class="at">alpha =</span> <span class="dv">0</span>, <span class="at">lambda =</span> <span class="fl">0.1</span>)</span>
-<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>rr      <span class="ot">&lt;-</span> <span class="fu">resample</span>(task, learner, <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">5</span>))</span>
-<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>rr<span class="sc">$</span><span class="fu">aggregate</span>(<span class="fu">msr</span>(<span class="st">"regr.rmse"</span>))</span>
-<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a><span class="do">## SuperLearner (5 lines)</span></span>
-<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a>fit_sl <span class="ot">&lt;-</span> <span class="fu">SuperLearner</span>(<span class="at">Y =</span> y_train, <span class="at">X =</span> <span class="fu">as.data.frame</span>(X_train),</span>
-<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>                       <span class="at">SL.library =</span> <span class="st">"SL.glmnet"</span>, <span class="at">family =</span> <span class="fu">gaussian</span>())</span>
-<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(fit_sl, <span class="fu">as.data.frame</span>(X_test))</span>
-<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-31"><a href="#cb30-31" aria-hidden="true" tabindex="-1"></a><span class="do">## h2o (7 lines, after h2o.init)</span></span>
-<span id="cb30-32"><a href="#cb30-32" aria-hidden="true" tabindex="-1"></a>train_h2o <span class="ot">&lt;-</span> <span class="fu">as.h2o</span>(train)</span>
-<span id="cb30-33"><a href="#cb30-33" aria-hidden="true" tabindex="-1"></a>fit_h2o   <span class="ot">&lt;-</span> <span class="fu">h2o.glm</span>(<span class="at">x =</span> x_cols, <span class="at">y =</span> <span class="st">"medv"</span>, <span class="at">training_frame =</span> train_h2o,</span>
-<span id="cb30-34"><a href="#cb30-34" aria-hidden="true" tabindex="-1"></a>                     <span class="at">alpha =</span> <span class="dv">0</span>, <span class="at">lambda =</span> <span class="fl">0.1</span>, <span class="at">nfolds =</span> <span class="dv">5</span>)</span>
-<span id="cb30-35"><a href="#cb30-35" aria-hidden="true" tabindex="-1"></a><span class="fu">h2o.rmse</span>(fit_h2o, <span class="at">xval =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<hr>
-</section>
-<section id="decision-guide" class="level2">
-<h2 class="anchored" data-anchor-id="decision-guide">Decision Guide</h2>
-<p>The best framework depends on what you’re trying to do:</p>
-<pre><code>What do you need?
-│
-├─ Quickly benchmark 3–4 models with zero boilerplate?
-│   └─ unifiedml ✓
-│
-├─ Feature engineering (imputation, encoding, scaling)?
-│   ├─ You're in the tidyverse already → tidymodels (recipes)
-│   └─ You prefer R6 / data.table → mlr3 (mlr3pipelines)
-│
-├─ Hyperparameter tuning?
-│   ├─ Tidy workflow → tidymodels (tune_grid / tune_bayes)
-│   └─ Research / reproducible benchmarks → mlr3 (mlr3tuning)
-│
-├─ Optimal ensemble without picking one model?
-│   └─ SuperLearner ✓
-│
-├─ Data &gt; 1 million rows / need distributed compute?
-│   └─ h2o ✓
-│
-├─ Fully automated model search (AutoML)?
-│   └─ h2o.automl() ✓
-│
-├─ Maintaining a codebase that already uses caret?
-│   └─ Stay on caret. Migrating is low priority.
-│
-└─ Deploying models to production in R?
-    └─ tidymodels + vetiver ✓</code></pre>
-<hr>
-</section>
-<section id="the-hybrid-workflow" class="level2">
-<h2 class="anchored" data-anchor-id="the-hybrid-workflow">The Hybrid Workflow</h2>
-<p>These tools are not mutually exclusive. A practical workflow uses each for what it’s best at:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Phase 1: Exploration with unifiedml</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(unifiedml)</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (fn <span class="cf">in</span> <span class="fu">list</span>(glmnet<span class="sc">::</span>glmnet, randomForest<span class="sc">::</span>randomForest, e1071<span class="sc">::</span>svm)) {</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  mod <span class="ot">&lt;-</span> Model<span class="sc">$</span><span class="fu">new</span>(fn)</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  mod<span class="sc">$</span><span class="fu">fit</span>(X_train, y_train)</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">class</span>(fn), <span class="st">"→ CV RMSE:"</span>,</span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">cross_val_score</span>(mod, X_train, y_train, <span class="at">cv =</span> <span class="dv">5</span>L,</span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">show_progress =</span> <span class="cn">FALSE</span>)), <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>mod<span class="sc">$</span><span class="fu">summary</span>()          <span class="co"># Which features matter?</span></span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>mod<span class="sc">$</span><span class="fu">plot</span>(<span class="at">feature =</span> <span class="st">"rm"</span>)  <span class="co"># Where does the relationship bend?</span></span>
-<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Phase 2: Full CV + tuning in tidymodels</span></span>
-<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
-<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>rf_tune_spec <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">trees =</span> <span class="dv">500</span>, <span class="at">mtry =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"ranger"</span>) <span class="sc">%&gt;%</span> <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
-<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>tuned <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
-<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> <span class="fu">add_formula</span>(medv <span class="sc">~</span> .) <span class="sc">%&gt;%</span> <span class="fu">add_model</span>(rf_tune_spec),</span>
-<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> <span class="fu">vfold_cv</span>(<span class="fu">as_tibble</span>(train), <span class="at">v =</span> <span class="dv">10</span>),</span>
-<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid      =</span> <span class="fu">grid_regular</span>(<span class="fu">mtry</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">13</span>)), <span class="at">levels =</span> <span class="dv">6</span>),</span>
-<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics   =</span> <span class="fu">metric_set</span>(rmse)</span>
-<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a><span class="fu">show_best</span>(tuned, <span class="at">metric =</span> <span class="st">"rmse"</span>)</span>
-<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Phase 3: Deploy with vetiver</span></span>
-<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vetiver)</span>
-<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>final_fit <span class="ot">&lt;-</span> <span class="fu">last_fit</span>(</span>
-<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> <span class="fu">add_formula</span>(medv <span class="sc">~</span> .) <span class="sc">%&gt;%</span></span>
-<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_model</span>(<span class="fu">finalize_model</span>(rf_tune_spec, <span class="fu">select_best</span>(tuned, <span class="st">"rmse"</span>))),</span>
-<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">split =</span> <span class="fu">initial_split</span>(<span class="fu">as_tibble</span>(Boston), <span class="at">prop =</span> <span class="fl">0.8</span>)</span>
-<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">vetiver_model</span>(<span class="fu">extract_workflow</span>(final_fit), <span class="at">model_name =</span> <span class="st">"boston_rf"</span>)</span>
-<span id="cb32-34"><a href="#cb32-34" aria-hidden="true" tabindex="-1"></a><span class="fu">vetiver_write_plumber</span>(v, <span class="st">"plumber.R"</span>)   <span class="co"># Ready to serve as a REST API</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<hr>
+<p>On a clean, small dataset like <code>iris</code>, accuracy differences are minimal. The real differentiator is the API and workflow each framework provides. On real-world datasets the choice of framework matters more for how you structure your code than for raw accuracy.</p>
 </section>
-<section id="summary" class="level2">
-<h2 class="anchored" data-anchor-id="summary">Summary</h2>
-<p>No single framework is universally best. The table below shows where each lives on the spectrum from <em>fast and simple</em> to <em>powerful and complete</em>:</p>
-<pre><code>Simple ◄─────────────────────────────────────────────────────► Powerful
-
-  unifiedml    SuperLearner    caret    mlr3    tidymodels    h2o
-      │               │           │       │          │         │
-  prototype       ensemble     legacy  research   production  scale</code></pre>
-<p>If you’re new to ML in R, start with <code>unifiedml</code> to understand the problem, then graduate to <code>tidymodels</code> when you need preprocessing, tuning, or deployment. If you come from an academic background or care deeply about reproducible benchmarks, <code>mlr3</code> is worth the steeper learning curve. And if your data is too big to fit in memory, <code>h2o</code> is hard to beat.</p>
-<p>Happy modeling!</p>
+<section id="closing-thoughts" class="level2">
+<h2 class="anchored" data-anchor-id="closing-thoughts">Closing thoughts</h2>
+<p>There is no single “best” ML framework in R and the right choice depends on the task at hand:</p>
+<ul>
+<li><strong>Start with <code>tidymodels</code></strong> for a modern, composable, production-ready pipeline.</li>
+<li><strong>Try <code>qeML</code></strong> for the fastest path from data to results.</li>
+<li><strong>Use <code>h2o</code></strong> for automatic model selection and stacking with minimal effort.</li>
+<li><strong>Consider <code>mlr3</code></strong> for rigorous benchmarking and advanced pipeline composition.</li>
+<li><strong>Stick with <code>caret</code></strong> if maintaining existing code or prefer its battle-tested simplicity.</li>
+</ul>
 
 
 </section>

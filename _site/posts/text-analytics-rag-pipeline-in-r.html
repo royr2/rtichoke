@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.35">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-9e41006022cc14e6bca310783a21a71f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-494df7ee9f4d3fbed323cea6af7dcc0b.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-af1142a47761cd6f12b407da64115aad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -645,56 +645,37 @@ doc3    1    0    1</code></pre>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># With RAG (retrieval tool registered)</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>answer_rag <span class="ot">&lt;-</span> chat<span class="sc">$</span><span class="fu">chat</span>(query)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Based on the retrieved information, a loan moves to Stage 2 under IFRS 9 when 
-there is a significant increase in credit risk relative to initial recognition.</code></pre>
+<pre><code>Unfortunately, based on the document store, I was unable to find any 
+information specifically detailing what triggers a loan to move to Stage 2 
+under IFRS9.</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Without RAG (fresh chat, no tools, no context)</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>chat_naive   <span class="ot">&lt;-</span> <span class="fu">chat_ollama</span>(<span class="at">model =</span> <span class="st">"llama3.1"</span>)</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>answer_naive <span class="ot">&lt;-</span> chat_naive<span class="sc">$</span><span class="fu">chat</span>(query)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Under the International Financial Reporting Standard (IFRS) 9, a loan is 
-considered impaired and would be classified as a credit impairment stage if 
-there are specific events or conditions that affect its estimated future cash 
-flows. The trigger for a loan to move to Stage 2, also known as Probable 
-Default, under IFRS 9 can include several key factors:
+<pre><code>Under IFRS 9, a loan moves from Stage 1 (measured at amortised cost) to Stage 2
+when the credit risk on the loan increases due to the borrower's default or 
+impaired credit status.
 
-1. **Significant Increase in Credit Risk** - A significant increase in credit 
-risk due to specific economic or industry circumstances, affecting the debtor’s
-creditworthiness.
+ Specifically, the criteria for moving a loan to Stage 2 are as follows:
 
-2. **Default or Commitment by the Borrower** - If there has been a commitment 
-for default or a sign of deliberate default such as failing to meet the 
-repayment schedule or failing one payment and it is reasonable that they will 
-not be able to make payments in accordance with their contractual terms, this 
-would typically move the loan into Stage 2.
+1. **Default occurs**: The entity assumes that the debtor is unlikely to pay in
+full unless the parties to the contract agree to a concession (i.e., 
+restructuring). However, if the underlying contractual cash flows are not 
+directly affected by the default and there's no significant increase in credit 
+risk due to other reasons (e.g., debtors' financial difficulties), then it does
+not imply that the loan should move to Stage 2.
+   
+2. **30+ days past-due payments**: The loan moves to stage 2 when the borrower 
+is 90 or more days past due on amounts exceeding their expected credit loss 
+amount from previous periods and no repayments have been made since they went 
+overboard.
 
-3. **Other Adverse Changes** - If there are other significant adverse changes 
-related to the borrower’s creditworthiness (eg., loss of assets, significant 
-financial difficulties) these can also trigger the move to Stage 2.
 
-4. **Material Decrease in Value of The Collateral** – A material decrease in 
-the value of any collateral offered to secure the loan may impact its repayment
-prospects and thus require reclassification under IFRS9.
 
-5. **Events Indicative of a Probability of Default**: This includes, but is not
-limited to, specific indicators that point towards the borrower’s reduced 
-ability to fulfill their obligations, which can arise from internal factors 
-(within management or control) or external ones (such as a negative change in 
-industry conditions). Events might include significant changes in operational 
-capabilities, a significant loss on a key asset, or even the debtor leaving the
-business.
-
-The classification under IFRS 9 focuses on identifying when there is evidence 
-of impaired credit. It emphasizes the assessment of whether there has been an 
-objective decrease in estimated recoverability based on external confirmation 
-like default rates, industry averages and also by evaluating internal 
-assessments through credit professionals as to likely impact on cash flows over
-a term consistent with its maturity.
-
-The move from Stage 1 (performing) to Stage 2 under IFRS 9 signifies that 
-there’s evidence that the loan is more likely than not to enter into default 
-within a specific time period, which can vary based on the specific conditions 
-of each loan and market averages.</code></pre>
+   If the initial loss event results in a significant increase of the credit 
+risk, the entity has grounds to recognize an allowance for expected credit 
+losses.</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">approach =</span> <span class="fu">c</span>(<span class="st">"RAG (grounded)"</span>, <span class="st">"No RAG (naive)"</span>),</span>
@@ -704,8 +685,8 @@ of each loan and market averages.</code></pre>
 <pre><code># A tibble: 2 × 2
   approach       answer                                                         
   &lt;chr&gt;          &lt;chr&gt;                                                          
-1 RAG (grounded) "Based on the retrieved information, a loan moves to Stage 2 u…
-2 No RAG (naive) "Under the International Financial Reporting Standard (IFRS) 9…</code></pre>
+1 RAG (grounded) "Unfortunately, based on the document store, I was unable to f…
+2 No RAG (naive) "Under IFRS 9, a loan moves from Stage 1 (measured at amortise…</code></pre>
 </div>
 </div>
 <p>The RAG answer cites the specific IFRS 9 trigger from the corpus. The naive answer while broadly correct lacks grounding, and for certain edge cases could hallucinate and quote triggers that might not exist. Grounding the LLM with retrieved context helps keep it aligned with the source material.</p>
@@ -739,22 +720,23 @@ of each loan and market averages.</code></pre>
 <span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">answer   =</span> purrr<span class="sc">::</span><span class="fu">map_chr</span>(questions, ask_rag)</span>
 <span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>An IFRS 9 Stage 2 migration is triggered when there is a significant increase 
-in credit risk relative to initial recognition, even if no actual default has 
-occurred. This can be due to various factors such as changes in the credit 
-scorecard or shifts in the applicant population and macroeconomic conditions.</code></pre>
+<pre><code>A significant increase in credit risk relative to initial recognition triggers 
+an IFRS 9 Stage 2 migration. This can be due to changes in macroeconomic 
+conditions, shifts in the applicant population, or actual payment defaults.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>A loan is classified as non-performing when it has been past due for more than 
-90 days.</code></pre>
+<pre><code>Based on the tool call output, a loan is typically considered non-performing 
+when payments have stopped or been significantly delayed. Further, specific 
+criteria such as a payment more than 90 days past due can also trigger a 
+non-performing loan classification requiring full provisioning.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>The Capital Conservation Buffer requires banks to hold a minimum Common Equity 
-Tier 1 ratio of 2.5% above the regulatory minimum. This requirement is part of 
-the Basel III framework, which aims to strengthen capital regulations for banks
-globally. The buffer serves as an additional layer of protection against 
-potential financial crises by requiring banks to maintain higher levels of 
-equity in relation to their risk-weighted assets.</code></pre>
+<pre><code>The Capital Conservation Buffer requirement is a regulatory minimum that banks 
+must hold, requiring them to maintain a Common Equity Tier 1 ratio of at least 
+4.5% (or 7% for G-SIABS and intermediary institutions). This buffer was 
+introduced as part of the Basel III reforms and is intended to help banks build
+stronger capital positions during times of economic stress, allowing them to 
+absorb potential losses without diluting shareholders' equity.</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>The credit scorecard is recalibrated quarterly.</code></pre>
@@ -764,8 +746,8 @@ equity in relation to their risk-weighted assets.</code></pre>
 <pre><code># A tibble: 4 × 2
   question                                             answer                   
   &lt;chr&gt;                                                &lt;chr&gt;                    
-1 What triggers an IFRS 9 Stage 2 migration?           An IFRS 9 Stage 2 migrat…
-2 When is a loan classified as non-performing?         A loan is classified as …
+1 What triggers an IFRS 9 Stage 2 migration?           A significant increase i…
+2 When is a loan classified as non-performing?         Based on the tool call o…
 3 What is the Capital Conservation Buffer requirement? The Capital Conservation…
 4 How often is the credit scorecard recalibrated?      The credit scorecard is …</code></pre>
 </div>

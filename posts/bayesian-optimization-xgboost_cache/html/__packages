@@ -1,7 +1,6 @@
 xgboost
-ParBayesianOptimization
+rBayesianOptimization
 mlbench
 dplyr
 recipes
 rsample
-DiceKriging

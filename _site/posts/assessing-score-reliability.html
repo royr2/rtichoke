@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.35">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-9e41006022cc14e6bca310783a21a71f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-494df7ee9f4d3fbed323cea6af7dcc0b.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-af1142a47761cd6f12b407da64115aad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -305,15 +305,15 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare coefficient of variation</span></span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(sample_means)<span class="sc">/</span><span class="fu">mean</span>(sample_means)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01017773</code></pre>
+<pre><code>[1] 0.01020788</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(sample_75_quantile)<span class="sc">/</span><span class="fu">mean</span>(sample_75_quantile)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01287054</code></pre>
+<pre><code>[1] 0.01266596</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(sample_95_quantile)<span class="sc">/</span><span class="fu">mean</span>(sample_75_quantile)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.01884669</code></pre>
+<pre><code>[1] 0.01939092</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the distributions</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>combined_vec <span class="ot">&lt;-</span> <span class="fu">c</span>(sample_means, sample_75_quantile, sample_95_quantile, sample_99_quantile)</span>
@@ -388,25 +388,25 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <pre><code># A tibble: 3 × 2
   splits               id          
   &lt;list&gt;               &lt;chr&gt;       
-1 &lt;split [10000/3640]&gt; Bootstrap001
-2 &lt;split [10000/3670]&gt; Bootstrap002
-3 &lt;split [10000/3660]&gt; Bootstrap003</code></pre>
+1 &lt;split [10000/3697]&gt; Bootstrap001
+2 &lt;split [10000/3696]&gt; Bootstrap002
+3 &lt;split [10000/3639]&gt; Bootstrap003</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Each row represents a separate bootstrapped sample with an analysis set and assessment set</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>boot_sample<span class="sc">$</span>splits[[<span class="dv">1</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;Analysis/Assess/Total&gt;
-&lt;10000/3640/10000&gt;</code></pre>
+&lt;10000/3697/10000&gt;</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show the first 5 rows and 5 columns of the first sample</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">analysis</span>(boot_sample<span class="sc">$</span>splits[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> .[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     V1        id member_id loan_amnt funded_amnt
-1 36670  67798765        -1     12000       12000
-2 47857   1243964        -1      2225        2225
-3 57237  95173569        -1      4000        4000
-4 56986 141865899        -1      1600        1600
-5 12547  74505751        -1     18000       18000</code></pre>
+1 14192  46702803        -1     13050       13050
+2 31933  91397132        -1     10000       10000
+3 79661 125260410        -1      8650        8650
+4 79515  54535222        -1      2700        2700
+5 24356  12686393        -1     35000       35000</code></pre>
 </div>
 </div>
 <p>Each bootstrap sample consists of random draws with replacement from the original dataset, creating controlled variations that effectively reveal model sensitivity to different data compositions.</p>
@@ -439,7 +439,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Check output</span></span>
 <span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(pred)  <span class="co"># Output is on log odds scale</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -25.956219   1.301621</code></pre>
+<pre><code>[1] -27.884057   1.082999</code></pre>
 </div>
 </div>
 <p>The function returns predictions in log-odds format, which will subsequently be transformed to a more intuitive credit score scale in later steps.</p>
@@ -460,7 +460,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>boot_preds <span class="ot">&lt;-</span> <span class="fu">do.call</span>(c, output)</span>
 <span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(boot_preds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -140.233643    4.938884</code></pre>
+<pre><code>[1] -132.89625    3.16478</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get outliers</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>q_high <span class="ot">&lt;-</span> <span class="fu">quantile</span>(boot_preds, <span class="fl">0.99</span>)</span>
@@ -473,7 +473,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(boot_preds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -5.0709351 -0.2214304</code></pre>
+<pre><code>[1] -5.0670232 -0.2304028</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to a data frame</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>boot_preds <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">pred =</span> boot_preds, </span>
@@ -481,12 +481,12 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(boot_preds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       pred id
-1 -2.498278  1
-2 -1.439371  1
-3 -2.728261  1
-4 -1.522470  1
-5 -2.924104  1
-6 -2.831498  1</code></pre>
+1 -1.415344  1
+2 -2.363616  1
+3 -1.758686  1
+4 -2.551845  1
+5 -4.488183  1
+6 -1.690804  1</code></pre>
 </div>
 </div>
 <p>Here, let’s apply the logistic regression model to each bootstrap sample and collect the resulting predictions. Extreme values beyond the 1st and 99th percentiles are then truncated to remove outliers — the same capping approach used in production credit models.</p>

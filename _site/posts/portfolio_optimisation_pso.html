@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.35">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -75,7 +75,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-9e41006022cc14e6bca310783a21a71f.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-494df7ee9f4d3fbed323cea6af7dcc0b.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-af1142a47761cd6f12b407da64115aad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -370,12 +370,12 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the date range of our data</span></span>
 <span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(prices_df<span class="sc">$</span>date)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "2020-08-21" "2026-04-02"</code></pre>
+<pre><code>[1] "2020-08-21" "2026-04-10"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check dimensions (number of trading days × number of stocks + date column)</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(prices_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1390   48</code></pre>
+<pre><code>[1] 1395   48</code></pre>
 </div>
 </div>
 </section>
@@ -601,7 +601,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify that the weights sum to approximately 1 (full investment constraint)</span></span>
 <span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(out<span class="sc">$</span>obj_loc)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9927524</code></pre>
+<pre><code>[1] 0.9988184</code></pre>
 </div>
 </div>
 <p>In this implementation, the tracking of all particle movements throughout the optimization process occurs. This enables visualization of how the swarm converges toward the optimal solution.</p>
@@ -678,17 +678,17 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate and display the expected return of the optimized portfolio</span></span>
 <span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(<span class="st">"Portfolio returns:"</span>, <span class="fu">round</span>(opt<span class="sc">$</span>par <span class="sc">%*%</span> mean_returns, <span class="dv">5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio returns: 0.00049"</code></pre>
+<pre><code>[1] "Portfolio returns: 0.00053"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate and display the standard deviation (risk) of the optimized portfolio</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(<span class="st">"Portfolio Std dev:"</span>, <span class="fu">round</span>(<span class="fu">sqrt</span>(opt<span class="sc">$</span>par <span class="sc">%*%</span> cov_mat <span class="sc">%*%</span> opt<span class="sc">$</span>par), <span class="dv">5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio Std dev: 0.00763"</code></pre>
+<pre><code>[1] "Portfolio Std dev: 0.00753"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify that the weights sum to approximately 1 (full investment constraint)</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(opt<span class="sc">$</span>par)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9966289</code></pre>
+<pre><code>[1] 0.9934328</code></pre>
 </div>
 </div>
 </section>
@@ -759,17 +759,17 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb20-61"><a href="#cb20-61" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate and display the expected return of the optimized portfolio</span></span>
 <span id="cb20-62"><a href="#cb20-62" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(<span class="st">"Portfolio returns:"</span>, <span class="fu">round</span>(opt<span class="sc">$</span>par <span class="sc">%*%</span> mean_returns, <span class="dv">5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio returns: 0.00084"</code></pre>
+<pre><code>[1] "Portfolio returns: 9e-04"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate and display the standard deviation (risk) of the optimized portfolio</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">paste</span>(<span class="st">"Portfolio Std dev:"</span>, <span class="fu">round</span>(<span class="fu">sqrt</span>(opt<span class="sc">$</span>par <span class="sc">%*%</span> cov_mat <span class="sc">%*%</span> opt<span class="sc">$</span>par), <span class="dv">5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio Std dev: 0.00898"</code></pre>
+<pre><code>[1] "Portfolio Std dev: 0.00909"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify that the weights sum to approximately 1</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(opt<span class="sc">$</span>par)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9936629</code></pre>
+<pre><code>[1] 0.9910437</code></pre>
 </div>
 </div>
 <p>Adding the tracking error constraint, not only balances risk and return but also tracks the performance of an equally-weighted benchmark. The <code>lambda2</code> parameter controls the closeness of benchmark tracking - higher values result in portfolios that more closely resemble the benchmark.</p>

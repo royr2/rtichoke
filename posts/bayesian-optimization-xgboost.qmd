@@ -11,18 +11,18 @@ execute:
   cache: true
 ---
 
-Hyperparameter tuning is computationally intensive and time-consuming. In this post, let's use Bayesian optimization to search for good XGBoost hyperparameters — a systematic approach that typically requires far fewer evaluations than an exhaustive grid search.
+Hyperparameter tuning is computationally intensive and time-consuming. In this post, we'll use Bayesian optimization to search for good XGBoost hyperparameters — a systematic approach that typically requires far fewer evaluations than an exhaustive grid search.
 
 ## Required Packages
 
-```{r}
-#| label: setup
-#| message: false
-#| warning: false
+```{r eval = FALSE}
+pak::pkg_install(c("xgboost", "rBayesianOptimization", "mlbench", "dplyr", "recipes", "rsample"))
+```
 
-# Load required packages
+
+```{r}
 library(xgboost)
-library(ParBayesianOptimization)
+library(rBayesianOptimization)
 library(mlbench)
 library(dplyr)
 library(recipes)
@@ -31,11 +31,9 @@ library(rsample)
 
 ## Data Acquisition and Initial Processing
 
-This post uses the Boston Housing dataset — a canonical regression problem with both numerical and categorical variables, and a solid starting point for demonstrating Bayesian optimization.
+This post uses the Boston Housing dataset — a regression problem with both numerical and categorical variables, and a great starting point for demonstrating Bayesian optimization.
 
 ```{r}
-#| label: data-load
-
 # Load the Boston Housing dataset
 data("BostonHousing2")
 
@@ -43,15 +41,15 @@ data("BostonHousing2")
 str(BostonHousing2)
 ```
 
-XGBoost algorithms require numerical input features exclusively. Therefore, we employ the `recipes` package to systematically transform categorical variables through appropriate preprocessing techniques:
+XGBoost requires numerical input features exclusively. We can use the `recipes` package to systematically transform categorical variables through appropriate preprocessing:
 
 ```{r}
-#| label: data-prep
-
 # Create a recipe for preprocessing
 rec <- recipe(cmedv ~ ., data = BostonHousing2) %>%
+  
   # Collapse categories where population is < 3%
   step_other(town, chas, threshold = .03, other = "Other") %>% 
+  
   # Create dummy variables for all factor variables 
   step_dummy(all_nominal_predictors())
 
@@ -65,15 +63,13 @@ model_df <- bake(prep, new_data = BostonHousing2)
 colnames(model_df)
 ```
 
-Let's partition into training and testing sets:
+Let's also partition the data into training and testing sets:
 
 ```{r}
-#| label: train-test-split
-
 # Create a 70/30 train-test split
-splits <- rsample::initial_split(model_df, prop = 0.7)
-train_df <- rsample::training(splits)
-test_df <- rsample::testing(splits)
+splits <- initial_split(model_df, prop = 0.7)
+train_df <- training(splits)
+test_df <- testing(splits)
 
 # Prepare the training data for XGBoost
 X <- train_df %>%
@@ -81,7 +77,11 @@ X <- train_df %>%
   as.matrix()
 
 # Get the target variable
-y <- train_df %>% pull(cmedv)
+y <- train_df %>% 
+  pull(cmedv)
+
+# Build xgb.DMatrix (required by xgboost >= 2.x)
+dtrain <- xgb.DMatrix(data = X, label = y)
 
 # Create cross-validation folds
 folds <- list(
@@ -92,35 +92,35 @@ folds <- list(
 
 ## Bayesian Optimization Framework Implementation
 
-The implementation of Bayesian optimization requires the development of two fundamental components:
+The implementation of Bayesian optimization requires the development of two components:
 
-1. **Objective Function**: A function that evaluates model performance for given hyperparameter configurations
+1. **Objective Function**: A function that evaluates model performance for a given hyperparameter configuration
 2. **Parameter Space Definition**: The bounds and constraints that define the search space for optimization
 
 ```{r}
-#| label: objective-function
-
-# Our objective function takes hyperparameters as inputs
-obj_func <- function(eta, max_depth, min_child_weight, subsample, lambda, alpha) {
+# Objective function takes hyperparameters as inputs
+obj_func <- function(eta, 
+                     max_depth, 
+                     min_child_weight, 
+                     subsample, 
+                     lambda, 
+                     alpha) {
   
   param <- list(
-    # Learning parameters
     eta = eta,                       # Learning rate
     max_depth = max_depth,           # Tree depth
     min_child_weight = min_child_weight, # Min observations per node
     subsample = subsample,           # Data subsampling
     lambda = lambda,                 # L2 regularization
     alpha = alpha,                   # L1 regularization
-    
     booster = "gbtree",             # Use tree model
     objective = "reg:squarederror",  # Regression task
     eval_metric = "mape"            # Mean Absolute Percentage Error
   )
   
   xgbcv <- xgb.cv(params = param,
-                  data = X,
-                  label = y,
-                  nround = 50,
+                  data = dtrain,
+                  nrounds = 50,
                   folds = folds,
                   prediction = TRUE,
                   early_stopping_rounds = 5,
@@ -132,8 +132,8 @@ obj_func <- function(eta, max_depth, min_child_weight, subsample, lambda, alpha)
     # Function finds maxima so inverting the output
     Score = -min(xgbcv$evaluation_log$test_mape_mean),
     
-    # Get number of trees for the best performing model
-    nrounds = xgbcv$best_iteration
+    # Pred is required by rBayesianOptimization (placeholder when not stacking)
+    Pred = 0
   )
   
   return(lst)
@@ -155,23 +155,24 @@ bounds <- list(
 The optimization procedure employs intelligent search strategies to systematically explore the hyperparameter space, utilizing Gaussian process modeling to predict promising parameter combinations:
 
 ```{r}
-#| label: bayesian-opt
-
 set.seed(1234)
-bayes_out <- bayesOpt(
+
+bayes_out <- BayesianOptimization(
   FUN = obj_func,                    # Our objective function
   bounds = bounds,                   # Parameter bounds
-  initPoints = length(bounds) + 2,   # Initial random points
-  iters.n = 10,                      # Number of iterations
-  verbose = 0                        # Suppress output
+  init_points = length(bounds) + 2,  # Initial random points
+  n_iter = 10,                       # Number of iterations
+  acq = "ucb",                       # Acquisition function
+  verbose = FALSE                    # Suppress output
 )
 
 # View top results
-bayes_out$scoreSummary[1:5, c(3:8, 13)]
+head(bayes_out$History, 5)
 
 # Get the best parameters
-best_params <- getBestPars(bayes_out)
-data.frame(best_params)
+best_params <- as.list(bayes_out$Best_Par)
+
+best_params
 ```
 
 ## Final Model Development and Evaluation
@@ -179,57 +180,39 @@ data.frame(best_params)
 With the best parameters found by the optimizer, let's train the final XGBoost model and evaluate it on the held-out test set.
 
 ```{r}
-#| label: final-model
-
 # Combine best params with base params
-opt_params <- append(
-  list(booster = "gbtree", 
-       objective = "reg:squarederror", 
-       eval_metric = "mae"), 
-  best_params
+opt_params <- xgb.params(
+  eta = best_params$eta,
+  max_depth = best_params$max_depth,
+  min_child_weight = best_params$min_child_weight, 
+  subsample = best_params$subsample,           
+  lambda = best_params$lambda,                 
+  alpha = best_params$alpha,                   
+  booster = "gbtree",             
+  objective = "reg:squarederror",  
+  eval_metric = "mape"            
 )
-
-# Run cross-validation to determine optimal number of rounds
-xgbcv <- xgb.cv(
-  params = opt_params,
-  data = X,
-  label = y,
-  nround = 100,
-  folds = folds,
-  prediction = TRUE,
-  early_stopping_rounds = 5,
-  verbose = 0,
-  maximize = FALSE
-)
-
-# Get optimal number of rounds
-nrounds = xgbcv$best_iteration
 
 # Fit the final XGBoost model
-mdl <- xgboost(
-  data = X, 
-  label = y, 
-  params = opt_params, 
-  maximize = FALSE, 
-  early_stopping_rounds = 5, 
-  nrounds = nrounds, 
+mdl <- xgb.train( 
+  params = opt_params,
+  data = dtrain,
+  nrounds = 100,
   verbose = 0
 )
-
 # Make predictions on the test set
 actuals <- test_df$cmedv
-predicted <- test_df %>%
-  select_at(mdl$feature_names) %>%
-  as.matrix() %>%
-  predict(mdl, newdata = .)
+test_features <- as.matrix(test_df[, getinfo(dtrain, "feature_name")])
+dtest <- xgb.DMatrix(data = test_features)
+predicted <- predict(mdl, newdata = test_features)
 
 # Evaluate performance using Mean Absolute Percentage Error (MAPE)
 mape <- mean(abs(actuals - predicted)/actuals)
 cat("MAPE on test set:", mape)
 ```
-## Key Advantages of Bayesian Optimization
+## Advantages of Bayesian Optimization
 
-Compared to grid or random search, Bayesian optimization has a few practical advantages:
+Compared to grid or random search, Bayesian optimization has a few advantages:
 
 1. **Fewer evaluations**: It uses a surrogate model to prioritise promising regions of the parameter space, so it typically needs fewer iterations to find good parameters
 2. **Adaptive search**: Each new evaluation informs the next, rather than being chosen blindly
@@ -237,13 +220,13 @@ Compared to grid or random search, Bayesian optimization has a few practical adv
 
 ### Practical Considerations
 
-This methodology becomes increasingly critical as model complexity and hyperparameter spaces expand. For production environments, increasing the iteration count (`iters.n`) could help ensure comprehensive exploration of the parameter landscape.
+This methodology becomes increasingly critical as model complexity and hyperparameter spaces expand. For production environments, increasing the iteration count (`n_iter`) could help ensure comprehensive exploration of the parameter landscape.
 
 ## Key Takeaways
 
 - **Bayesian optimization builds a surrogate model** of the objective function, using past results to guide future evaluations
 - **Data preprocessing matters** for XGBoost — categorical variables need encoding before the algorithm can use them
 - **Cross-validation within the objective function** gives a more reliable performance estimate for each parameter set
-- **Increasing `iters.n`** gives the optimizer more chances to explore, which can help in high-dimensional parameter spaces
+- **Increasing `n_iter`** gives the optimizer more chances to explore, which can help in high-dimensional parameter spaces
 
 The same approach applies to any model that needs hyperparameter tuning — not just XGBoost.

@@ -15,19 +15,11 @@ The `torch` package brings PyTorch to R. In this post, let's build and train a s
 ## Installation
 
 ```{r}
-#| label: installation
-#| eval: false
-
 # install.packages("torch")
-library(torch)
 # torch::install_torch()
 ```
 
 ```{r}
-#| label: load-libraries
-#| echo: false
-
-# Load required libraries
 library(torch)
 library(ggplot2)
 ```
@@ -39,8 +31,6 @@ This section focuses on the creation of a neural network to perform a simple reg
 ### 1. Sample Data
 
 ```{r}
-#| label: generate-data
-
 # Set seed for reproducibility
 set.seed(42)
 
@@ -61,8 +51,6 @@ head(
 The next step involves defining the neural network architecture using `torch`'s module system:
 
 ```{r}
-#| label: define-network
-
 # Define a simple feedforward neural network
 nnet <- nn_module(
   initialize = function() {
@@ -91,8 +79,6 @@ print(model)
 The training process requires defining how the model will learn from the data:
 
 ```{r}
-#| label: setup-training
-
 # Set up optimizer (Adam optimizer with learning rate 0.02)
 optimizer <- optim_adam(model$parameters, lr = 0.02)
 
@@ -105,8 +91,6 @@ loss_fn <- nnf_mse_loss
 The neural network training process proceeds as follows:
 
 ```{r}
-#| label: training-loop
-
 # Store loss values for plotting
 loss_history <- numeric(300)
 
@@ -141,7 +125,6 @@ for(epoch in 1:300) {
 The following visualization demonstrates how the loss decreased during training:
 
 ```{r}
-#| label: training-progress
 
 # Create a data frame for plotting
 training_df <- data.frame(
@@ -170,7 +153,6 @@ ggplot(training_df, aes(x = epoch, y = loss)) +
 The following analysis demonstrates how well the trained model performs:
 
 ```{r}
-#| label: visualize-results
 
 # Set model to evaluation mode
 model$eval()
@@ -219,7 +201,6 @@ ggplot(plot_df, aes(x = x)) +
 The following analysis examines how well the model learned the underlying pattern:
 
 ```{r}
-#| label: performance-analysis
 
 # Calculate performance metrics
 mse <- mean((y_pred_np - y_np)^2)
@@ -278,7 +259,6 @@ ggplot(comparison_df, aes(x = x)) +
 The following examination reveals what the network learned by analyzing its parameters:
 
 ```{r}
-#| label: examine-parameters
 
 # Extract learned parameters
 layer1_weight <- as.matrix(model$layer1$weight$detach())
@@ -307,7 +287,6 @@ print(round(layer2_bias, 4))
 The following section analyzes the simple network against different architectures:
 
 ```{r}
-#| label: architecture-comparison
 
 # Define different network architectures
 create_network <- function(hidden_sizes) {

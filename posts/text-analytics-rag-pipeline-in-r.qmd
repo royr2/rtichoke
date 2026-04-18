@@ -13,8 +13,6 @@ execute:
 ## Required Packages
 
 ```{r}
-#| eval: true
-
 # install.packages(c("ragnar", "ellmer", "dplyr", "ggplot2", "tibble"))
 library(ragnar)
 library(ellmer)
@@ -77,7 +75,6 @@ curl http://localhost:11434
 ## The Problem with tf-idf + Cosine Similarity
 
 ```{r}
-#| eval: true
 library(quanteda)
 library(quanteda.textstats)
 
@@ -140,7 +137,6 @@ Now that we have a way to represent documents as dense vectors, we can build a R
 We will use a synthetic set of credit policy and regulatory excerpts, the kind of text that lives in internal model documentation, IFRS 9 frameworks, and Basel III guidance.
 
 ```{r}
-#| eval: true
 credit_docs <- tibble(
   id = 1:15,
   source = c(

@@ -23,19 +23,11 @@ This approach is particularly valuable when dealing with related prediction prob
 ## Required Packages
 
 ```{r}
-#| label: installation
-#| eval: false
-
 # install.packages(c("torch", "tidyverse", "corrplot"))
 # install_torch()
-library(torch)
-library(tidyverse)
 ```
 
 ```{r}
-#| label: load-libraries
-#| echo: false
-
 # Load required libraries
 library(torch)
 library(tidyverse)
@@ -53,7 +45,6 @@ The implementation will construct a model that simultaneously performs two relat
 ### Sample Data
 
 ```{r}
-#| label: generate-data
 
 # Set seed for reproducibility
 set.seed(123)
@@ -93,7 +84,6 @@ y_cls_test <- y_classification[test_idx]
 The architecture design creates a neural network with shared layers and task-specific branches:
 
 ```{r}
-#| label: define-network
 
 # Define the multi-task neural network
 multi_task_net <- nn_module(
@@ -155,7 +145,6 @@ print(model)
 Multi-task learning requires separate loss functions for each task.
 
 ```{r}
-#| label: setup-training
 
 # Loss functions
 regression_loss_fn <- nnf_mse_loss  # Mean squared error for regression
@@ -186,7 +175,6 @@ y_cls_train <- y_classification[train_indices]
 ### Training Loop
 
 ```{r}
-#| label: enhanced-training-loop
 
 # Hyperparameters
 epochs <- 100  # Increased epochs since we have early stopping
@@ -289,7 +277,6 @@ for (epoch in 1:epochs) {
 ### Model Evaluation
 
 ```{r}
-#| label: evaluation
 
 # Set model to evaluation mode
 model$eval()

@@ -34,7 +34,6 @@ The `mtcars` dataset contains information about 32 cars from Motor Trend magazin
 Visualization is essential for understanding patterns in data. The following examples create informative plots:
 
 ```{r}
-#| label: basic-visualizations
 #| fig-width: 10
 #| fig-height: 8
 
@@ -76,7 +75,6 @@ These visualizations reveal:
 Data rarely comes in the exact format needed. The `dplyr` package makes transformations straightforward:
 
 ```{r}
-#| label: data-transformations
 
 # Load required packages
 library(dplyr)
@@ -113,7 +111,6 @@ head(mtcars_enhanced[, c("car_name", "mpg", "wt", "hp", "efficiency_ratio", "eff
 The enhanced dataset can be used to answer practical questions:
 
 ```{r}
-#| label: business-analysis
 
 # Question 1: What are the average characteristics by cylinder count?
 cylinder_analysis <- mtcars_enhanced %>%
@@ -162,7 +159,6 @@ ggplot(mtcars, aes(x = factor(am, labels = c("Automatic", "Manual")), y = mpg, f
 Understanding relationships between variables is crucial for business decisions:
 
 ```{r}
-#| label: correlation-analysis
 #| fig-width: 9
 #| fig-height: 7
 
@@ -189,7 +185,6 @@ pairs(mtcars[, c("mpg", "wt", "hp", "disp")],
 The famous Iris dataset demonstrates a complete workflow:
 
 ```{r}
-#| label: iris-analysis
 #| fig-width: 10
 #| fig-height: 8
 
@@ -253,7 +248,6 @@ iris_wide %>% arrange(desc(max_difference))
 Missing data is a common challenge. This practical example demonstrates handling techniques:
 
 ```{r}
-#| label: missing-data-analysis
 
 # Create a simulated customer dataset with missing values
 set.seed(123) # For reproducibility
@@ -322,7 +316,6 @@ head(calculate_value(customers_complete), 5)
 Time series analysis is essential for understanding business trends and forecasting:
 
 ```{r}
-#| label: time-series-analysis
 #| fig-width: 10
 #| fig-height: 6
 

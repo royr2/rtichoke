@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -11,6 +11,9 @@
 
 <title>Introduction to data.table – R’tichoke</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -73,10 +76,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7e58e3368124f49f6e3733161a9b089d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-494df7ee9f4d3fbed323cea6af7dcc0b.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-658c2336f25e20434af7fb9caa8b0f44.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-af1142a47761cd6f12b407da64115aad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -275,7 +278,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <h3 class="anchored" data-anchor-id="getting-started-with-data.table">Getting Started with data.table</h3>
 <p>First, install and load the package:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install if needed (uncomment to run)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install if needed (uncomment to run)</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("data.table")</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the package</span></span>
@@ -284,7 +287,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert the built-in mtcars dataset to a data.table</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>dt_cars <span class="ot">&lt;-</span> <span class="fu">as.data.table</span>(mtcars, <span class="at">keep.rownames =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">setnames</span>(dt_cars, <span class="st">"rn"</span>, <span class="st">"model"</span>)  <span class="co"># Rename the rownames column</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dt_cars)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dt_cars)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>               model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am
               &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
@@ -311,8 +314,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <section id="subsetting-rows-i" class="level4">
 <h4 class="anchored" data-anchor-id="subsetting-rows-i">Subsetting Rows (i)</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select cars with 6 cylinders</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dt_cars[cyl <span class="sc">==</span> <span class="dv">6</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select cars with 6 cylinders</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dt_cars[cyl <span class="sc">==</span> <span class="dv">6</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>            model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear
            &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
@@ -333,8 +336,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 6:     4
 7:     6</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple conditions</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dt_cars[cyl <span class="sc">==</span> <span class="dv">6</span> <span class="sc">&amp;</span> mpg <span class="sc">&gt;</span> <span class="dv">20</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple conditions</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dt_cars[cyl <span class="sc">==</span> <span class="dv">6</span> <span class="sc">&amp;</span> mpg <span class="sc">&gt;</span> <span class="dv">20</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>            model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear
            &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
@@ -347,8 +350,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 2:     4
 3:     1</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select specific rows by position</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>dt_cars[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select specific rows by position</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>dt_cars[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>               model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am
               &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
@@ -370,8 +373,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <section id="selecting-and-computing-on-columns-j" class="level4">
 <h4 class="anchored" data-anchor-id="selecting-and-computing-on-columns-j">Selecting and Computing on Columns (j)</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select specific columns</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>dt_cars[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, .(mpg, hp, cyl)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select specific columns</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>dt_cars[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, .(mpg, hp, cyl)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      mpg    hp   cyl
     &lt;num&gt; &lt;num&gt; &lt;num&gt;
@@ -386,8 +389,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
  9:  22.8    95     4
 10:  19.2   123     6</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute new values</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>dt_cars[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, .(<span class="at">kpl =</span> mpg <span class="sc">*</span> <span class="fl">0.425</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute new values</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>dt_cars[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, .(<span class="at">kpl =</span> mpg <span class="sc">*</span> <span class="fl">0.425</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        kpl
       &lt;num&gt;
@@ -402,8 +405,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
  9:  9.6900
 10:  8.1600</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select and compute multiple columns</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>dt_cars[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, .(model, <span class="at">kpl =</span> mpg <span class="sc">*</span> <span class="fl">0.425</span>, <span class="at">hp_per_cyl =</span> hp<span class="sc">/</span>cyl)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select and compute multiple columns</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>dt_cars[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, .(model, <span class="at">kpl =</span> mpg <span class="sc">*</span> <span class="fl">0.425</span>, <span class="at">hp_per_cyl =</span> hp<span class="sc">/</span>cyl)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                model     kpl hp_per_cyl
                &lt;char&gt;   &lt;num&gt;      &lt;num&gt;
@@ -418,8 +421,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
  9:          Merc 230  9.6900   23.75000
 10:          Merc 280  8.1600   20.50000</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply functions</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dt_cars[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, .(<span class="at">avg_mpg =</span> <span class="fu">mean</span>(mpg), <span class="at">max_hp =</span> <span class="fu">max</span>(hp))]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply functions</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dt_cars[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, .(<span class="at">avg_mpg =</span> <span class="fu">mean</span>(mpg), <span class="at">max_hp =</span> <span class="fu">max</span>(hp))]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   avg_mpg max_hp
      &lt;num&gt;  &lt;num&gt;
@@ -430,8 +433,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <section id="grouping-by" class="level4">
 <h4 class="anchored" data-anchor-id="grouping-by">Grouping (by)</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Group by cylinder and calculate statistics</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, .(<span class="at">count =</span> .N, <span class="at">avg_mpg =</span> <span class="fu">mean</span>(mpg)), by <span class="ot">=</span> cyl]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Group by cylinder and calculate statistics</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, .(<span class="at">count =</span> .N, <span class="at">avg_mpg =</span> <span class="fu">mean</span>(mpg)), by <span class="ot">=</span> cyl]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     cyl count  avg_mpg
    &lt;num&gt; &lt;int&gt;    &lt;num&gt;
@@ -439,8 +442,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 2:     4    11 26.66364
 3:     8    14 15.10000</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple grouping variables</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, .(<span class="at">count =</span> .N, <span class="at">avg_mpg =</span> <span class="fu">mean</span>(mpg)), by <span class="ot">=</span> .(cyl, gear)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple grouping variables</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, .(<span class="at">count =</span> .N, <span class="at">avg_mpg =</span> <span class="fu">mean</span>(mpg)), by <span class="ot">=</span> .(cyl, gear)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     cyl  gear count avg_mpg
    &lt;num&gt; &lt;num&gt; &lt;int&gt;   &lt;num&gt;
@@ -453,8 +456,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 7:     8     5     2  15.400
 8:     6     5     1  19.700</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Grouping with expressions</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, .(<span class="at">count =</span> .N), by <span class="ot">=</span> .(cyl, <span class="at">high_mpg =</span> mpg <span class="sc">&gt;</span> <span class="dv">20</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Grouping with expressions</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, .(<span class="at">count =</span> .N), by <span class="ot">=</span> .(cyl, <span class="at">high_mpg =</span> mpg <span class="sc">&gt;</span> <span class="dv">20</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     cyl high_mpg count
    &lt;num&gt;   &lt;lgcl&gt; &lt;int&gt;
@@ -470,12 +473,12 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <h3 class="anchored" data-anchor-id="special-symbols-in-data.table">Special Symbols in data.table</h3>
 <p>data.table provides special symbols for common operations:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># .N: number of rows</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, .N]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># .N: number of rows</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, .N]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 32</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>dt_cars[, .N, by <span class="ot">=</span> cyl]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>dt_cars[, .N, by <span class="ot">=</span> cyl]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     cyl     N
    &lt;num&gt; &lt;int&gt;
@@ -483,8 +486,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 2:     4    11
 3:     8    14</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># .SD: Subset of Data</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, <span class="fu">lapply</span>(.SD, mean), by <span class="ot">=</span> cyl, .SDcols <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"mpg"</span>, <span class="st">"hp"</span>, <span class="st">"wt"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># .SD: Subset of Data</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, <span class="fu">lapply</span>(.SD, mean), by <span class="ot">=</span> cyl, .SDcols <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"mpg"</span>, <span class="st">"hp"</span>, <span class="st">"wt"</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     cyl      mpg        hp       wt
    &lt;num&gt;    &lt;num&gt;     &lt;num&gt;    &lt;num&gt;
@@ -492,8 +495,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 2:     4 26.66364  82.63636 2.285727
 3:     8 15.10000 209.21429 3.999214</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># .I: Row numbers</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, .I[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], by <span class="ot">=</span> cyl]  <span class="co"># First two row numbers for each cyl group</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># .I: Row numbers</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>dt_cars[, .I[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], by <span class="ot">=</span> cyl]  <span class="co"># First two row numbers for each cyl group</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     cyl    V1
    &lt;num&gt; &lt;int&gt;
@@ -510,12 +513,12 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <h3 class="anchored" data-anchor-id="modifying-data">Modifying Data</h3>
 <p>data.table allows efficient in-place modifications:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a copy to avoid modifying the original</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a copy to avoid modifying the original</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>dt_copy <span class="ot">&lt;-</span> <span class="fu">copy</span>(dt_cars)</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Add a new column</span></span>
 <span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>dt_copy[, efficiency <span class="sc">:</span><span class="er">=</span> mpg<span class="sc">/</span>wt]</span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dt_copy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dt_copy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>               model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am
               &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
@@ -534,9 +537,9 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 5:     3     2   5.436047
 6:     3     1   5.231214</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Update existing values</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Update existing values</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>dt_copy[cyl <span class="sc">==</span> <span class="dv">4</span>, mpg <span class="sc">:</span><span class="er">=</span> mpg <span class="sc">*</span> <span class="fl">1.1</span>]  <span class="co"># Increase mpg by 10% for 4-cylinder cars</span></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dt_copy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dt_copy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>               model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am
               &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
@@ -555,9 +558,9 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 5:     3     2   5.436047
 6:     3     1   5.231214</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Delete columns</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Delete columns</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>dt_copy[, <span class="fu">c</span>(<span class="st">"carb"</span>, <span class="st">"vs"</span>) <span class="sc">:</span><span class="er">=</span> <span class="cn">NULL</span>]</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dt_copy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dt_copy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>               model   mpg   cyl  disp    hp  drat    wt  qsec    am  gear
               &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
@@ -582,9 +585,9 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <h3 class="anchored" data-anchor-id="keys-and-indexing">Keys and Indexing</h3>
 <p>Setting keys enables fast subsetting and joins:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set a key</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set a key</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">setkey</span>(dt_copy, cyl)</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>dt_copy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>dt_copy</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Key: &lt;cyl&gt;
                   model   mpg   cyl  disp    hp  drat    wt  qsec    am  gear
@@ -660,8 +663,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
     efficiency
          &lt;num&gt;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fast subsetting using key</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>dt_copy[.(<span class="dv">6</span>)]  <span class="co"># All rows where cyl == 6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fast subsetting using key</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>dt_copy[.(<span class="dv">6</span>)]  <span class="co"># All rows where cyl == 6</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Key: &lt;cyl&gt;
             model   mpg   cyl  disp    hp  drat    wt  qsec    am  gear
@@ -683,9 +686,9 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 6:   5.174419
 7:   7.111913</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple keys</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiple keys</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">setkey</span>(dt_copy, cyl, gear)</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>dt_copy[.(<span class="dv">6</span>, <span class="dv">4</span>)]  <span class="co"># All rows where cyl == 6 and gear == 4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>dt_copy[.(<span class="dv">6</span>, <span class="dv">4</span>)]  <span class="co"># All rows where cyl == 6 and gear == 4</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Key: &lt;cyl, gear&gt;
            model   mpg   cyl  disp    hp  drat    wt  qsec    am  gear
@@ -707,7 +710,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <h3 class="anchored" data-anchor-id="joins-in-data.table">Joins in data.table</h3>
 <p>data.table provides efficient joins using keys:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create sample data.tables</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create sample data.tables</span></span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>manufacturers <span class="ot">&lt;-</span> <span class="fu">data.table</span>(</span>
 <span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">make =</span> <span class="fu">c</span>(<span class="st">"Honda"</span>, <span class="st">"Toyota"</span>, <span class="st">"Ford"</span>, <span class="st">"BMW"</span>, <span class="st">"Mercedes"</span>),</span>
 <span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">country =</span> <span class="fu">c</span>(<span class="st">"Japan"</span>, <span class="st">"Japan"</span>, <span class="st">"USA"</span>, <span class="st">"Germany"</span>, <span class="st">"Germany"</span>)</span>
@@ -723,7 +726,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a><span class="fu">setkey</span>(cars, make)</span>
 <span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Inner join</span></span>
-<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>cars[manufacturers]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>cars[manufacturers]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Key: &lt;make&gt;
       model     make country
@@ -735,8 +738,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 5:     &lt;NA&gt; Mercedes Germany
 6:  Corolla   Toyota   Japan</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Left join</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>manufacturers[cars, nomatch<span class="ot">=</span><span class="cn">NA</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Left join</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>manufacturers[cars, nomatch<span class="ot">=</span><span class="cn">NA</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Key: &lt;make&gt;
      make country    model
@@ -747,8 +750,8 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 4:  Honda   Japan    Civic
 5: Toyota   Japan  Corolla</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Non-equi joins</span></span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>dt_cars[dt_cars[, .(<span class="at">max_mpg =</span> <span class="fu">max</span>(mpg)), by <span class="ot">=</span> cyl], on <span class="ot">=</span> .(<span class="at">mpg =</span> max_mpg, cyl)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Non-equi joins</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>dt_cars[dt_cars[, .(<span class="at">max_mpg =</span> <span class="fu">max</span>(mpg)), by <span class="ot">=</span> cyl], on <span class="ot">=</span> .(<span class="at">mpg =</span> max_mpg, cyl)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>              model   mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear
              &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
@@ -767,13 +770,13 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <h3 class="anchored" data-anchor-id="reshaping-data">Reshaping data</h3>
 <p>data.table provides functions for reshaping data:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample data.table</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample data.table</span></span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>dt <span class="ot">&lt;-</span> <span class="fu">data.table</span>(</span>
 <span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">each =</span> <span class="dv">2</span>),</span>
 <span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">variable =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"height"</span>, <span class="st">"weight"</span>), <span class="dv">3</span>),</span>
 <span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(<span class="dv">170</span>, <span class="dv">68</span>, <span class="dv">155</span>, <span class="dv">52</span>, <span class="dv">182</span>, <span class="dv">75</span>)</span>
 <span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>dt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>dt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      id variable value
    &lt;int&gt;   &lt;char&gt; &lt;num&gt;
@@ -784,9 +787,9 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 5:     3   height   182
 6:     3   weight    75</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Wide to long</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Wide to long</span></span>
 <span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>dt_wide <span class="ot">&lt;-</span> <span class="fu">dcast</span>(dt, id <span class="sc">~</span> variable, <span class="at">value.var =</span> <span class="st">"value"</span>)</span>
-<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>dt_wide</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>dt_wide</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Key: &lt;id&gt;
       id height weight
@@ -795,9 +798,9 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 2:     2    155     52
 3:     3    182     75</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Long to wide</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Long to wide</span></span>
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>dt_long <span class="ot">&lt;-</span> <span class="fu">melt</span>(dt_wide, <span class="at">id.vars =</span> <span class="st">"id"</span>, <span class="at">variable.name =</span> <span class="st">"measure"</span>, <span class="at">value.name =</span> <span class="st">"value"</span>)</span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>dt_long</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>dt_long</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      id measure value
    &lt;int&gt;  &lt;fctr&gt; &lt;num&gt;
@@ -814,7 +817,7 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <h3 class="anchored" data-anchor-id="performance-benefits">Performance Benefits</h3>
 <p>data.table is designed for performance:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a larger dataset for demonstration</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a larger dataset for demonstration</span></span>
 <span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
 <span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fl">1e6</span></span>
 <span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>dt_large <span class="ot">&lt;-</span> <span class="fu">data.table</span>(</span>
@@ -824,17 +827,17 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
 <span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Measure time for a grouped operation</span></span>
-<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(dt_large[, .(<span class="at">mean_x =</span> <span class="fu">mean</span>(x)), <span class="at">by =</span> y])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(dt_large[, .(<span class="at">mean_x =</span> <span class="fu">mean</span>(x)), <span class="at">by =</span> y])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-      0       0       0 </code></pre>
+   0.00    0.00    0.01 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare with equivalent dplyr operation (if dplyr is installed)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare with equivalent dplyr operation (if dplyr is installed)</span></span>
 <span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>df_large <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(dt_large)</span>
-<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(dplyr<span class="sc">::</span><span class="fu">summarise</span>(dplyr<span class="sc">::</span><span class="fu">group_by</span>(df_large, y), <span class="at">mean_x =</span> <span class="fu">mean</span>(x)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(dplyr<span class="sc">::</span><span class="fu">summarise</span>(dplyr<span class="sc">::</span><span class="fu">group_by</span>(df_large, y), <span class="at">mean_x =</span> <span class="fu">mean</span>(x)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-   0.13    0.01    0.14 </code></pre>
+   0.14    0.00    0.13 </code></pre>
 </div>
 </div>
 <p>data.table is particularly valuable when working with large datasets due to its efficient memory usage and optimized C implementation.</p>
@@ -894,13 +897,14 @@ gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

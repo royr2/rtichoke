@@ -15,10 +15,6 @@ R has plenty of visualization options, but `ggplot2` stands out for its flexibil
 ## Required Packages
 
 ```{r}
-#| label: setup
-#| message: false
-#| warning: false
-
 # Load required packages
 library(dplyr)
 library(ggplot2)
@@ -31,7 +27,6 @@ library(stringr)
 Let's use a summarized version of the COVID-19 Data Repository from [Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19) to build and test the custom charts.
 
 ```{r}
-#| label: data-load
 
 # Load COVID-19 data
 df <- read.csv("https://bit.ly/3G8G63u")
@@ -49,7 +44,6 @@ print(top_countries)
 Let's calculate a 7-day centered moving average of daily confirmed cases for these five countries:
 
 ```{r}
-#| label: data-prep
 
 
 # Create a data frame with the required information
@@ -69,7 +63,6 @@ plotdf <- df %>%
 The initial implementation demonstrates the creation of a basic line chart function. Note the utilization of `aes_string()` instead of `aes()`, which enables the provision of arguments to `ggplot2` as string parameters, thereby enhancing function flexibility and programmability.
 
 ```{r}
-#| label: line-chart-basic
 
 # Function definition
 line_chart <- function(df, 
@@ -100,7 +93,6 @@ line_chart(plotdf,
 Now let's build a custom theme on top of those chart functions. Because `custom_theme()` returns a standard `ggplot2` object, it can be applied to any chart type — making it straightforward to keep a consistent look across a report or dashboard.
 
 ```{r}
-#| label: custom-theme-basic
 
 custom_theme <- function(plt, 
                          base_size = 11, 
@@ -129,7 +121,6 @@ line_chart(plotdf, "date", "MA", "country") %>% custom_theme()
 The following section demonstrates the expansion of the `line_chart()` function to incorporate additional features and parameters, thereby increasing its versatility and applicability across diverse visualization requirements:
 
 ```{r}
-#| label: line-chart-enhanced
 
 line_chart <- function(df, 
                        x, y, 
@@ -162,7 +153,6 @@ line_chart <- function(df,
 Correspondingly, we enhance the `custom_theme()` function to accommodate diverse axis formatting options and advanced styling parameters:
 
 ```{r}
-#| label: custom-theme-enhanced
 
 custom_theme <- function(plt, 
                          palette = "Set1", 
@@ -252,7 +242,6 @@ line_chart(plotdf,
 The architectural design of our `custom_theme()` function enables its universal application to any `ggplot2` object, regardless of visualization type. The following example demonstrates this flexibility through bar chart implementation:
 
 ```{r}
-#| label: bar-chart
 
 p <- plotdf %>%  
   mutate(month = format(date, "%m-%b")) %>% 

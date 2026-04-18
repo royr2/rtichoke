@@ -15,7 +15,6 @@ Generating random data with a specific correlation structure is a common need in
 ## The Cholesky Decomposition Method
 
 ```{r}
-#| label: setup
 
 # Load required packages
 library(ggplot2)
@@ -47,7 +46,6 @@ The resulting `new_random` matrix contains values exhibiting approximately the t
 The input data must demonstrate statistical independence for the Cholesky method to function correctly. Pre-existing correlations in the input data compromise the method's ability to achieve target correlation structures:
 
 ```{r}
-#| label: correlation-comparison
 
 # What happens with already correlated input?
 simulate_correlation <- function(input_correlation, target = 0.3) {
@@ -100,7 +98,6 @@ When input data contains pre-existing correlation patterns, the Cholesky method 
 The method works best when all variables share the same marginal distribution. Mixing distributions (e.g. normal with chi-squared) can produce unexpected results:
 
 ```{r}
-#| label: distribution-comparison
 
 # Different distributions cause problems
 set.seed(123)
@@ -131,7 +128,6 @@ The combination of different probability distributions (such as normal and chi-s
 The Cholesky transformation may fundamentally alter the statistical properties of the original data:
 
 ```{r}
-#| label: property-changes
 
 # Original positive-only distribution
 x <- rchisq(1000, df = 3)  # Always positive
@@ -155,7 +151,6 @@ The Cholesky transformation can fundamentally modify data characteristics, such 
 For practical applications requiring efficient implementation, the `mvtnorm` package provides a streamlined solution for generating multivariate normal distributions with specified correlation structures:
 
 ```{r}
-#| label: mvtnorm
 
 # Load the package
 library(mvtnorm)
