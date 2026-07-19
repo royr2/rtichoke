@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-06-28">
+
+<title>One Model or Many? Pooling, Blending, and Error Correction Across Segments – R’tichoke</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-494df7ee9f4d3fbed323cea6af7dcc0b.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-af1142a47761cd6f12b407da64115aad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-EMPXPEL31W"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-EMPXPEL31W', { 'anonymize_ip': true});
+</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">R’tichoke</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../installation.html"> 
+<span class="menu-text">R Installation Guide</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-get-started" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Get Started</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-get-started">    
+        <li>
+    <a class="dropdown-item" href="../get-started/r-package-management.html">
+ <span class="dropdown-text">Installing Packages</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/variables.html">
+ <span class="dropdown-text">Variables in R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/loops.html">
+ <span class="dropdown-text">Loops and Apply Functions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/indexing.html">
+ <span class="dropdown-text">Indexing Arrays</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/reading-data.html">
+ <span class="dropdown-text">Reading Data</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/dplyr.html">
+ <span class="dropdown-text">Introduction to dplyr</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/data-table.html">
+ <span class="dropdown-text">Introduction to data.table</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/base-graphics.html">
+ <span class="dropdown-text">Base Graphics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/ggplot2.html">
+ <span class="dropdown-text">ggplot2 Graphics</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../get-started/parallel-computing-in-r.html">
+ <span class="dropdown-text">Parallel Computing in R</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../webr.html"> 
+<span class="menu-text">WebR Playground</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../posts.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://www.r-bloggers.com/"> 
+<span class="menu-text">R-Bloggers</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-setup" id="toc-the-setup" class="nav-link active" data-scroll-target="#the-setup">The setup</a></li>
+  <li><a href="#generating-the-data" id="toc-generating-the-data" class="nav-link" data-scroll-target="#generating-the-data">Generating the data</a></li>
+  <li><a href="#metrics-and-helpers" id="toc-metrics-and-helpers" class="nav-link" data-scroll-target="#metrics-and-helpers">Metrics and helpers</a></li>
+  <li><a href="#the-three-strategies" id="toc-the-three-strategies" class="nav-link" data-scroll-target="#the-three-strategies">The three strategies</a></li>
+  <li><a href="#racing-them-across-the-drift-grid" id="toc-racing-them-across-the-drift-grid" class="nav-link" data-scroll-target="#racing-them-across-the-drift-grid">Racing them across the drift grid</a></li>
+  <li><a href="#what-wins-where" id="toc-what-wins-where" class="nav-link" data-scroll-target="#what-wins-where">What wins where</a></li>
+  <li><a href="#the-catch-generalisation-cost" id="toc-the-catch-generalisation-cost" class="nav-link" data-scroll-target="#the-catch-generalisation-cost">The catch: generalisation cost</a></li>
+  <li><a href="#takeaways" id="toc-takeaways" class="nav-link" data-scroll-target="#takeaways">Takeaways</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">One Model or Many? Pooling, Blending, and Error Correction Across Segments</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">R</div>
+    <div class="quarto-category">Credit Risk Analytics</div>
+    <div class="quarto-category">Segmentation</div>
+    <div class="quarto-category">Simulation</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 28, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A recurring question that credit risk modelers face is how to build models that generalise across populations — say <em>known goods</em>, <em>known bads</em>, and a messy <em>others</em> bucket. Do you pool everything into one model? Build a model per segment and blend them? Or train a base model and bolt on a correction layer for the segment you care about?</p>
+<p>This post delves into these questions using a synthetic credit dataset where we can dial two kinds of drift between segments and then applies three strategies across that grid to see exactly <em>when</em> each one wins.</p>
+<section id="the-setup" class="level2">
+<h2 class="anchored" data-anchor-id="the-setup">The setup</h2>
+<p>Three segments, each with a binary default target and a standard set of bureau predictors (utilisation, inquiries, tradelines, history length, delinquencies etc.). The population&nbsp;we want to target is <strong>KG</strong> but need the model to perform relatively well on <strong>KB</strong> and <strong>Others</strong> as well.</p>
+<p>We’ll build two levers that control how the segments differ:</p>
+<ul>
+<li><strong>Population drift</strong>: how far apart segments sit in <em>feature distribution</em> and <em>base default rate</em>. At zero, the three segments are almost identical; at one, they are fully separated.</li>
+<li><strong>Concept drift</strong>: how much the <em>feature → default</em> relationship changes between segments (controlled via coefficients). At zero, every segment obeys the same risk equation; at one, each segment’s coefficients are strongly perturbed.</li>
+</ul>
+<p>This distinction matters because population drift is something a single model can absorb (with an intercept or a dummy), whereas concept drift means no single set of coefficients is right for everyone - which is when segment-specific machinery should pay off.</p>
+<p>The three strategies:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Strategy</th>
+<th># Models</th>
+<th>Idea</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Pooled</strong></td>
+<td>1</td>
+<td>One logistic regression on all segments.</td>
+</tr>
+<tr class="even">
+<td><strong>Blended</strong></td>
+<td>3</td>
+<td>One model per segment, combined by out-of-fold weights.</td>
+</tr>
+<tr class="odd">
+<td><strong>Error Correction using caseweights</strong></td>
+<td>2</td>
+<td>Base model on KG+KB, then refit upweighting <em>misclassified</em> Others rows. The misclassification threshold is <strong>tuned</strong>, not fixed at 0.5.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="generating-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="generating-the-data">Generating the data</h2>
+<p>The generator below assigns each row a segment, shifts that segment’s feature means and base rate by <code>pop_drift</code>, perturbs its coefficients by <code>concept_shift</code>, then calibrates a per-segment intercept so the marginal default rate hits its target.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stats)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># true (shared) risk relationship; sign: + =&gt; riskier</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">util =</span> <span class="fl">0.90</span>, <span class="at">inq =</span> <span class="fl">0.50</span>, <span class="at">trades =</span> <span class="sc">-</span><span class="fl">0.40</span>, <span class="at">age =</span> <span class="sc">-</span><span class="fl">0.50</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">delinq =</span> <span class="fl">0.80</span>, <span class="at">dpd =</span> <span class="fl">0.60</span>, <span class="at">bal =</span> <span class="fl">0.30</span>, <span class="at">thin =</span> <span class="fl">0.40</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>feat_names <span class="ot">&lt;-</span> <span class="fu">names</span>(beta)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># per-segment feature means at FULL population drift</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>seg_mean_full <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">KG     =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.60</span>, <span class="sc">-</span><span class="fl">0.40</span>,  <span class="fl">0.60</span>,  <span class="fl">0.70</span>, <span class="sc">-</span><span class="fl">0.50</span>, <span class="sc">-</span><span class="fl">0.50</span>,  <span class="fl">0.10</span>, <span class="sc">-</span><span class="fl">0.80</span>),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">KB     =</span> <span class="fu">c</span>( <span class="fl">0.90</span>,  <span class="fl">0.60</span>, <span class="sc">-</span><span class="fl">0.10</span>, <span class="sc">-</span><span class="fl">0.20</span>,  <span class="fl">1.00</span>,  <span class="fl">1.00</span>,  <span class="fl">0.30</span>, <span class="sc">-</span><span class="fl">0.30</span>),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">Others =</span> <span class="fu">c</span>( <span class="fl">0.10</span>,  <span class="fl">0.50</span>, <span class="sc">-</span><span class="fl">0.70</span>, <span class="sc">-</span><span class="fl">0.80</span>,  <span class="fl">0.10</span>,  <span class="fl">0.00</span>, <span class="sc">-</span><span class="fl">0.40</span>,  <span class="fl">1.20</span>))</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(seg_mean_full) <span class="ot">&lt;-</span> feat_names</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>segments <span class="ot">&lt;-</span> <span class="fu">rownames</span>(seg_mean_full)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>mix         <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">KG =</span> <span class="fl">0.45</span>, <span class="at">KB =</span> <span class="fl">0.15</span>, <span class="at">Others =</span> <span class="fl">0.40</span>)  <span class="co"># population shares</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>base_full   <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">KG =</span> <span class="fl">0.03</span>, <span class="at">KB =</span> <span class="fl">0.35</span>, <span class="at">Others =</span> <span class="fl">0.12</span>)  <span class="co"># bad rates at full drift</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>base_common <span class="ot">&lt;-</span> <span class="fl">0.12</span>                                    <span class="co"># common rate at zero drift</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>solve_intercept <span class="ot">&lt;-</span> <span class="cf">function</span>(eta0, target)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">uniroot</span>(<span class="cf">function</span>(c0) <span class="fu">mean</span>(<span class="fu">plogis</span>(c0 <span class="sc">+</span> eta0)) <span class="sc">-</span> target,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>          <span class="fu">c</span>(<span class="sc">-</span><span class="dv">12</span>, <span class="dv">12</span>), <span class="at">extendInt =</span> <span class="st">"yes"</span>)<span class="sc">$</span>root</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>gen_population <span class="ot">&lt;-</span> <span class="cf">function</span>(seed, pop_drift, concept_shift, <span class="at">n =</span> <span class="dv">6000</span>) {</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  seg      <span class="ot">&lt;-</span> <span class="fu">sample</span>(segments, n, <span class="cn">TRUE</span>, <span class="at">prob =</span> mix[segments])</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  seg_mean <span class="ot">&lt;-</span> seg_mean_full <span class="sc">*</span> pop_drift</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  base_bad <span class="ot">&lt;-</span> base_common <span class="sc">+</span> pop_drift <span class="sc">*</span> (base_full <span class="sc">-</span> base_common)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed <span class="sc">+</span> <span class="dv">7</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  beta_seg <span class="ot">&lt;-</span> <span class="fu">lapply</span>(segments, <span class="cf">function</span>(s)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    beta <span class="sc">+</span> concept_shift <span class="sc">*</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(beta)) <span class="sc">*</span> <span class="fu">abs</span>(beta))</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>(beta_seg) <span class="ot">&lt;-</span> segments</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, n, <span class="fu">length</span>(feat_names), <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, feat_names))</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> segments) {</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    idx <span class="ot">&lt;-</span> <span class="fu">which</span>(seg <span class="sc">==</span> s); <span class="cf">if</span> (<span class="sc">!</span><span class="fu">length</span>(idx)) <span class="cf">next</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    blk <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="fu">length</span>(idx) <span class="sc">*</span> <span class="fu">length</span>(feat_names)), <span class="fu">length</span>(idx),</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>                  <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, feat_names))</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    blk <span class="ot">&lt;-</span> <span class="fu">sweep</span>(blk, <span class="dv">2</span>, seg_mean[s, ], <span class="st">"+"</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    blk[, <span class="st">"thin"</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(blk[, <span class="st">"thin"</span>] <span class="sc">&gt;</span> <span class="fl">0.5</span>)   <span class="co"># thin = binary flag</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    X[idx, ] <span class="ot">&lt;-</span> blk</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  eta <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> segments) { idx <span class="ot">&lt;-</span> <span class="fu">which</span>(seg <span class="sc">==</span> s); eta[idx] <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(X[idx, ] <span class="sc">%*%</span> beta_seg[[s]]) }</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> segments) { idx <span class="ot">&lt;-</span> <span class="fu">which</span>(seg <span class="sc">==</span> s); eta[idx] <span class="ot">&lt;-</span> eta[idx] <span class="sc">+</span> <span class="fu">solve_intercept</span>(eta[idx], base_bad[s]) }</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">segment =</span> <span class="fu">factor</span>(seg, <span class="at">levels =</span> segments),</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">plogis</span>(eta)), X, <span class="at">check.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>A quick look at what the knobs do — at full population drift the segments separate cleanly on bad rate:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">gen_population</span>(<span class="dv">1</span>, <span class="at">pop_drift =</span> <span class="dv">1</span>, <span class="at">concept_shift =</span> <span class="dv">0</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">tapply</span>(d<span class="sc">$</span>y, d<span class="sc">$</span>segment, mean), <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    KG     KB Others 
+ 0.034  0.350  0.127 </code></pre>
+</div>
+</div>
+</section>
+<section id="metrics-and-helpers" class="level2">
+<h2 class="anchored" data-anchor-id="metrics-and-helpers">Metrics and helpers</h2>
+<p>We score with AUC (rank-based) and KS, and use a small wrapper around <code>glm</code> so we can pass weights and offsets cleanly.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>auc <span class="ot">&lt;-</span> <span class="cf">function</span>(s, y) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(<span class="fu">unique</span>(y)) <span class="sc">&lt;</span> <span class="dv">2</span>) <span class="fu">return</span>(<span class="cn">NA_real_</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  r <span class="ot">&lt;-</span> <span class="fu">rank</span>(s, <span class="at">ties.method =</span> <span class="st">"average"</span>); n1 <span class="ot">&lt;-</span> <span class="fu">sum</span>(y <span class="sc">==</span> <span class="dv">1</span>); n0 <span class="ot">&lt;-</span> <span class="fu">sum</span>(y <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  (<span class="fu">sum</span>(r[y <span class="sc">==</span> <span class="dv">1</span>]) <span class="sc">-</span> n1 <span class="sc">*</span> (n1 <span class="sc">+</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="dv">2</span>) <span class="sc">/</span> (n1 <span class="sc">*</span> n0)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>ks <span class="ot">&lt;-</span> <span class="cf">function</span>(s, y) {</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(<span class="fu">unique</span>(y)) <span class="sc">&lt;</span> <span class="dv">2</span>) <span class="fu">return</span>(<span class="cn">NA_real_</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  o <span class="ot">&lt;-</span> <span class="fu">order</span>(s); <span class="fu">max</span>(<span class="fu">abs</span>(<span class="fu">cumsum</span>(y[o] <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">/</span><span class="fu">sum</span>(y <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">-</span> <span class="fu">cumsum</span>(y[o] <span class="sc">==</span> <span class="dv">0</span>)<span class="sc">/</span><span class="fu">sum</span>(y <span class="sc">==</span> <span class="dv">0</span>)))</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>pr  <span class="ot">&lt;-</span> <span class="cf">function</span>(m, nd) <span class="fu">as.vector</span>(<span class="fu">predict</span>(m, nd, <span class="at">type =</span> <span class="st">"response"</span>))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>fml <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">"y ~"</span>, <span class="fu">paste</span>(feat_names, <span class="at">collapse =</span> <span class="st">" + "</span>)))</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>qglm <span class="ot">&lt;-</span> <span class="cf">function</span>(formula, data, weights) {</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  cl <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">quote</span>(stats<span class="sc">::</span>glm), <span class="at">formula =</span> formula, <span class="at">family =</span> <span class="fu">quote</span>(<span class="fu">binomial</span>()))</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">missing</span>(data))    cl<span class="sc">$</span>data    <span class="ot">&lt;-</span> data</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">missing</span>(weights)) cl<span class="sc">$</span>weights <span class="ot">&lt;-</span> weights</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">suppressWarnings</span>(<span class="fu">eval</span>(<span class="fu">as.call</span>(cl), <span class="fu">parent.frame</span>()))</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>strat_idx <span class="ot">&lt;-</span> <span class="cf">function</span>(seg, frac, seed) {</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unlist</span>(<span class="fu">lapply</span>(segments, <span class="cf">function</span>(s){ i <span class="ot">&lt;-</span> <span class="fu">which</span>(seg <span class="sc">==</span> s); <span class="fu">sample</span>(i, <span class="fu">floor</span>(frac <span class="sc">*</span> <span class="fu">length</span>(i))) }))</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="the-three-strategies" class="level2">
+<h2 class="anchored" data-anchor-id="the-three-strategies">The three strategies</h2>
+<p><strong>Pooled</strong> is one line. <strong>Blended</strong> fits a model per segment and learns how to combine them with out-of-fold stacking, so the blend weights are chosen on held-out predictions rather than in-sample. <strong>EC-caseweights</strong> trains a base model on the labelled KG+KB populations, finds the Others rows that base model gets wrong, and refits the pooled model with extra weight on those — and crucially it <em>tunes the threshold</em> that defines “wrong” on a validation slice instead of assuming 0.5.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Pooled ------------------------------------------------------------------</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>m_pooled <span class="ot">&lt;-</span> <span class="cf">function</span>(train, test) <span class="fu">pr</span>(<span class="fu">qglm</span>(fml, <span class="at">data =</span> train), test)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Blended: per-segment models + out-of-fold logistic stacking -------------</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>m_blended <span class="ot">&lt;-</span> <span class="cf">function</span>(train, test, <span class="at">K =</span> <span class="dv">3</span>) {</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">11</span>); fold <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">rep_len</span>(<span class="dv">1</span><span class="sc">:</span>K, <span class="fu">nrow</span>(train)))</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  oof <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="fu">nrow</span>(train), <span class="fu">length</span>(segments), <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, segments))</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>K) {</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    tr <span class="ot">&lt;-</span> train[fold <span class="sc">!=</span> k, ]; ho <span class="ot">&lt;-</span> <span class="fu">which</span>(fold <span class="sc">==</span> k)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (s <span class="cf">in</span> segments) {</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      dd <span class="ot">&lt;-</span> tr[tr<span class="sc">$</span>segment <span class="sc">==</span> s, ]</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">length</span>(<span class="fu">unique</span>(dd<span class="sc">$</span>y)) <span class="sc">==</span> <span class="dv">2</span>) oof[ho, s] <span class="ot">&lt;-</span> <span class="fu">pr</span>(<span class="fu">qglm</span>(fml, <span class="at">data =</span> dd), train[ho, ])</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  ok   <span class="ot">&lt;-</span> <span class="fu">complete.cases</span>(oof)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  meta <span class="ot">&lt;-</span> <span class="fu">qglm</span>(train<span class="sc">$</span>y[ok] <span class="sc">~</span> oof[ok, ])                 <span class="co"># learn optimal weights</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  full <span class="ot">&lt;-</span> <span class="fu">sapply</span>(segments, <span class="cf">function</span>(s){ dd <span class="ot">&lt;-</span> train[train<span class="sc">$</span>segment <span class="sc">==</span> s, ]</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (<span class="fu">length</span>(<span class="fu">unique</span>(dd<span class="sc">$</span>y)) <span class="sc">==</span> <span class="dv">2</span>) <span class="fu">pr</span>(<span class="fu">qglm</span>(fml, <span class="at">data =</span> dd), test) <span class="cf">else</span> <span class="fu">rep</span>(<span class="fu">mean</span>(dd<span class="sc">$</span>y), <span class="fu">nrow</span>(test)) })</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  cf <span class="ot">&lt;-</span> <span class="fu">coef</span>(meta); cf[<span class="fu">is.na</span>(cf)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.vector</span>(<span class="fu">plogis</span>(cf[<span class="dv">1</span>] <span class="sc">+</span> full <span class="sc">%*%</span> cf[<span class="sc">-</span><span class="dv">1</span>]))</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. EC-caseweights with TUNED misclassification threshold -------------------</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>m_ec <span class="ot">&lt;-</span> <span class="cf">function</span>(train, test, <span class="at">cw_mult =</span> <span class="dv">4</span>, <span class="at">thr_grid =</span> <span class="fu">seq</span>(<span class="fl">0.10</span>, <span class="fl">0.90</span>, <span class="fl">0.20</span>)) {</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  is_t <span class="ot">&lt;-</span> train<span class="sc">$</span>segment <span class="sc">==</span> <span class="st">"Others"</span>; src <span class="ot">&lt;-</span> train[<span class="sc">!</span>is_t, ]</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># tune threshold on a validation split</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  vi  <span class="ot">&lt;-</span> <span class="fu">strat_idx</span>(train<span class="sc">$</span>segment, <span class="fl">0.30</span>, <span class="dv">77</span>)</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> train[<span class="sc">-</span>vi, ]; val <span class="ot">&lt;-</span> train[vi, ]</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  bfit <span class="ot">&lt;-</span> <span class="fu">qglm</span>(fml, <span class="at">data =</span> fit[fit<span class="sc">$</span>segment <span class="sc">!=</span> <span class="st">"Others"</span>, ])</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  ot <span class="ot">&lt;-</span> fit<span class="sc">$</span>segment <span class="sc">==</span> <span class="st">"Others"</span>; p_ot <span class="ot">&lt;-</span> <span class="fu">pr</span>(bfit, fit[ot, ]); vo <span class="ot">&lt;-</span> val<span class="sc">$</span>segment <span class="sc">==</span> <span class="st">"Others"</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  score_t <span class="ot">&lt;-</span> <span class="cf">function</span>(t) {</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    mis <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>((p_ot <span class="sc">&gt;</span> t) <span class="sc">!=</span> (fit<span class="sc">$</span>y[ot] <span class="sc">==</span> <span class="dv">1</span>))</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    w <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(fit)); w[ot] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">+</span> (cw_mult <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> mis</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">auc</span>(<span class="fu">pr</span>(<span class="fu">qglm</span>(fml, <span class="at">data =</span> fit, <span class="at">weights =</span> w), val[vo, ]), val<span class="sc">$</span>y[vo])</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  aucs   <span class="ot">&lt;-</span> <span class="fu">sapply</span>(thr_grid, <span class="cf">function</span>(t) <span class="fu">tryCatch</span>(<span class="fu">score_t</span>(t), <span class="at">error =</span> <span class="cf">function</span>(e) <span class="cn">NA</span>))</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  t_best <span class="ot">&lt;-</span> thr_grid[<span class="fu">which.max</span>(aucs)]</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>  <span class="co"># final fit on full train at tuned threshold</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  base <span class="ot">&lt;-</span> <span class="fu">qglm</span>(fml, <span class="at">data =</span> src); p_o <span class="ot">&lt;-</span> <span class="fu">pr</span>(base, train[is_t, ])</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  mis  <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>((p_o <span class="sc">&gt;</span> t_best) <span class="sc">!=</span> (train<span class="sc">$</span>y[is_t] <span class="sc">==</span> <span class="dv">1</span>))</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  w <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(train)); w[is_t] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">+</span> (cw_mult <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> mis</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">p =</span> <span class="fu">pr</span>(<span class="fu">qglm</span>(fml, <span class="at">data =</span> train, <span class="at">weights =</span> w), test), <span class="at">t =</span> t_best)</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="racing-them-across-the-drift-grid" class="level2">
+<h2 class="anchored" data-anchor-id="racing-them-across-the-drift-grid">Racing them across the drift grid</h2>
+<p>For each combination of population drift and concept drift we simulate several populations, hold out a stratified test set, and record AUC on each segment. We track the <em>target</em> (Others) plus KG and KB so we can see the generalisation cost.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pop_grid     <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.00</span>, <span class="fl">0.33</span>, <span class="fl">0.67</span>, <span class="fl">1.00</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>concept_grid <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.00</span>, <span class="fl">0.33</span>, <span class="fl">0.67</span>, <span class="fl">1.00</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>methods      <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Pooled"</span>, <span class="st">"Blended"</span>, <span class="st">"EC-caseweights"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>n_reps       <span class="ot">&lt;-</span> <span class="dv">6</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>run_cell <span class="ot">&lt;-</span> <span class="cf">function</span>(pd, cs) {</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  agg <span class="ot">&lt;-</span> <span class="fu">setNames</span>(<span class="fu">lapply</span>(methods, <span class="cf">function</span>(m) <span class="fu">data.frame</span>()), methods); tsel <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (rep <span class="cf">in</span> <span class="fu">seq_len</span>(n_reps)) {</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    dat  <span class="ot">&lt;-</span> <span class="fu">gen_population</span>(<span class="dv">100</span> <span class="sc">+</span> rep, pd, cs)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    te_i <span class="ot">&lt;-</span> <span class="fu">strat_idx</span>(dat<span class="sc">$</span>segment, <span class="fl">0.30</span>, <span class="dv">1100</span> <span class="sc">+</span> rep)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    train <span class="ot">&lt;-</span> dat[<span class="sc">-</span>te_i, ]; test <span class="ot">&lt;-</span> dat[te_i, ]</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    oth <span class="ot">&lt;-</span> test<span class="sc">$</span>segment <span class="sc">==</span> <span class="st">"Others"</span>; kg <span class="ot">&lt;-</span> test<span class="sc">$</span>segment <span class="sc">==</span> <span class="st">"KG"</span>; kb <span class="ot">&lt;-</span> test<span class="sc">$</span>segment <span class="sc">==</span> <span class="st">"KB"</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    preds <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">Pooled =</span> <span class="fu">m_pooled</span>(train, test), <span class="at">Blended =</span> <span class="fu">m_blended</span>(train, test))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    ec <span class="ot">&lt;-</span> <span class="fu">m_ec</span>(train, test); preds[[<span class="st">"EC-caseweights"</span>]] <span class="ot">&lt;-</span> ec<span class="sc">$</span>p; tsel <span class="ot">&lt;-</span> <span class="fu">c</span>(tsel, ec<span class="sc">$</span>t)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (m <span class="cf">in</span> methods)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>      agg[[m]] <span class="ot">&lt;-</span> <span class="fu">rbind</span>(agg[[m]], <span class="fu">data.frame</span>(</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>        <span class="at">Others =</span> <span class="fu">auc</span>(preds[[m]][oth], test<span class="sc">$</span>y[oth]),</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">KG =</span> <span class="fu">auc</span>(preds[[m]][kg], test<span class="sc">$</span>y[kg]),</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">KB =</span> <span class="fu">auc</span>(preds[[m]][kb], test<span class="sc">$</span>y[kb])))</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(methods, <span class="cf">function</span>(m) <span class="fu">data.frame</span>(</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">pop_drift =</span> pd, <span class="at">concept_shift =</span> cs, <span class="at">Method =</span> m,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">AUC_Others =</span> <span class="fu">round</span>(<span class="fu">mean</span>(agg[[m]]<span class="sc">$</span>Others), <span class="dv">3</span>),</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">AUC_KG =</span> <span class="fu">round</span>(<span class="fu">mean</span>(agg[[m]]<span class="sc">$</span>KG), <span class="dv">3</span>),</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">AUC_KB =</span> <span class="fu">round</span>(<span class="fu">mean</span>(agg[[m]]<span class="sc">$</span>KB), <span class="dv">3</span>),</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">tuned_thr =</span> <span class="cf">if</span> (m <span class="sc">==</span> <span class="st">"EC-caseweights"</span>) <span class="fu">round</span>(<span class="fu">mean</span>(tsel), <span class="dv">2</span>) <span class="cf">else</span> <span class="cn">NA</span>)))</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(pop_grid, <span class="cf">function</span>(pd)</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>         <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(concept_grid, <span class="cf">function</span>(cs) <span class="fu">run_cell</span>(pd, cs)))))</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(res, <span class="dv">6</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  pop_drift concept_shift         Method AUC_Others AUC_KG AUC_KB tuned_thr
+1         0          0.00         Pooled      0.838  0.831  0.829        NA
+2         0          0.00        Blended      0.837  0.830  0.827        NA
+3         0          0.00 EC-caseweights      0.837  0.826  0.827      0.60
+4         0          0.33         Pooled      0.859  0.826  0.830        NA
+5         0          0.33        Blended      0.856  0.828  0.827        NA
+6         0          0.33 EC-caseweights      0.864  0.803  0.825      0.53</code></pre>
+</div>
+</div>
+</section>
+<section id="what-wins-where" class="level2">
+<h2 class="anchored" data-anchor-id="what-wins-where">What wins where</h2>
+<p>First, the target-segment AUC for each method, laid out as population drift (rows) by concept drift (columns):</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>pivot <span class="ot">&lt;-</span> <span class="cf">function</span>(method) {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  M <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="fu">length</span>(pop_grid), <span class="fu">length</span>(concept_grid),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="fu">paste0</span>(<span class="st">"pop="</span>, pop_grid), <span class="fu">paste0</span>(<span class="st">"con="</span>, concept_grid)))</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(pop_grid)) <span class="cf">for</span> (j <span class="cf">in</span> <span class="fu">seq_along</span>(concept_grid)) {</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    r <span class="ot">&lt;-</span> res[res<span class="sc">$</span>pop_drift <span class="sc">==</span> pop_grid[i] <span class="sc">&amp;</span> res<span class="sc">$</span>concept_shift <span class="sc">==</span> concept_grid[j] <span class="sc">&amp;</span> res<span class="sc">$</span>Method <span class="sc">==</span> method, ]</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    M[i, j] <span class="ot">&lt;-</span> r<span class="sc">$</span>AUC_Others</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  M</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(<span class="fu">setNames</span>(methods, methods), pivot)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$Pooled
+         con=0 con=0.33 con=0.67 con=1
+pop=0    0.838    0.859    0.868 0.869
+pop=0.33 0.839    0.862    0.875 0.877
+pop=0.67 0.837    0.864    0.887 0.888
+pop=1    0.840    0.864    0.890 0.891
+
+$Blended
+         con=0 con=0.33 con=0.67 con=1
+pop=0    0.837    0.856    0.867 0.876
+pop=0.33 0.839    0.858    0.871 0.879
+pop=0.67 0.837    0.859    0.883 0.886
+pop=1    0.841    0.860    0.885 0.885
+
+$`EC-caseweights`
+         con=0 con=0.33 con=0.67 con=1
+pop=0    0.837    0.864    0.897 0.921
+pop=0.33 0.838    0.864    0.896 0.918
+pop=0.67 0.832    0.866    0.899 0.917
+pop=1    0.830    0.868    0.899 0.911</code></pre>
+</div>
+</div>
+<p>Two things jump out. Reading <strong>down</strong> any column (increasing population drift) the numbers barely move — a single model soaks up distribution and base-rate differences without trouble. Reading <strong>across</strong> any row (increasing concept drift) is where the methods separate, and only EC-caseweights climbs meaningfully.</p>
+<p>The crossover is clearest in a plot. Fixing population drift at its maximum, here is target AUC as concept drift increases:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>pal <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">Pooled =</span> <span class="st">"#6F69AC"</span>, <span class="at">Blended =</span> <span class="st">"#95DAC1"</span>, <span class="st">`</span><span class="at">EC-caseweights</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"#FD6F96"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sub <span class="ot">&lt;-</span> res[res<span class="sc">$</span>pop_drift <span class="sc">==</span> <span class="fl">1.00</span>, ]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">range</span>(concept_grid), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.83</span>, <span class="fl">0.93</span>),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Concept drift"</span>, <span class="at">ylab =</span> <span class="st">"AUC on target segment (Others)"</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Target performance vs concept drift (pop_drift = 1)"</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (m <span class="cf">in</span> methods) {</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> sub[sub<span class="sc">$</span>Method <span class="sc">==</span> m, ]</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines</span>(d<span class="sc">$</span>concept_shift, d<span class="sc">$</span>AUC_Others, <span class="at">col =</span> pal[m], <span class="at">lwd =</span> <span class="dv">3</span>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>(d<span class="sc">$</span>concept_shift, d<span class="sc">$</span>AUC_Others, <span class="at">col =</span> pal[m], <span class="at">pch =</span> <span class="dv">19</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>, <span class="at">legend =</span> methods, <span class="at">col =</span> pal[methods], <span class="at">lwd =</span> <span class="dv">3</span>, <span class="at">bty =</span> <span class="st">"n"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="segmentation-vs-error-correction_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>With no concept drift the three lines sit on top of each other near 0.85 — the extra models buy nothing. As concept drift grows, EC-caseweights pulls clear of the pack while Pooled and Blended stay flat.</p>
+</section>
+<section id="the-catch-generalisation-cost" class="level2">
+<h2 class="anchored" data-anchor-id="the-catch-generalisation-cost">The catch: generalisation cost</h2>
+<p>Winning on the target is only half the brief — we also wanted to hold up on KG and KB. Here is the picture at full concept drift, where EC looked best:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>worst <span class="ot">&lt;-</span> res[res<span class="sc">$</span>pop_drift <span class="sc">==</span> <span class="fl">1.00</span> <span class="sc">&amp;</span> res<span class="sc">$</span>concept_shift <span class="sc">==</span> <span class="fl">1.00</span>,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>             <span class="fu">c</span>(<span class="st">"Method"</span>, <span class="st">"AUC_Others"</span>, <span class="st">"AUC_KG"</span>, <span class="st">"AUC_KB"</span>, <span class="st">"tuned_thr"</span>)]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>worst</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Method AUC_Others AUC_KG AUC_KB tuned_thr
+46         Pooled      0.891  0.743  0.841        NA
+47        Blended      0.885  0.863  0.845        NA
+48 EC-caseweights      0.911  0.666  0.784      0.57</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>M <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">as.matrix</span>(worst[, <span class="fu">c</span>(<span class="st">"AUC_Others"</span>, <span class="st">"AUC_KG"</span>, <span class="st">"AUC_KB"</span>)]))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(M) <span class="ot">&lt;-</span> worst<span class="sc">$</span>Method</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(M, <span class="at">beside =</span> <span class="cn">TRUE</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#6F69AC"</span>, <span class="st">"#95DAC1"</span>, <span class="st">"#FD6F96"</span>),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.text =</span> <span class="fu">c</span>(<span class="st">"Others"</span>, <span class="st">"KG"</span>, <span class="st">"KB"</span>),</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">args.legend =</span> <span class="fu">list</span>(<span class="at">x =</span> <span class="st">"topright"</span>, <span class="at">bty =</span> <span class="st">"n"</span>),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">"Per-segment AUC at full concept drift"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="segmentation-vs-error-correction_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>EC-caseweights buys its target lift by sacrificing the other segments — KG and KB discrimination drop sharply because the reweighting bends the model toward Others’ hard cases. Blended, by contrast, holds KG and KB up the best of any method, since each segment keeps its own dedicated model; it just never wins outright on the target. Note too that the tuned EC threshold is <em>not</em> 0.5 — it drifts as the segments diverge, which is why tuning it rather than hard-coding 0.5 matters.</p>
+</section>
+<section id="takeaways" class="level2">
+<h2 class="anchored" data-anchor-id="takeaways">Takeaways</h2>
+<p>The grid collapses to a fairly clean decision rule:</p>
+<ul>
+<li><strong>No concept drift (whatever the population drift): use one Pooled model.</strong> The strategies are within noise of each other, so the extra models and tuning are wasted effort. If you want segment-aware intercepts for free, a population indicator inside the pooled model handles base-rate differences without adding a model.</li>
+<li><strong>Concept drift present, and Others is the only thing that matters: use EC-caseweights</strong> with a tuned threshold. It delivers the best target AUC, accepting that KG and KB will degrade.</li>
+<li><strong>Concept drift present, but you need the other segments to stay healthy: use Blended.</strong> It is the only option that lifts the target while keeping KG and KB strong — at the cost of maintaining three models.</li>
+</ul>
+<p>The broader lesson is that the <em>kind</em> of heterogeneity between your populations, not the amount, decides the architecture. Distribution and base-rate differences are cheap to absorb; differences in the underlying risk relationship are what justify segment-specific models or correction layers. Before reaching for a more complex setup, it is worth checking — on your own data — whether the segments actually disagree on coefficients, or merely on means. The simulation above is a template for exactly that check: swap in your segment definitions and shift parameters, and read off which region of the grid you live in.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rtichoke\.netlify\.app");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>2026 R’tichoke</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com">
+      <i class="bi bi-twitter" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

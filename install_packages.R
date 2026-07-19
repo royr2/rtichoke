@@ -65,6 +65,12 @@ packages <- c(
   # Python integration
   "reticulate", # Interface to Python
   
+  # Database and date/time
+  "DBI",        # Database interface
+  "duckdb",     # DuckDB SQL database engine
+  "lubridate",  # Date and time manipulation
+  "RSQLite",    # SQLite interface for R
+  
   # Other utilities
   "devtools",   # Tools to make developing R packages easier
   "pROC",       # ROC curve analysis. 
@@ -72,16 +78,18 @@ packages <- c(
   "foreach",    # Foreach looping construct
   "doParallel", # Parallel backend for foreach
   "tictoc",     # Timing functions
-  "RSQLite",    # SQLite interface for R
   "pacman",     # Package management tool
   "pak",        # Package installation tools
-  "renv",       # Reproducible environments
+  "renv"        # Reproducible environments
   
   # Add more packages as needed for future posts
   "ggrepel",    # Non-overlapping text labels for ggplot2
   "DBI",        # Database interface (used by ragnar's DuckDB store)
   "ellmer",     # LLM interaction and tool registration. 
-  "ragnar"     # Retrieval-augmented generation store (DuckDB + VSS)
+  "ragnar",     # Retrieval-augmented generation store (DuckDB + VSS)
+
+  # Python integration for the TabICL post (installed via reticulate::py_install)
+  # tabicl itself is a Python package: pip install tabicl torch pandas scikit-learn
 )
 
 if(!require(pak)) install.packages("pak")

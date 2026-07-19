@@ -14,7 +14,7 @@
   </url>
   <url>
     <loc>https://rtichoke.netlify.app/posts/portfolio_optimisation_pso.html</loc>
-    <lastmod>2026-04-06T16:23:39.993Z</lastmod>
+    <lastmod>2026-07-19T07:33:38.103Z</lastmod>
   </url>
   <url>
     <loc>https://rtichoke.netlify.app/posts/monotonic-binning-using-xgboost.html</loc>
@@ -66,7 +66,7 @@
   </url>
   <url>
     <loc>https://rtichoke.netlify.app/about.html</loc>
-    <lastmod>2025-10-07T15:51:40.064Z</lastmod>
+    <lastmod>2026-04-19T05:50:07.783Z</lastmod>
   </url>
   <url>
     <loc>https://rtichoke.netlify.app/get-started/base-graphics.html</loc>
@@ -122,7 +122,7 @@
   </url>
   <url>
     <loc>https://rtichoke.netlify.app/posts/quarto_live.html</loc>
-    <lastmod>2026-04-06T16:23:39.993Z</lastmod>
+    <lastmod>2026-07-19T07:33:38.106Z</lastmod>
   </url>
   <url>
     <loc>https://rtichoke.netlify.app/posts/text-analytics-quanteda.html</loc>
@@ -131,5 +131,41 @@
   <url>
     <loc>https://rtichoke.netlify.app/posts.html</loc>
     <lastmod>2025-10-07T15:55:49.570Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/posts/rca-lending-portfolio-diagnostics.html</loc>
+    <lastmod>2026-06-06T07:49:39.079Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/posts/intro-to-causal-ml.html</loc>
+    <lastmod>2026-06-06T08:10:38.933Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/posts/causal-ml-credit-risk.html</loc>
+    <lastmod>2026-06-06T09:22:32.889Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/posts/credit-risk-root-cause-analysis.html</loc>
+    <lastmod>2026-06-07T17:08:45.094Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/posts/deploying-one-model-across-populations.html</loc>
+    <lastmod>2026-06-20T15:48:54.246Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/posts/correcting-pooled-model-toward-segment.html</loc>
+    <lastmod>2026-06-27T07:45:12.661Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/posts/segmentation-vs-error-correction.html</loc>
+    <lastmod>2026-06-28T08:04:47.253Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/IDEA.html</loc>
+    <lastmod>2026-07-19T07:20:52.465Z</lastmod>
+  </url>
+  <url>
+    <loc>https://rtichoke.netlify.app/posts/tabular-foundation-models-tabicl.html</loc>
+    <lastmod>2026-07-19T16:37:04.539Z</lastmod>
   </url>
 </urlset>

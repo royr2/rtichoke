@@ -1,0 +1,207 @@
+---
+title: "Tabular Foundation Models: A First Look with TabICL"
+date: "2026-07-19"
+categories: [R, Machine Learning, Foundation Models, reticulate]
+image: "../images/tabicl-thumbnail.png"
+description: "What tabular foundation models actually do, why in-context learning is a real shift for tabular ML, and how TabICL compares to XGBoost on a credit-risk dataset — without a single hyperparameter tuning loop."
+execute:
+  echo: true
+  warning: false
+  message: false
+  eval: true
+  cache: true
+---
+
+Tabular foundation models are a new category of machine learning model that can perform zero-shot (i.e., without any gradient updates) prediction on tabular datasets. They are pretrained on a distribution of synthetic tables and can transfer to new datasets using in-context learning. TabICL is one of the strongest open-source tabular foundation models, and this post explores how it works and compares its performance to XGBoost on a credit-risk dataset, all from R using the `reticulate` package to call Python.
+
+## What is a tabular foundation model?
+
+A foundation model has three ingredients, and the tabular version satisfies them in specific ways:
+
+1. **Pretrained on many datasets**, not one. You don't train on your specific table; you train on a *distribution* of tables.
+2. **Transfers to a new dataset in context** — no gradient steps on the new dataset. The model "reads" the training rows and predicts on test rows in a single forward pass.
+3. **The model is a sequence transformer.** Same architecture family as LLMs, just operating over rows of a table instead of tokens.
+
+Ingredient #1 is where tabular FMs diverge from text/vision FMs. There is no corpus of labeled tables to scrape. Instead, TabICL uses **synthetic data**: millions of tabular datasets drawn from structured priors. The pretraining task is "given some rows of a synthetic table, predict the target for held-out rows." After seeing millions of these, the transformer learns a general *procedure* for in-context tabular prediction, not a specific dataset.
+
+## How does TabICL work?
+
+Two stages, in order:
+
+1. **Column-then-row attention.** Each column is processed independently to produce a fixed-dimensional embedding of that column's values; then rows attend across columns to produce a fixed-dimensional *row embedding*. This decouples the model from the schema. A 10-column table and a 200-column table both produce row embeddings of the same dimension.
+2. **Transformer ICL over rows.** Row embeddings (training + test) are fed to a transformer that uses standard self-attention. Training rows with labels act as "context"; test rows get predicted in a single forward pass. No gradient updates at inference.
+
+That's the whole idea. The pretraining objective — "predict held-out targets given in-context rows" — is exactly what the model does at inference, so zero-shot transfer is structurally built in. The two-stage design is what lets TabICL scale to larger training sets than TabPFNv2, which alternates column- and row-wise attention and gets expensive past 10K rows.
+
+## Setup: Python env via reticulate
+
+TabICL is Python-first. From R, use `reticulate`. Assuming you have a Python env from the [previous post](/posts/getting-started-with-reticulate.qmd):
+
+```{r}
+#| eval: false
+library(reticulate)
+py_install(c("tabicl", "torch", "pandas", "scikit-learn"), pip = TRUE, pip_options = "--force-reinstall --no-cache-dir")
+```
+
+`tabicl` downloads a pretrained checkpoint (a few hundred MB) from Hugging Face on the first `fit()` call and caches it locally.
+
+## A first example: predicting credit default with TabICL
+
+We'll use a LendingClub-style credit dataset (10,000 rows, ~150 features) that's already in the repo. The target is `bad_flag` (1 = default / charge-off, 0 = paid). First, a little R-side prep:
+
+```{r}
+library(readr)
+library(dplyr)
+library(rsample)
+
+# Load the credit sample (path is relative to the project root, not this post)
+credit <- read.csv("https://bit.ly/42ypcnJ")
+
+# Keep a focused subset — mostly numeric features plus a few categoricals
+keep_cols <- c(
+  "loan_amnt", "int_rate", "installment", "grade", "sub_grade",
+  "annual_inc", "dti", "revol_util", "total_acc", "open_acc",
+  "delinq_2yrs", "pub_rec", "fico_range_low", "inq_last_6mths",
+  "home_ownership", "verification_status", "purpose", "term",
+  "bad_flag"
+)
+
+df <- credit |>
+  select(all_of(keep_cols)) |>
+  mutate(across(where(is.character), as.factor)) |>
+  mutate(bad_flag = factor(bad_flag))
+
+# Train / test split (stratified on the target since it's imbalanced)
+set.seed(42)
+split <- initial_split(df, prop = 0.8, strata = "bad_flag")
+train <- training(split)
+test  <- testing(split)
+
+# Quick class balance sanity check
+prop.table(table(train$bad_flag))
+```
+
+Now call TabICL through reticulate. One gotcha: pass features as a data frame, **not** a matrix — TabICL detects categorical columns by dtype and ordinal-encodes them internally. Coercing to a matrix makes everything character and loses that handling.
+
+```{r}
+library(reticulate)
+
+# Import the Python classifier
+tabicl <- import("tabicl")
+clf <- tabicl$TabICLClassifier(random_state = 42L)
+
+# Keep X as a data frame — reticulate auto-converts to a pandas DataFrame,
+# preserving dtypes so TabICL can detect categoricals.
+X_train <- train[, setdiff(names(train), "bad_flag")]
+y_train <- as.character(train$bad_flag)
+X_test  <- test[,  setdiff(names(test),  "bad_flag")]
+
+# TabICL's "fit" is cheap — it just stashes the training data.
+# The actual prediction happens in the forward pass at predict() time.
+clf$fit(X_train, y_train)
+
+# Predicted probabilities for the positive class
+proba <- clf$predict_proba(X_test)
+pred_prob <- as.numeric(proba[, 2])
+```
+
+A couple of things worth noting if you've only ever used R-native models:
+
+- **`fit()` returns almost instantly.** TabICL doesn't train on your data; it just stores it. The work happens at `predict()` time — the transformer's single forward pass over (train + test) rows together. Your training rows *are* the context.
+- **The first `fit()` downloads the pretrained checkpoint.** Subsequent uses load from cache.
+
+## Evaluation: TabICL vs XGBoost on the same split
+
+```{r}
+library(tidymodels)
+library(tictoc)
+
+# XGBoost with a modest tuning grid — a realistic "I spent 10 minutes" baseline
+xgb_spec <- boost_tree(
+  trees = 500,
+  tree_depth = tune(),
+  min_n = tune(),
+  learn_rate = 0.01
+) |>
+  set_engine("xgboost") |>
+  set_mode("classification")
+
+xgb_grid <- grid_regular(
+  tree_depth(range = c(4, 10)),
+  min_n(range = c(2, 20)),
+  levels = 3
+)
+
+xgb_wf <- workflow() |>
+  add_model(xgb_spec) |>
+  add_formula(bad_flag ~ .)
+
+folds <- vfold_cv(train, v = 5, strata = "bad_flag")
+
+tic("XGBoost tuning")
+xgb_res <- tune_grid(
+  xgb_wf,
+  resamples = folds,
+  grid = xgb_grid,
+  metrics = metric_set(roc_auc)
+)
+toc(log = TRUE)
+
+best_xgb <- select_best(xgb_res, metric = "roc_auc")
+xgb_final <- finalize_workflow(xgb_wf, best_xgb) |>
+  fit(train)
+
+xgb_prob <- predict(xgb_final, test, type = "prob")$.pred_1
+```
+
+Now TabICL on the clock:
+
+```{r}
+tic("TabICL fit + predict")
+clf$fit(X_train, y_train)
+tabicl_prob <- as.numeric(clf$predict_proba(X_test)[, 2])
+toc(log = TRUE)
+```
+
+Compare:
+
+```{r}
+library(pROC)
+
+xgb_auc <- auc(test$bad_flag, xgb_prob)
+tabicl_auc <- auc(test$bad_flag, tabicl_prob)
+
+results <- tibble(
+  model = c("XGBoost (tuned, 5-fold CV)", "TabICL (zero-shot)"),
+  roc_auc = c(xgb_auc, tabicl_auc)
+)
+results
+```
+
+## Some observations
+
+From running this on the credit sample (8K-row training set, 18 features, ~12% positive rate):
+
+- **TabICL is a serious challenger** Zero-shot ROC AUC landed around **0.70** comparable to a modestly tuned XGBoost on the same split
+- **The win is "no tuning loop."** XGBoost requires a grid search with multi-fold CV. TabICL requires none of that, `fit` and `predict` and you're done. Useful for quick baselines, cold starts, or benchmark before you engineer features.
+- **TabICL is not free.** First run downloads a checkpoint. On very wide tables (500+ columns), inference cost climbs. Not the right tool for every tabular job.
+
+## When TabICL is (and isn't) a good fit
+
+**Reach for TabICL when:**
+
+- You want a strong baseline on a new dataset without a tuning loop.
+- The dataset is small-to-medium (hundreds to tens of thousands of rows) the regime where in-context learning shines
+- You're sweeping many datasets quickly and want a zero-shot default
+- The task is classification (v1 was classification-only; v2 adds regression and time-series forecasting via `TabICLForecaster`).
+
+**Don't reach for TabICL when:**
+
+- **Monotonicity or regulatory interpretability is non-negotiable.** XGBoost/LightGBM have native monotonic constraints and SHAP-tree; TabICL is a transformer with no native monotonic constraints. In a credit-scoring pipeline under model risk management review, that's a real blocker.
+- **The dataset is very large (500K+ rows).** TabICL scales that far with CPU/disk offloading but accuracy may degrade. Tuned GBDT remains the safer bet at scale.
+- **You need custom missing-value imputation.** TabICL handles missing values internally, but if your domain has a specific convention (sentinel values, MICE), preprocessing would be required.
+- **Regression with an unusual target distribution.** v2's regression support is newer than classification; check the [docs](https://tabicl.readthedocs.io/).
+
+## Takeaway
+
+Tabular foundation models don't replace XGBoost they add a strong zero-shot baseline that needs no tuning and runs in a single forward pass. For small-to-medium tabular classification, TabICL is a credible challenger to the GBDT default. Using it to benchmark before committing to a tuning loop would be a good idea. GBDTs are the way to go when the dataset is large, the constraints are regulatory, or native interpretability is required.

@@ -14,7 +14,7 @@ Portfolio optimization represents a critical task in investment management, wher
 
 1. For additional information on mean-variance optimization and the CAPM model, refer to this [paper](http://www.columbia.edu/~mh2078/FoundationsFE/MeanVariance-CAPM.pdf).
 
-2. For additional information on particle swarm optimisation, refer to [this post](/posts/building-particle-swarm-optimizer.qmd) on 
+2. For additional information on particle swarm optimisation, refer to [this post](/posts/building-particle-swarm-optimizer.qmd)
 
 ## Required Packages
 

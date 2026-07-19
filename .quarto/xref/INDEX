@@ -199,5 +199,32 @@
   },
   "posts/ml-frameworks-ready-reckoner.qmd": {
     "ml-frameworks-ready-reckoner.html": "55a60103"
+  },
+  "posts/rca-lending-portfolio-diagnostics.qmd": {
+    "rca-lending-portfolio-diagnostics.html": "8f6cdc1b"
+  },
+  "posts/intro-to-causal-ml.qmd": {
+    "intro-to-causal-ml.html": "5ab58592"
+  },
+  "posts/causal-ml-credit-risk.qmd": {
+    "causal-ml-credit-risk.html": "0671191a"
+  },
+  "posts/credit-risk-root-cause-analysis.qmd": {
+    "credit-risk-root-cause-analysis.html": "bdcff289"
+  },
+  "posts/deploying-one-model-across-populations.qmd": {
+    "deploying-one-model-across-populations.html": "09555f74"
+  },
+  "posts/correcting-pooled-model-toward-segment.qmd": {
+    "correcting-pooled-model-toward-segment.html": "24f02575"
+  },
+  "posts/segmentation-vs-error-correction.qmd": {
+    "segmentation-vs-error-correction.html": "ba2db0a8"
+  },
+  "IDEA.md": {
+    "IDEA.html": "9e8e29c3"
+  },
+  "posts/tabular-foundation-models-tabicl.qmd": {
+    "tabular-foundation-models-tabicl.html": "da195214"
   }
 }

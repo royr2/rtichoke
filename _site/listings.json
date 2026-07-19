@@ -2,6 +2,7 @@
   {
     "listing": "/posts.html",
     "items": [
+      "/posts/tabular-foundation-models-tabicl.html",
       "/posts/ml-frameworks-in-r.html",
       "/posts/text-analytics-rag-pipeline-in-r.html",
       "/posts/text-analytics-quanteda.html",

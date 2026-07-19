@@ -26,5 +26,6 @@ Here are some additional resources for learning R:
 - [RStudio](https://posit.co/products/open-source/rstudio/)
 - [Tidyverse](https://www.tidyverse.org/)
 - [R for Data Science](https://r4ds.had.co.nz/)
+- [R-Bloggers](https://www.r-bloggers.com/)
 
-Disclaimer: Parts of this website (including posts) have been generated using GenAI. 
+Disclaimer: Parts of this website (including posts) have been generated using GenAI tools. 

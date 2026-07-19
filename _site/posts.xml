@@ -10,7 +10,634 @@
 <atom:link href="https://rtichoke.netlify.app/posts.xml" rel="self" type="application/rss+xml"/>
 <description></description>
 <generator>quarto-1.9.37</generator>
-<lastBuildDate>Sat, 11 Apr 2026 18:30:00 GMT</lastBuildDate>
+<lastBuildDate>Sat, 18 Jul 2026 18:30:00 GMT</lastBuildDate>
+<item>
+  <title>Tabular Foundation Models: A First Look with TabICL</title>
+  <link>https://rtichoke.netlify.app/posts/tabular-foundation-models-tabicl.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>Tabular foundation models are a new category of machine learning model that can perform zero-shot (i.e., without any gradient updates) prediction on tabular datasets. They are pretrained on a distribution of synthetic tables and can transfer to new datasets using in-context learning. TabICL is one of the strongest open-source tabular foundation models, and this post explores how it works and compares its performance to XGBoost on a credit-risk dataset, all from R using the <code>reticulate</code> package to call Python.</p>
+<section id="what-is-a-tabular-foundation-model" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-a-tabular-foundation-model">What is a tabular foundation model?</h2>
+<p>A foundation model has three ingredients, and the tabular version satisfies them in specific ways:</p>
+<ol type="1">
+<li><strong>Pretrained on many datasets</strong>, not one. You don’t train on your specific table; you train on a <em>distribution</em> of tables.</li>
+<li><strong>Transfers to a new dataset in context</strong> — no gradient steps on the new dataset. The model “reads” the training rows and predicts on test rows in a single forward pass.</li>
+<li><strong>The model is a sequence transformer.</strong> Same architecture family as LLMs, just operating over rows of a table instead of tokens.</li>
+</ol>
+<p>Ingredient #1 is where tabular FMs diverge from text/vision FMs. There is no corpus of labeled tables to scrape. Instead, TabICL uses <strong>synthetic data</strong>: millions of tabular datasets drawn from structured priors. The pretraining task is “given some rows of a synthetic table, predict the target for held-out rows.” After seeing millions of these, the transformer learns a general <em>procedure</em> for in-context tabular prediction, not a specific dataset.</p>
+</section>
+<section id="how-does-tabicl-work" class="level2">
+<h2 class="anchored" data-anchor-id="how-does-tabicl-work">How does TabICL work?</h2>
+<p>Two stages, in order:</p>
+<ol type="1">
+<li><strong>Column-then-row attention.</strong> Each column is processed independently to produce a fixed-dimensional embedding of that column’s values; then rows attend across columns to produce a fixed-dimensional <em>row embedding</em>. This decouples the model from the schema. A 10-column table and a 200-column table both produce row embeddings of the same dimension.</li>
+<li><strong>Transformer ICL over rows.</strong> Row embeddings (training + test) are fed to a transformer that uses standard self-attention. Training rows with labels act as “context”; test rows get predicted in a single forward pass. No gradient updates at inference.</li>
+</ol>
+<p>That’s the whole idea. The pretraining objective — “predict held-out targets given in-context rows” — is exactly what the model does at inference, so zero-shot transfer is structurally built in. The two-stage design is what lets TabICL scale to larger training sets than TabPFNv2, which alternates column- and row-wise attention and gets expensive past 10K rows.</p>
+</section>
+<section id="setup-python-env-via-reticulate" class="level2">
+<h2 class="anchored" data-anchor-id="setup-python-env-via-reticulate">Setup: Python env via reticulate</h2>
+<p>TabICL is Python-first. From R, use <code>reticulate</code>. Assuming you have a Python env from the <a href="../posts/getting-started-with-reticulate.html">previous post</a>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(reticulate)</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">py_install</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"tabicl"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"torch"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"pandas"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"scikit-learn"</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pip =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pip_options =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"--force-reinstall --no-cache-dir"</span>)</span></code></pre></div></div>
+</div>
+<p><code>tabicl</code> downloads a pretrained checkpoint (a few hundred MB) from Hugging Face on the first <code>fit()</code> call and caches it locally.</p>
+</section>
+<section id="a-first-example-predicting-credit-default-with-tabicl" class="level2">
+<h2 class="anchored" data-anchor-id="a-first-example-predicting-credit-default-with-tabicl">A first example: predicting credit default with TabICL</h2>
+<p>We’ll use a LendingClub-style credit dataset (10,000 rows, ~150 features) that’s already in the repo. The target is <code>bad_flag</code> (1 = default / charge-off, 0 = paid). First, a little R-side prep:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(readr)</span>
+<span id="cb2-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(dplyr)</span>
+<span id="cb2-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(rsample)</span>
+<span id="cb2-4"></span>
+<span id="cb2-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Load the credit sample (path is relative to the project root, not this post)</span></span>
+<span id="cb2-6">credit <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">read.csv</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"https://bit.ly/42ypcnJ"</span>)</span>
+<span id="cb2-7"></span>
+<span id="cb2-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Keep a focused subset — mostly numeric features plus a few categoricals</span></span>
+<span id="cb2-9">keep_cols <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(</span>
+<span id="cb2-10">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"loan_amnt"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"int_rate"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"installment"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"grade"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"sub_grade"</span>,</span>
+<span id="cb2-11">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"annual_inc"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dti"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"revol_util"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"total_acc"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"open_acc"</span>,</span>
+<span id="cb2-12">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"delinq_2yrs"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"pub_rec"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"fico_range_low"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"inq_last_6mths"</span>,</span>
+<span id="cb2-13">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"home_ownership"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"verification_status"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"purpose"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"term"</span>,</span>
+<span id="cb2-14">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bad_flag"</span></span>
+<span id="cb2-15">)</span>
+<span id="cb2-16"></span>
+<span id="cb2-17">df <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> credit <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb2-18">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">select</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">all_of</span>(keep_cols)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb2-19">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">across</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">where</span>(is.character), as.factor)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb2-20">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">bad_flag =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">factor</span>(bad_flag))</span>
+<span id="cb2-21"></span>
+<span id="cb2-22"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Train / test split (stratified on the target since it's imbalanced)</span></span>
+<span id="cb2-23"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">42</span>)</span>
+<span id="cb2-24">split <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">initial_split</span>(df, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">prop =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">strata =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bad_flag"</span>)</span>
+<span id="cb2-25">train <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">training</span>(split)</span>
+<span id="cb2-26">test  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">testing</span>(split)</span>
+<span id="cb2-27"></span>
+<span id="cb2-28"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Quick class balance sanity check</span></span>
+<span id="cb2-29"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">prop.table</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">table</span>(train<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>bad_flag))</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+        0         1 
+0.8838605 0.1161395 </code></pre>
+</div>
+</div>
+<p>Now call TabICL through reticulate. One gotcha: pass features as a data frame, <strong>not</strong> a matrix — TabICL detects categorical columns by dtype and ordinal-encodes them internally. Coercing to a matrix makes everything character and loses that handling.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(reticulate)</span>
+<span id="cb4-2"></span>
+<span id="cb4-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Import the Python classifier</span></span>
+<span id="cb4-4">tabicl <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">import</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"tabicl"</span>)</span>
+<span id="cb4-5">clf <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> tabicl<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">TabICLClassifier</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">random_state =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">42</span>L)</span>
+<span id="cb4-6"></span>
+<span id="cb4-7"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Keep X as a data frame — reticulate auto-converts to a pandas DataFrame,</span></span>
+<span id="cb4-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># preserving dtypes so TabICL can detect categoricals.</span></span>
+<span id="cb4-9">X_train <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> train[, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">setdiff</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(train), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bad_flag"</span>)]</span>
+<span id="cb4-10">y_train <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.character</span>(train<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>bad_flag)</span>
+<span id="cb4-11">X_test  <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> test[,  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">setdiff</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(test),  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bad_flag"</span>)]</span>
+<span id="cb4-12"></span>
+<span id="cb4-13"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># TabICL's "fit" is cheap — it just stashes the training data.</span></span>
+<span id="cb4-14"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># The actual prediction happens in the forward pass at predict() time.</span></span>
+<span id="cb4-15">clf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">fit</span>(X_train, y_train)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>TabICLClassifier()</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Predicted probabilities for the positive class</span></span>
+<span id="cb6-2">proba <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> clf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict_proba</span>(X_test)</span>
+<span id="cb6-3">pred_prob <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.numeric</span>(proba[, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>])</span></code></pre></div></div>
+</div>
+<p>A couple of things worth noting if you’ve only ever used R-native models:</p>
+<ul>
+<li><strong><code>fit()</code> returns almost instantly.</strong> TabICL doesn’t train on your data; it just stores it. The work happens at <code>predict()</code> time — the transformer’s single forward pass over (train + test) rows together. Your training rows <em>are</em> the context.</li>
+<li><strong>The first <code>fit()</code> downloads the pretrained checkpoint.</strong> Subsequent uses load from cache.</li>
+</ul>
+</section>
+<section id="evaluation-tabicl-vs-xgboost-on-the-same-split" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation-tabicl-vs-xgboost-on-the-same-split">Evaluation: TabICL vs XGBoost on the same split</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(tidymodels)</span>
+<span id="cb7-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(tictoc)</span>
+<span id="cb7-3"></span>
+<span id="cb7-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># XGBoost with a modest tuning grid — a realistic "I spent 10 minutes" baseline</span></span>
+<span id="cb7-5">xgb_spec <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">boost_tree</span>(</span>
+<span id="cb7-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">trees =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">500</span>,</span>
+<span id="cb7-7">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">tree_depth =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tune</span>(),</span>
+<span id="cb7-8">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">min_n =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tune</span>(),</span>
+<span id="cb7-9">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">learn_rate =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.01</span></span>
+<span id="cb7-10">) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb7-11">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set_engine</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"xgboost"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb7-12">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set_mode</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"classification"</span>)</span>
+<span id="cb7-13"></span>
+<span id="cb7-14">xgb_grid <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">grid_regular</span>(</span>
+<span id="cb7-15">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tree_depth</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">range =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>)),</span>
+<span id="cb7-16">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">min_n</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">range =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20</span>)),</span>
+<span id="cb7-17">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">levels =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span></span>
+<span id="cb7-18">)</span>
+<span id="cb7-19"></span>
+<span id="cb7-20">xgb_wf <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">workflow</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb7-21">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">add_model</span>(xgb_spec) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb7-22">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">add_formula</span>(bad_flag <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> .)</span>
+<span id="cb7-23"></span>
+<span id="cb7-24">folds <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vfold_cv</span>(train, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">v =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">strata =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bad_flag"</span>)</span>
+<span id="cb7-25"></span>
+<span id="cb7-26"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tic</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"XGBoost tuning"</span>)</span>
+<span id="cb7-27">xgb_res <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tune_grid</span>(</span>
+<span id="cb7-28">  xgb_wf,</span>
+<span id="cb7-29">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">resamples =</span> folds,</span>
+<span id="cb7-30">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">grid =</span> xgb_grid,</span>
+<span id="cb7-31">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">metrics =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">metric_set</span>(roc_auc)</span>
+<span id="cb7-32">)</span>
+<span id="cb7-33"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">toc</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">log =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>XGBoost tuning: 81.94 sec elapsed</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">best_xgb <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">select_best</span>(xgb_res, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">metric =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"roc_auc"</span>)</span>
+<span id="cb9-2">xgb_final <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">finalize_workflow</span>(xgb_wf, best_xgb) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb9-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">fit</span>(train)</span>
+<span id="cb9-4"></span>
+<span id="cb9-5">xgb_prob <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(xgb_final, test, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"prob"</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>.pred_1</span></code></pre></div></div>
+</div>
+<p>Now TabICL on the clock:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tic</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"TabICL fit + predict"</span>)</span>
+<span id="cb10-2">clf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">fit</span>(X_train, y_train)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>TabICLClassifier()</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1">tabicl_prob <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.numeric</span>(clf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict_proba</span>(X_test)[, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>])</span>
+<span id="cb12-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">toc</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">log =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>TabICL fit + predict: 110.86 sec elapsed</code></pre>
+</div>
+</div>
+<p>Compare:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(pROC)</span>
+<span id="cb14-2"></span>
+<span id="cb14-3">xgb_auc <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">auc</span>(test<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>bad_flag, xgb_prob)</span>
+<span id="cb14-4">tabicl_auc <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">auc</span>(test<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>bad_flag, tabicl_prob)</span>
+<span id="cb14-5"></span>
+<span id="cb14-6">results <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tibble</span>(</span>
+<span id="cb14-7">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">model =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"XGBoost (tuned, 5-fold CV)"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"TabICL (zero-shot)"</span>),</span>
+<span id="cb14-8">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">roc_auc =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(xgb_auc, tabicl_auc)</span>
+<span id="cb14-9">)</span>
+<span id="cb14-10">results</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  model                      roc_auc
+  &lt;chr&gt;                        &lt;dbl&gt;
+1 XGBoost (tuned, 5-fold CV)   0.648
+2 TabICL (zero-shot)           0.701</code></pre>
+</div>
+</div>
+</section>
+<section id="some-observations" class="level2">
+<h2 class="anchored" data-anchor-id="some-observations">Some observations</h2>
+<p>From running this on the credit sample (8K-row training set, 18 features, ~12% positive rate):</p>
+<ul>
+<li><strong>TabICL is a serious challenger</strong> Zero-shot ROC AUC landed around <strong>0.70</strong> comparable to a modestly tuned XGBoost on the same split</li>
+<li><strong>The win is “no tuning loop.”</strong> XGBoost requires a grid search with multi-fold CV. TabICL requires none of that, <code>fit</code> and <code>predict</code> and you’re done. Useful for quick baselines, cold starts, or benchmark before you engineer features.</li>
+<li><strong>TabICL is not free.</strong> First run downloads a checkpoint. On very wide tables (500+ columns), inference cost climbs. Not the right tool for every tabular job.</li>
+</ul>
+</section>
+<section id="when-tabicl-is-and-isnt-a-good-fit" class="level2">
+<h2 class="anchored" data-anchor-id="when-tabicl-is-and-isnt-a-good-fit">When TabICL is (and isn’t) a good fit</h2>
+<p><strong>Reach for TabICL when:</strong></p>
+<ul>
+<li>You want a strong baseline on a new dataset without a tuning loop.</li>
+<li>The dataset is small-to-medium (hundreds to tens of thousands of rows) the regime where in-context learning shines</li>
+<li>You’re sweeping many datasets quickly and want a zero-shot default</li>
+<li>The task is classification (v1 was classification-only; v2 adds regression and time-series forecasting via <code>TabICLForecaster</code>).</li>
+</ul>
+<p><strong>Don’t reach for TabICL when:</strong></p>
+<ul>
+<li><strong>Monotonicity or regulatory interpretability is non-negotiable.</strong> XGBoost/LightGBM have native monotonic constraints and SHAP-tree; TabICL is a transformer with no native monotonic constraints. In a credit-scoring pipeline under model risk management review, that’s a real blocker.</li>
+<li><strong>The dataset is very large (500K+ rows).</strong> TabICL scales that far with CPU/disk offloading but accuracy may degrade. Tuned GBDT remains the safer bet at scale.</li>
+<li><strong>You need custom missing-value imputation.</strong> TabICL handles missing values internally, but if your domain has a specific convention (sentinel values, MICE), preprocessing would be required.</li>
+<li><strong>Regression with an unusual target distribution.</strong> v2’s regression support is newer than classification; check the <a href="https://tabicl.readthedocs.io/">docs</a>.</li>
+</ul>
+</section>
+<section id="takeaway" class="level2">
+<h2 class="anchored" data-anchor-id="takeaway">Takeaway</h2>
+<p>Tabular foundation models don’t replace XGBoost they add a strong zero-shot baseline that needs no tuning and runs in a single forward pass. For small-to-medium tabular classification, TabICL is a credible challenger to the GBDT default. Using it to benchmark before committing to a tuning loop would be a good idea. GBDTs are the way to go when the dataset is large, the constraints are regulatory, or native interpretability is required.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>R</category>
+  <category>Machine Learning</category>
+  <category>Foundation Models</category>
+  <category>reticulate</category>
+  <guid>https://rtichoke.netlify.app/posts/tabular-foundation-models-tabicl.html</guid>
+  <pubDate>Sat, 18 Jul 2026 18:30:00 GMT</pubDate>
+  <media:content url="https://rtichoke.netlify.app/images/tabicl-thumbnail.png" medium="image" type="image/png" height="81" width="144"/>
+</item>
 <item>
   <title>Machine Learning Frameworks in R</title>
   <link>https://rtichoke.netlify.app/posts/ml-frameworks-in-r.html</link>
@@ -18661,7 +19288,7 @@ font-style: inherit;">kable</span>(tab)</span></code></pre></div></div>
 <p>Portfolio optimization represents a critical task in investment management, where the goal involves allocating capital across different assets to maximize returns while controlling risk. This post explores how to use Particle Swarm Optimization (PSO) to perform mean-variance portfolio optimization with various constraints.</p>
 <ol type="1">
 <li><p>For additional information on mean-variance optimization and the CAPM model, refer to this <a href="http://www.columbia.edu/~mh2078/FoundationsFE/MeanVariance-CAPM.pdf">paper</a>.</p></li>
-<li><p>For additional information on particle swarm optimisation, refer to <a href="../posts/building-particle-swarm-optimizer.html">this post</a> on</p></li>
+<li><p>For additional information on particle swarm optimisation, refer to <a href="../posts/building-particle-swarm-optimizer.html">this post</a></p></li>
 </ol>
 <section id="required-packages" class="level2">
 <h2 class="anchored" data-anchor-id="required-packages">Required Packages</h2>
@@ -18944,7 +19571,7 @@ font-style: inherit;">range</span>(prices_df<span class="sc" style="color: #5E5E
 background-color: null;
 font-style: inherit;">$</span>date)</span></code></pre></div></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "2020-08-21" "2026-04-10"</code></pre>
+<pre><code>[1] "2020-08-21" "2026-07-17"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -18953,7 +19580,7 @@ font-style: inherit;"># Check dimensions (number of trading days × number of st
 background-color: null;
 font-style: inherit;">dim</span>(prices_df)</span></code></pre></div></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1395   48</code></pre>
+<pre><code>[1] 1463   48</code></pre>
 </div>
 </div>
 </section>
@@ -19948,7 +20575,7 @@ font-style: inherit;">sum</span>(out<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>obj_loc)</span></code></pre></div></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9988184</code></pre>
+<pre><code>[1] 0.9959607</code></pre>
 </div>
 </div>
 <p>In this implementation, the tracking of all particle movements throughout the optimization process occurs. This enables visualization of how the swarm converges toward the optimal solution.</p>
@@ -20251,7 +20878,7 @@ font-style: inherit;">%*%</span> mean_returns, <span class="dv" style="color: #A
 background-color: null;
 font-style: inherit;">5</span>))</span></code></pre></div></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio returns: 0.00053"</code></pre>
+<pre><code>[1] "Portfolio returns: 0.00055"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -20276,7 +20903,7 @@ font-style: inherit;">$</span>par), <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">5</span>))</span></code></pre></div></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio Std dev: 0.00753"</code></pre>
+<pre><code>[1] "Portfolio Std dev: 0.00738"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -20287,7 +20914,7 @@ font-style: inherit;">sum</span>(opt<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>par)</span></code></pre></div></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9934328</code></pre>
+<pre><code>[1] 0.9918225</code></pre>
 </div>
 </div>
 </section>
@@ -20573,7 +21200,7 @@ font-style: inherit;">%*%</span> mean_returns, <span class="dv" style="color: #A
 background-color: null;
 font-style: inherit;">5</span>))</span></code></pre></div></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio returns: 9e-04"</code></pre>
+<pre><code>[1] "Portfolio returns: 0.00087"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -20598,7 +21225,7 @@ font-style: inherit;">$</span>par), <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">5</span>))</span></code></pre></div></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Portfolio Std dev: 0.00909"</code></pre>
+<pre><code>[1] "Portfolio Std dev: 0.00903"</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -20609,7 +21236,7 @@ font-style: inherit;">sum</span>(opt<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>par)</span></code></pre></div></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9910437</code></pre>
+<pre><code>[1] 0.9917746</code></pre>
 </div>
 </div>
 <p>Adding the tracking error constraint, not only balances risk and return but also tracks the performance of an equally-weighted benchmark. The <code>lambda2</code> parameter controls the closeness of benchmark tracking - higher values result in portfolios that more closely resemble the benchmark.</p>
